@@ -1,0 +1,31 @@
+{
+  "version": 2,
+  "asOf": "July 2026",
+  "updateChecklist": "Quarterly: (1) check US share of VT on Vanguard's page, (2) check EM share of VXUS, (3) spot-check the biggest expense ratios below, (4) update splits/marketIntl/ers, (5) each November update limits from the IRS announcement, (6) bump asOf and version, commit. The site picks it up automatically. NOTE: gold/REIT/commodity/crypto/managed-futures funds auto-create their own category on entry (see AUTO_CATEGORY in the HTML); equity factor styles (momentum, quality, dividend, sectors) classify as their underlying US/intl stock. To recognize a new alternative fund, add it to AUTO_CATEGORY; to recognize a new stock/bond fund, add it to TICKER_GUESS.",
+  "marketIntl": 38,
+  "limits": {
+    "year": 2026,
+    "401k": 24500, "401k_catchup": 8000,
+    "ira": 7500, "ira_catchup": 1100,
+    "hsa_self": 4400, "hsa_family": 8750, "hsa_catchup": 1000
+  },
+  "ers": {
+    "VTI": 0.03, "VOO": 0.03, "VT": 0.07, "VXUS": 0.07, "BND": 0.03,
+    "AVUV": 0.25, "AVDV": 0.36, "FXAIX": 0.015, "FZROX": 0, "FSKAX": 0.015
+  },
+  "splits": {
+    "VT":    {"US": 0.62, "INTL": 0.285, "EM": 0.095},
+    "VTWAX": {"US": 0.62, "INTL": 0.285, "EM": 0.095},
+    "ACWI":  {"US": 0.62, "INTL": 0.285, "EM": 0.095},
+    "SPGM":  {"US": 0.62, "INTL": 0.285, "EM": 0.095},
+    "AVGE":  {"US": 0.62, "INTL": 0.285, "EM": 0.095},
+    "VXUS":  {"INTL": 0.75, "EM": 0.25},
+    "VTIAX": {"INTL": 0.75, "EM": 0.25},
+    "IXUS":  {"INTL": 0.75, "EM": 0.25},
+    "VEU":   {"INTL": 0.75, "EM": 0.25},
+    "VFWAX": {"INTL": 0.75, "EM": 0.25},
+    "FTIHX": {"INTL": 0.75, "EM": 0.25},
+    "FZILX": {"INTL": 0.75, "EM": 0.25}
+  },
+  "tickers": {}
+}

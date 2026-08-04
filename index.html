@@ -1,0 +1,1502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; frame-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<title>Drift Calculator: where should this month's contribution go?</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F5F7FA; --card:#FFFFFF; --ink:#0B1F3B; --muted:#5B6B83; --faint:#93A1B5;
+  --accent:#2E6BE6; --accent-soft:#E8F0FE; --border:#E3E8F0; --hairline:#EEF2F7;
+  --green:#17A374; --green-soft:#E7F6F0; --red:#D93B3B; --red-soft:#FCEDED;
+  --navy:#0B1F3B; --radius:12px;
+  --shadow:0 1px 2px rgba(16,24,40,.05), 0 1px 3px rgba(16,24,40,.04);
+  --disp:'Manrope','Inter',-apple-system,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:linear-gradient(#EDF3FE 0px, var(--bg) 380px);color:var(--ink);font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
+.num{font-variant-numeric:tabular-nums}
+.wrap{max-width:1080px;margin:0 auto;padding:0 24px}
+
+/* header */
+header{background:var(--navy);position:sticky;top:0;z-index:50;box-shadow:0 1px 0 rgba(255,255,255,.06), 0 2px 12px rgba(11,31,59,.25)}
+header .badge{color:#B9C6DB;border-color:rgba(255,255,255,.16);background:rgba(255,255,255,.06)}
+header .btn.ghost{color:#B9C6DB}
+header .btn.ghost:hover{color:#fff;background:rgba(255,255,255,.09)}
+header .btn.tiny:not(.ghost){background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.18);color:#fff}
+.hbar{display:flex;align-items:center;justify-content:space-between;height:60px;gap:12px}
+@media(max-width:860px){header .badge{display:none}}
+@media(max-width:560px){.logo{font-size:15px}.hide-sm{display:none}}
+.logo{font-weight:700;font-size:16.5px;letter-spacing:-.02em;display:flex;align-items:center;gap:9px;color:#fff;font-family:var(--disp)}
+.logo-mark{width:24px;height:24px;border-radius:7px;background:var(--accent);display:inline-flex;align-items:center;justify-content:center}
+.logo-mark svg{display:block}
+.sec-head.collapser{cursor:pointer;user-select:none;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px 16px;align-items:center;transition:all .15s}
+.sec-head.collapser{box-shadow:var(--shadow)}
+.sec-head.collapser:hover{border-color:#A9C3F2;background:#FBFDFF;box-shadow:0 2px 8px rgba(46,107,230,.10)}
+.chev{margin-left:auto;flex:none;font-size:12px;font-weight:600;color:var(--accent);background:var(--accent-soft);border-radius:8px;padding:5px 13px;transition:all .15s}
+.chev::after{content:'Hide ▴'}
+section.closed .chev::after{content:'Show ▾'}
+.sec-head.collapser:hover .chev{background:var(--accent);color:#fff}
+section.closed .sec-body{display:none}
+.dseg{cursor:pointer;transition:opacity .15s ease, stroke-width .15s ease}
+.growth-wrap{position:relative}
+.gtip{position:absolute;pointer-events:none;background:var(--navy);color:#fff;font-size:11.5px;line-height:1.6;border-radius:8px;padding:7px 11px;display:none;z-index:5;white-space:nowrap;box-shadow:0 4px 14px rgba(11,31,59,.3)}
+
+/* overview dashboard */
+#overview{margin:4px 0 10px}
+.stat-strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));border:1px solid var(--border);border-radius:var(--radius);background:var(--card);overflow:hidden;box-shadow:var(--shadow)}
+.stat{padding:13px 16px;border-right:1px solid var(--hairline)}
+.stat:last-child{border-right:none}
+.stat .k{font-size:10.5px;text-transform:uppercase;letter-spacing:.07em;color:var(--faint);font-weight:500;white-space:nowrap}
+.stat .v{font-family:var(--disp);font-size:20px;font-weight:800;letter-spacing:-.02em;margin-top:3px}
+.stat .s{font-size:11.5px;color:var(--muted);margin-top:1px}
+.ovr{display:grid;gap:16px;margin-top:16px}
+@media(min-width:900px){.ovr{grid-template-columns:6fr 6fr}}
+.donut-wrap{display:flex;align-items:center;gap:22px;flex-wrap:wrap}
+.legend{display:flex;flex-direction:column;gap:7px;font-size:12.5px;min-width:190px;flex:1}
+.legend .lrow{display:flex;align-items:center;gap:8px;color:var(--muted)}
+.legend .lrow b{color:var(--ink);margin-left:auto;font-weight:600}
+.legend .lrow .lp{color:var(--faint);width:44px;text-align:right}
+.acct-bars .arow{margin-bottom:12px}
+.acct-bars .arow:last-child{margin-bottom:0}
+.acct-bars .alab{display:flex;justify-content:space-between;font-size:12.5px;color:var(--muted);margin-bottom:5px}
+.acct-bars .alab b{color:var(--ink);font-weight:600}
+.stackbar{display:flex;height:10px;border-radius:99px;overflow:hidden;background:var(--hairline)}
+.stackbar div{height:100%}
+.growth-note{font-size:11.5px;color:var(--faint);margin-top:8px}
+details.adv{margin-bottom:16px}
+details.adv > summary{cursor:pointer;font-size:13px;font-weight:600;color:var(--muted);padding:9px 0;list-style:none;display:flex;align-items:center;gap:8px}
+details.adv > summary::-webkit-details-marker{display:none}
+details.adv > summary::before{content:'▸';font-size:11px;color:var(--faint)}
+details.adv[open] > summary::before{content:'▾'}
+details.adv > summary:hover{color:var(--ink)}
+.badge{font-size:12px;color:var(--muted);border:1px solid var(--border);border-radius:99px;padding:3px 11px;background:var(--card);display:inline-flex;align-items:center;gap:6px}
+.badge .dot{width:6px;height:6px;border-radius:50%;background:var(--green)}
+.hbtns{display:flex;gap:8px;align-items:center}
+.btn{font-family:inherit;font-size:13px;font-weight:500;border:1px solid var(--border);background:var(--card);color:var(--ink);border-radius:8px;padding:7px 13px;cursor:pointer;transition:all .15s}
+.btn:hover{border-color:#CBD5E4;background:#FBFCFE}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.primary:hover{background:#2456C4}
+.btn.ghost{border-color:transparent;background:transparent;color:var(--muted)}
+.btn.ghost:hover{color:var(--ink);background:var(--hairline)}
+.btn.tiny{font-size:12px;padding:4px 9px}
+
+/* hero */
+.hero{padding:56px 0 36px}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:12.5px;font-weight:600;color:var(--accent);background:var(--accent-soft);border:1px solid #D5E3FB;border-radius:99px;padding:5px 14px;margin-bottom:18px}
+.eyebrow .lock{width:6px;height:6px;border-radius:50%;background:var(--green)}
+.hero h1{font-family:var(--disp);font-size:38px;font-weight:800;letter-spacing:-.035em;line-height:1.12;max-width:620px}
+.hero h1 em{font-style:normal;color:var(--accent)}
+.hero p{color:var(--muted);max-width:620px;margin-top:14px;font-size:15.5px}
+.hero .note{margin-top:16px;font-size:13px;color:var(--faint)}
+
+/* sections */
+section{padding:26px 0}
+.sec-head{display:flex;align-items:baseline;gap:12px;margin-bottom:16px}
+.step-n{font-size:12px;font-weight:600;color:var(--accent);background:var(--accent-soft);border-radius:99px;padding:2px 10px;letter-spacing:.02em}
+.sec-head h2{font-family:var(--disp);font-size:19px;font-weight:700;letter-spacing:-.02em}
+.sec-head .sub{color:var(--muted);font-size:13.5px}
+
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow)}
+.grid{display:grid;gap:14px}
+@media(min-width:820px){.grid.cols-acc{grid-template-columns:repeat(auto-fill,minmax(320px,1fr))}}
+
+/* account cards */
+.acc-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+.acc-name{font-weight:600;font-size:15px}
+.acc-type{font-size:11.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-top:1px}
+.acc-total{font-size:13px;color:var(--muted);margin:6px 0 10px}
+.acc-total b{color:var(--ink);font-weight:600}
+table.hold{width:100%;border-collapse:collapse;font-size:13.5px}
+table.hold th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--faint);font-weight:500;padding:5px 6px;border-bottom:1px solid var(--hairline)}
+table.hold td{padding:4px 3px;border-bottom:1px solid var(--hairline)}
+table.hold tr:last-child td{border-bottom:none}
+.inp{font-family:inherit;font-size:13.5px;border:1px solid transparent;background:transparent;border-radius:6px;padding:5px 7px;width:100%;color:var(--ink);transition:all .15s}
+.inp:hover{background:var(--hairline)}
+.inp:focus{outline:none;border-color:var(--accent);background:#fff;box-shadow:0 0 0 3px var(--accent-soft)}
+.inp.right{text-align:right}
+select.inp{cursor:pointer;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%239CA3AF' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center;padding-right:24px}
+.x{color:var(--faint);cursor:pointer;border:none;background:none;font-size:15px;padding:2px 6px;border-radius:5px;line-height:1}
+.x:hover{color:var(--red);background:var(--red-soft)}
+.addrow{margin-top:8px}
+
+/* pills */
+.pills{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+.pill{font-family:inherit;font-size:13px;font-weight:500;border:1px solid var(--border);background:var(--card);border-radius:99px;padding:7px 15px;cursor:pointer;color:var(--muted);transition:all .15s}
+.pill:hover{border-color:#CBD5E4;color:var(--ink)}
+.pill.on{background:var(--ink);border-color:var(--ink);color:#fff}
+
+/* targets */
+.tgt-layout{display:grid;gap:16px}
+@media(min-width:900px){.tgt-layout{grid-template-columns:1fr 1fr}}
+.risk-box{border:1px solid var(--border);background:var(--bg);border-radius:8px;padding:14px 16px;margin-bottom:16px}
+.risk-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px}
+.risk-top .t{font-size:13px;font-weight:600}
+.risk-lbl{font-size:12px;color:var(--muted);background:var(--card);border:1px solid var(--border);border-radius:99px;padding:2px 10px}
+.slider-row{display:flex;align-items:center;gap:14px}
+.slider-row .end{font-size:11.5px;color:var(--faint);white-space:nowrap}
+input[type=range]{flex:1;accent-color:var(--accent);height:4px}
+.split-read{font-family:var(--disp);font-size:15px;font-weight:800;white-space:nowrap;min-width:64px;text-align:center}
+.risk-draw{margin-top:10px;font-size:12.5px;color:var(--muted);line-height:1.5}
+.risk-draw b{color:var(--red);font-weight:600}
+table.tgt{width:100%;border-collapse:collapse;font-size:14px}
+table.tgt td{padding:8px 6px;border-bottom:1px solid var(--hairline)}
+table.tgt tr:last-child td{border-bottom:none}
+.tgt-pct{width:74px}
+.cls-dot{display:inline-block;width:9px;height:9px;border-radius:3px;margin-right:9px;vertical-align:1px}
+.sum-line{margin-top:10px;font-size:13px;color:var(--muted)}
+.sum-line.bad{color:var(--red);font-weight:500}
+
+/* drift bars */
+.bars{display:flex;flex-direction:column;gap:13px}
+.bar-row{display:grid;grid-template-columns:minmax(96px,150px) 1fr minmax(84px,120px);gap:12px;align-items:center;font-size:13px}
+.bar-row .lbl{color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+@media(max-width:520px){.bar-row{grid-template-columns:minmax(80px,1fr) 1.4fr auto;gap:8px;font-size:12px}.wrap{padding:0 16px}.card{padding:16px}}
+.track{position:relative;height:8px;background:var(--hairline);border-radius:99px;overflow:visible}
+.fill{position:absolute;left:0;top:0;height:100%;border-radius:99px;transition:width .4s ease}
+.tmark{position:absolute;top:-3px;width:2px;height:14px;background:var(--ink);opacity:.55;border-radius:2px}
+.bar-nums{text-align:right;color:var(--muted)}
+.bar-nums b{color:var(--ink);font-weight:600}
+.delta-pos{color:var(--green)}
+.delta-neg{color:var(--red)}
+
+/* contribution */
+.contrib-grid{display:grid;gap:12px;margin-bottom:18px}
+@media(min-width:760px){.contrib-grid{grid-template-columns:repeat(auto-fill,minmax(230px,1fr))}}
+.c-inp{display:flex;flex-direction:column;gap:5px}
+.c-inp label{font-size:12.5px;color:var(--muted);font-weight:500}
+.money-wrap{position:relative}
+.money-wrap span{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--faint);font-size:14px}
+.money{font-family:inherit;font-size:15px;border:1px solid var(--border);border-radius:8px;padding:9px 12px 9px 24px;width:100%;background:var(--card)}
+.money:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+
+/* results */
+.results{display:none}
+.results.show{display:block;animation:fadeUp .35s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.res-grid{display:grid;gap:16px;margin-top:16px}
+@media(min-width:900px){.res-grid{grid-template-columns:5fr 7fr}}
+.gap-list{display:flex;flex-direction:column;gap:2px}
+.gap-row{display:flex;justify-content:space-between;align-items:center;padding:9px 6px;border-bottom:1px solid var(--hairline);font-size:13.5px}
+.gap-row:last-child{border-bottom:none}
+.gap-amt{font-weight:600}
+.under{color:var(--red)}
+.over{color:var(--green)}
+.buy-acc{margin-bottom:14px}
+.buy-acc h4{font-size:13px;font-weight:600;margin-bottom:6px;display:flex;justify-content:space-between}
+.buy-acc h4 span{color:var(--muted);font-weight:400}
+table.buys{width:100%;border-collapse:collapse;font-size:13.5px}
+table.buys td{padding:7px 6px;border-bottom:1px solid var(--hairline)}
+table.buys tr:last-child td{border-bottom:none}
+table.buys .amt{text-align:right;font-weight:600}
+.res-note{margin-top:14px;font-size:13px;color:var(--muted);background:var(--accent-soft);border-radius:8px;padding:11px 14px}
+.res-warn{margin-top:10px;font-size:13px;color:#8a5a00;background:#FBF3E4;border-radius:8px;padding:11px 14px;display:none}
+.big-title{font-family:var(--disp);font-size:15px;font-weight:700;margin-bottom:12px;letter-spacing:-.01em}
+.empty{color:var(--faint);font-size:13.5px;padding:14px 4px}
+
+/* footer */
+footer{border-top:1px solid var(--border);margin-top:48px;padding:28px 0 44px;font-size:12.5px;color:var(--faint);line-height:1.7}
+footer .wrap{max-width:760px}
+
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;font-size:13px;border-radius:8px;padding:9px 16px;opacity:0;pointer-events:none;transition:opacity .25s;z-index:99}
+.toast.show{opacity:1}
+</style>
+</head>
+<body>
+
+<header><div class="wrap hbar">
+  <div class="logo"><span class="logo-mark"><svg width="12" height="12" viewBox="0 0 12 12"><rect x="1" y="6" width="2.4" height="5" rx="1" fill="#fff"/><rect x="4.8" y="3" width="2.4" height="8" rx="1" fill="#fff" opacity=".75"/><rect x="8.6" y="1" width="2.4" height="10" rx="1" fill="#fff" opacity=".5"/></svg></span>Drift Calculator</div>
+  <div class="hbtns">
+    <span class="badge"><span class="dot"></span>Your data never leaves this browser</span>
+    <button class="btn ghost tiny" onclick="exportJSON()">Export backup</button>
+    <button class="btn ghost tiny hide-sm" onclick="document.getElementById('importFile').click()">Import</button>
+    <input type="file" id="importFile" accept=".json" style="display:none" onchange="importJSON(this)">
+    <button class="btn ghost tiny hide-sm" onclick="loadSample()">Sample data</button>
+    <a class="btn tiny" href="https://ko-fi.com/driftcalc" target="_blank" rel="noopener" style="text-decoration:none;display:inline-flex;align-items:center;gap:5px"><span style="color:var(--accent)">&hearts;</span> Support</a>
+  </div>
+</div></header>
+
+<div class="wrap">
+
+<div class="hero">
+  <div class="eyebrow"><span class="lock"></span>Private portfolio math. No login, no account linking, your data never leaves your browser.</div>
+  <h1>Where should this month's <em>contribution</em> go?</h1>
+  <p>A drift calculator for index investors. Put in your accounts, your target allocation, and how much you're adding this month. It shows you where you're off target and how far the new money goes toward fixing it. The math is the tool's job. The decisions are yours. Think of it as the spreadsheet you'd have built if you were better at spreadsheets.</p>
+  <div class="note">This is an educational tool for portfolio math, not investment, tax, or legal advice. Nothing here is a recommendation to buy or sell anything.</div>
+</div>
+
+<!-- OVERVIEW DASHBOARD -->
+<div id="overview" style="display:none">
+  <div class="stat-strip" id="statStrip"></div>
+  <div class="ovr">
+    <div class="card">
+      <div class="big-title">Current allocation</div>
+      <div class="donut-wrap">
+        <svg id="donut" width="150" height="150" viewBox="0 0 140 140"></svg>
+        <div class="legend" id="donutLegend"></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="big-title">By account</div>
+      <div class="acct-bars" id="acctBars"></div>
+    </div>
+  </div>
+  <div class="card" style="margin-top:16px">
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:12px">
+      <div class="big-title" style="margin-bottom:0">The compounding picture</div>
+      <div style="display:flex;gap:10px;align-items:center;font-size:12.5px;color:var(--muted)">
+        <label>Adding monthly</label>
+        <div class="money-wrap" style="width:110px"><span>$</span><input class="money num" style="padding:6px 8px 6px 22px;font-size:13px" id="gMonthly" inputmode="numeric" onchange="S.plan.monthly=+this.value||0;save();renderOverview();renderPlanner()"></div>
+        <label>Goal</label>
+        <div class="money-wrap" style="width:130px"><span>$</span><input class="money num" style="padding:6px 8px 6px 22px;font-size:13px" id="gTarget" inputmode="numeric" onchange="S.plan.target=+this.value||0;save();renderOverview()"></div>
+      </div>
+    </div>
+    <div class="growth-wrap">
+      <svg id="growth" width="100%" height="150" viewBox="0 0 720 150" preserveAspectRatio="none" onmousemove="growthMove(event)" onmouseleave="growthLeave()"></svg>
+      <div class="gtip" id="gtip"></div>
+    </div>
+    <div class="growth-note" id="growthNote"></div>
+  </div>
+</div>
+
+<!-- STEP 1 -->
+<section id="s1">
+  <div class="sec-head collapser" onclick="toggleSec('s1')"><span class="step-n" id="s1chip">1</span><h2>Your accounts</h2><span class="sub" id="s1sum">Add each account and the funds you hold (or could buy) in it.</span><span class="chev"></span></div>
+  <div class="sec-body">
+    <div class="grid cols-acc" id="accounts"></div>
+    <div class="addrow"><button class="btn" onclick="addAccount()">+ Add account</button></div>
+  </div>
+</section>
+
+<!-- STEP 2 -->
+<section id="s2">
+  <div class="sec-head collapser" onclick="toggleSec('s2')"><span class="step-n" id="s2chip">2</span><h2>Target allocation</h2><span class="sub" id="s2sum">Pick a starting framework, then make it yours.</span><span class="chev"></span></div>
+  <div class="sec-body">
+  <div class="pills" id="presets"></div>
+  <div class="tgt-layout">
+    <div class="card">
+      <div class="risk-box">
+        <div class="risk-top">
+          <span class="t">Stocks / bonds, your risk dial</span>
+          <span class="risk-lbl" id="riskLbl">Aggressive</span>
+        </div>
+        <div class="slider-row">
+          <span class="end">More bonds</span>
+          <input type="range" min="0" max="100" step="5" id="eqSlider" oninput="onSlider(this.value)">
+          <span class="end">More stocks</span>
+          <span class="split-read num" id="splitRead">90 / 10</span>
+        </div>
+        <div class="risk-draw" id="riskDraw"></div>
+      </div>
+      <div class="risk-box">
+        <div class="risk-top">
+          <span class="t">International share of stocks</span>
+          <span class="risk-lbl num" id="intlLbl">38%</span>
+        </div>
+        <div class="slider-row">
+          <span class="end">All US</span>
+          <input type="range" min="0" max="60" step="1" id="intlSlider" oninput="onIntlSlider(this.value)">
+          <span class="end">More intl</span>
+          <span class="split-read num" id="intlRead">62 / 38</span>
+        </div>
+        <div class="risk-draw" id="intlNote"></div>
+      </div>
+      <details class="adv" id="advTilt">
+        <summary id="advSummary">Small-cap value tilt</summary>
+        <div class="risk-box" style="margin-bottom:0">
+          <div class="risk-top">
+            <span class="t">Small-cap value tilt</span>
+            <span class="risk-lbl" id="tiltLbl">None</span>
+          </div>
+          <div class="slider-row">
+            <span class="end">Market only</span>
+            <input type="range" min="0" max="40" step="1" id="tiltSlider" oninput="onTiltSlider(this.value)">
+            <span class="end">More SCV</span>
+            <span class="split-read num" id="tiltRead">0%</span>
+          </div>
+          <div class="risk-draw" id="tiltNote"></div>
+        </div>
+      </details>
+      <div id="customCats" style="display:none;border:1px solid var(--border);background:var(--bg);border-radius:8px;padding:14px 16px;margin-bottom:16px"></div>
+      <table class="tgt" id="tgtTable"></table>
+      <div class="sum-line" id="sumLine"></div>
+    </div>
+    <div class="card">
+      <div class="big-title">Current vs. target <span style="color:var(--faint);font-weight:400">(the tick marks are your targets)</span></div>
+      <div class="bars" id="driftBars"></div>
+    </div>
+  </div>
+  </div>
+</section>
+
+<!-- STEP 3 -->
+<section id="s3">
+  <div class="sec-head"><span class="step-n">3</span><h2>Contribute or rebalance</h2><span class="sub">Route new money, or check the drift without touching anything.</span></div>
+  <div class="card">
+    <div class="pills" style="margin-bottom:16px">
+      <button class="pill on" id="modeContrib" onclick="setMode('contrib')">New contribution</button>
+      <button class="pill" id="modeRebal" onclick="setMode('rebal')">Rebalance check</button>
+    </div>
+    <div id="rebalPane" style="display:none"></div>
+    <div id="contribPane">
+    <div class="contrib-grid" id="contribInputs"></div>
+    <button class="btn primary" onclick="runCalc()">Show me the math</button>
+
+    <div class="results" id="results">
+      <div class="res-grid">
+        <div>
+          <div class="big-title" style="margin-top:22px">Gaps to your target <span style="color:var(--faint);font-weight:400">(after this contribution)</span></div>
+          <div class="gap-list" id="gapList"></div>
+        </div>
+        <div>
+          <div class="big-title" style="margin-top:22px">One way to close the gaps</div>
+          <div id="buyPlan"></div>
+          <div class="res-note"><b>This is arithmetic, not advice.</b> It's one efficient way to move toward the targets you set, using only the funds you listed. A different split might suit your taxes or preferences better.</div>
+          <div class="res-warn" id="resWarn"></div>
+          <button class="btn" style="margin-top:14px" onclick="downloadReminder()">Get a monthly calendar reminder</button>
+          <div id="tipLine" style="display:none;margin-top:14px;padding-top:12px;border-top:1px solid var(--hairline);font-size:12.5px;color:var(--faint);line-height:1.6">
+            Free, no ads, nothing for sale. Keeping the fund data current takes a few hours every quarter, so if this saved you some time, <a href="https://ko-fi.com/driftcalc" target="_blank" rel="noopener" style="color:var(--accent);font-weight:500">$5 toward the upkeep</a> is genuinely appreciated. Ko-fi takes 0% — low fees, obviously.
+            <button class="x" title="Hide this" onclick="dismissTip()" style="float:right;margin-top:-2px">×</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    </div>
+  </div>
+</section>
+
+<!-- PLANNING TOOLS -->
+<section id="s5">
+  <div class="sec-head"><span class="step-n">+</span><h2>Planning tools</h2><span class="sub">The side math that answers the forum's most common questions.</span></div>
+  <div class="ovr" style="margin-top:0">
+    <div class="card">
+      <div class="big-title">What your funds cost <span style="color:var(--faint);font-weight:400">(fee drag)</span></div>
+      <div id="feesBody"></div>
+    </div>
+    <div class="card">
+      <div class="big-title">From paycheck to portfolio</div>
+      <div id="plannerBody"></div>
+    </div>
+  </div>
+  <div class="ovr">
+    <div class="card">
+      <div class="big-title">What 1% really costs <span style="color:var(--faint);font-weight:400">(advisor AUM fees)</span></div>
+      <div id="aumBody"></div>
+    </div>
+    <div class="card">
+      <div class="big-title">The cost of waiting</div>
+      <div id="waitBody"></div>
+    </div>
+  </div>
+  <div class="card" style="margin-top:16px">
+    <div class="big-title">Contribution room, <span id="limitYear"></span> <span style="color:var(--faint);font-weight:400">(how much you can still put in this year)</span></div>
+    <div id="roomBody"></div>
+  </div>
+</section>
+
+</div>
+
+<footer><div class="wrap">
+  <b>Drift Calc</b> is an educational calculator for portfolio arithmetic. It is not investment advice, tax advice, or a recommendation of any security or strategy, and it knows nothing about your situation. Every number is an estimate built from what you type in. Funds that span regions, like VT and VXUS, are broken down using approximate market weights as of <span id="asofFoot"></span>, and those weights drift over time, so check the fund provider's page if you need precision. Talk to a qualified professional before making investment decisions. Everything you enter stays in your browser's local storage. Export a backup now and then, because clearing your browser data erases it.
+  <br><br>This tool is free, runs on donations, and sells nothing. No ads, no affiliate links, no data collection. The core calculator stays free and the math will never sit behind a paywall. Down the road there may be optional paid extras for power users, things like multiple portfolios, history, and reports. If it's useful today, you can <a href="https://ko-fi.com/driftcalc" target="_blank" rel="noopener" style="color:var(--accent)">support its development</a>. It costs nothing to run, just time to maintain.
+</div></footer>
+
+<div class="toast" id="toast"></div>
+
+<script>
+'use strict';
+/* ---------- constants ---------- */
+const BUILTIN_CLASSES = {
+  US:      {name:'US total market',      color:'#2E6BE6'},
+  INTL:    {name:'International',        color:'#14B8A6'},
+  EM:      {name:'Emerging markets',     color:'#8B5CF6'},
+  USSCV:   {name:'US small-cap value',   color:'#F59E0B'},
+  INTLSCV: {name:'Intl small-cap value', color:'#F4694B'},
+  BOND:    {name:'Bonds / cash',         color:'#7C8DA6'},
+};
+/* custom user categories (gold, REITs, momentum...) are merged in at runtime */
+let CUSTOM_CLASSES = {};
+let CLASSES = {...BUILTIN_CLASSES};
+const CLASS_PALETTE = ['#E0A82E','#9333EA','#0EA5E9','#DC7633','#16A34A','#DB2777','#0891B2','#65A30D','#B45309','#4F46E5'];
+function syncClasses(){
+  CUSTOM_CLASSES = {};
+  (S && S.customClasses || []).forEach(cc=>{
+    if(!cc || !cc.id) return;
+    const name = String(cc.name||'Custom').replace(/[<>]/g,'').slice(0,40);   /* sanitize regardless of source (typed, imported, stored) */
+    const color = /^#[0-9a-fA-F]{3,6}$/.test(cc.color) ? cc.color : '#888';
+    CUSTOM_CLASSES[cc.id] = {name, color, custom:true};
+  });
+  CLASSES = {...BUILTIN_CLASSES, ...CUSTOM_CLASSES};
+}
+function shortName(c){ return SHORT[c] || (CLASSES[c] && CLASSES[c].name) || c; }
+/* funds that span classes decompose for the math (approx. market weights).
+   These are BUILT-IN FALLBACKS. The page also tries to load fund-data.json from
+   the same folder at startup; whatever it finds there overrides these values.
+   To update fund info: edit fund-data.json in the repo and commit. No code changes. */
+let SPLITS_ASOF = 'July 2026';
+/* kept internally consistent: world = 62% US / 38% intl; intl = 75% developed / 25% EM */
+const WORLD = {US:.62, INTL:.285, EM:.095};   /* total world (incl. US) */
+const EXUS  = {INTL:.75, EM:.25};             /* total international (ex-US, incl. EM) */
+const SPLITS = {
+  /* total world */
+  VT:WORLD, VTWAX:WORLD, ACWI:WORLD, SPGM:WORLD, AVGE:WORLD,
+  /* total international ex-US (developed + EM) */
+  VXUS:EXUS, VTIAX:EXUS, IXUS:EXUS, VEU:EXUS, VFWAX:EXUS,
+  FTIHX:EXUS, FZILX:EXUS,
+};
+const TICKER_GUESS = {
+  /* US total market & S&P 500 — ETFs */
+  VTI:'US', VOO:'US', SPY:'US', IVV:'US', ITOT:'US', SPLG:'US', SCHB:'US', SCHX:'US', VV:'US',
+  /* US — mutual funds (Vanguard, Fidelity, Schwab) */
+  VTSAX:'US', VFIAX:'US', VLCAX:'US', FSKAX:'US', FXAIX:'US', FZROX:'US', FNILX:'US', SWTSX:'US', SWPPX:'US',
+  /* US large-cap style/dividend (still US equity for allocation purposes) */
+  VUG:'US', VTV:'US', VIG:'US', VYM:'US', SCHD:'US', SCHG:'US', QQQ:'US', QQQM:'US', DIA:'US', RSP:'US',
+  /* US mid/small blend (not value tilts) */
+  VO:'US', VB:'US', IJH:'US', IJR:'US', VXF:'US', FSMDX:'US', FSSNX:'US', SCHA:'US', SCHM:'US', AVUS:'US',
+  /* Total world (also in SPLITS — class here is a fallback) */
+  VT:'US', VTWAX:'US', ACWI:'US', SPGM:'US', AVGE:'US',
+  /* International developed */
+  VEA:'INTL', SCHF:'INTL', IEFA:'INTL', SPDW:'INTL', EFA:'INTL', VTMGX:'INTL', FSPSX:'INTL', SWISX:'INTL', IDEV:'INTL', AVDE:'INTL',
+  /* Total international ex-US (also in SPLITS) */
+  VXUS:'INTL', IXUS:'INTL', VEU:'INTL', VTIAX:'INTL', VFWAX:'INTL', FTIHX:'INTL', FZILX:'INTL',
+  /* Emerging markets */
+  VWO:'EM', IEMG:'EM', EEM:'EM', SCHE:'EM', SPEM:'EM', AVES:'EM', AVEM:'EM', VEMAX:'EM', FPADX:'EM', DFEM:'EM',
+  /* US small-cap value */
+  AVUV:'USSCV', DFSV:'USSCV', DFAT:'USSCV', VBR:'USSCV', VIOV:'USSCV', IJS:'USSCV', SLYV:'USSCV', VSIAX:'USSCV', FISVX:'USSCV', RZV:'USSCV',
+  /* International small-cap value (SCZ/VSS are small blend, not value — they default to INTL) */
+  AVDV:'INTLSCV', DISV:'INTLSCV', DLS:'INTLSCV', FNDC:'INTLSCV', SCZ:'INTL', VSS:'INTL',
+  /* Bonds — total market & aggregate */
+  BND:'BOND', AGG:'BOND', BNDW:'BOND', BNDX:'BOND', IUSB:'BOND', SCHZ:'BOND', FBND:'BOND',
+  VBTLX:'BOND', FXNAX:'BOND', FTBFX:'BOND', SWAGX:'BOND', VBILX:'BOND', DODIX:'BOND',
+  /* Treasuries by duration */
+  VGSH:'BOND', VGIT:'BOND', VGLT:'BOND', SHY:'BOND', IEF:'BOND', TLT:'BOND', GOVT:'BOND', SCHR:'BOND', SCHO:'BOND', EDV:'BOND',
+  /* T-bills, ultra-short & money market */
+  SGOV:'BOND', BIL:'BOND', USFR:'BOND', TFLO:'BOND', VUSXX:'BOND', VMFXX:'BOND', SPAXX:'BOND', FDRXX:'BOND', SWVXX:'BOND', FDLXX:'BOND',
+  /* TIPS & munis */
+  VTIP:'BOND', TIP:'BOND', SCHP:'BOND', VAIPX:'BOND', VTEB:'BOND', MUB:'BOND', VWIUX:'BOND', VWITX:'BOND',
+  STIP:'BOND', TIPX:'BOND', LTPZ:'BOND', SPIP:'BOND', SCHO:'BOND', TFI:'BOND', SUB:'BOND',
+  /* corporate & high-yield & mortgage bonds */
+  LQD:'BOND', VCIT:'BOND', VCSH:'BOND', IGSB:'BOND', IGIB:'BOND', VCLT:'BOND', SPBO:'BOND',
+  HYG:'BOND', JNK:'BOND', USHY:'BOND', SHYG:'BOND', VWEHX:'BOND', MBB:'BOND', VMBS:'BOND', BILS:'BOND',
+  /* US equity factor styles — momentum, quality, min-vol, dividend, growth/value tilts (all US stock) */
+  SPMO:'US', MTUM:'US', PDP:'US', VFMO:'US', FDMO:'US', QMOM:'US', JMOM:'US',
+  QUAL:'US', SPHQ:'US', USMV:'US', SPLV:'US', VFQY:'US', OMFL:'US',
+  DGRO:'US', NOBL:'US', DGRW:'US', DVY:'US', SDY:'US', HDV:'US', SPYD:'US', FDVV:'US',
+  MOAT:'US', COWZ:'US', CALF:'US', VONG:'US', VONV:'US', IWF:'US', IWD:'US',
+  /* US sector funds (all US equity) */
+  XLK:'US', XLF:'US', XLE:'US', XLV:'US', XLY:'US', XLP:'US', XLI:'US', XLB:'US', XLU:'US', XLC:'US', SMH:'US', SOXX:'US', VGT:'US', VHT:'US', VDE:'US',
+  /* international factor styles (intl stock) */
+  IMTM:'INTL', EFAV:'INTL', IQLT:'INTL', VIGI:'INTL', VYMI:'INTL', IDMO:'INTL', DINT:'INTL',
+};
+
+/* Funds with no natural home among the built-in classes get their own category, created on demand.
+   Gold, commodities, REITs, crypto and managed futures are distinct assets — folding them into
+   US stock or bonds would corrupt the drift math, so we recognize them and spin up a category. */
+const AUTO_CATEGORY = {};
+const _autofill = (list, name, color) => list.forEach(t => AUTO_CATEGORY[t] = {name, color});
+_autofill(['GLD','IAU','GLDM','SGOL','AAAU','BAR','OUNZ','IAUM','GLDW'], 'Gold', '#E0A82E');
+_autofill(['SLV','SIVR','PSLV','PPLT','PALL','DBP'], 'Precious metals', '#94A3B8');
+_autofill(['PDBC','DBC','GSG','COMT','BCI','DJP','FTGC','PDBA','COM','USCI','CMDY'], 'Commodities', '#B45309');
+_autofill(['VNQ','SCHH','USRT','XLRE','FREL','IYR','RWR','FRI','VNQI','REET','RWX','REM','MORT','O','KBWY'], 'REITs', '#0EA5E9');
+_autofill(['IBIT','FBTC','GBTC','BITB','ARKB','BTCO','EZBC','HODL','ETHE','ETHA'], 'Crypto', '#F7931A');
+_autofill(['DBMF','KMLM','CTA','RSST','WTMF','FMF'], 'Managed futures', '#0891B2');
+const ACCT_TYPES = ['401(k)','403(b)','Traditional IRA','Roth IRA','HSA','Taxable','Other'];
+
+/* approximate expense ratios in percent, as of SPLITS_ASOF; fund-data.json can override */
+let ERS = {
+  VTI:.03, VOO:.03, SPY:.0945, IVV:.03, ITOT:.03, SPLG:.02, SCHB:.03, SCHX:.03, VV:.04,
+  VTSAX:.04, VFIAX:.04, VLCAX:.05, FSKAX:.015, FXAIX:.015, FZROX:0, FNILX:0, SWTSX:.03, SWPPX:.02,
+  VUG:.04, VTV:.04, VIG:.05, VYM:.06, SCHD:.06, SCHG:.04, QQQ:.20, QQQM:.15, DIA:.16, RSP:.20,
+  VO:.04, VB:.04, IJH:.05, IJR:.06, VXF:.06, FSMDX:.025, FSSNX:.025, SCHA:.04, SCHM:.04, AVUS:.15,
+  VT:.07, VTWAX:.09, ACWI:.32, SPGM:.09, AVGE:.23,
+  VEA:.06, SCHF:.06, IEFA:.07, SPDW:.03, EFA:.33, VTMGX:.10, FSPSX:.035, SWISX:.06, IDEV:.04, AVDE:.23,
+  VXUS:.07, IXUS:.07, VEU:.07, VTIAX:.11, VFWAX:.11, FTIHX:.06, FZILX:0,
+  VWO:.08, IEMG:.09, EEM:.70, SCHE:.11, SPEM:.07, AVES:.36, AVEM:.33, VEMAX:.14, FPADX:.075, DFEM:.34,
+  AVUV:.25, DFSV:.31, DFAT:.28, VBR:.07, VIOV:.10, IJS:.18, SLYV:.15, VSIAX:.07, FISVX:.05, RZV:.35,
+  AVDV:.36, DISV:.44, DLS:.58, FNDC:.39, SCZ:.40, VSS:.07,
+  BND:.03, AGG:.03, BNDW:.05, BNDX:.07, IUSB:.06, SCHZ:.03, FBND:.36,
+  VBTLX:.05, FXNAX:.025, FTBFX:.45, SWAGX:.04, VBILX:.07, DODIX:.41,
+  VGSH:.04, VGIT:.04, VGLT:.04, SHY:.15, IEF:.15, TLT:.15, GOVT:.05, SCHR:.03, SCHO:.03, EDV:.07,
+  SGOV:.09, BIL:.1356, USFR:.15, TFLO:.15, VUSXX:.09, VMFXX:.11, SPAXX:.42, FDRXX:.41, SWVXX:.34, FDLXX:.42,
+  VTIP:.04, TIP:.19, SCHP:.04, VTEB:.03, MUB:.05, VWIUX:.09, VWITX:.17, VAIPX:.10,
+  STIP:.03, TIPX:.15, LTPZ:.20, SPIP:.12, TFI:.23, SUB:.07,
+  LQD:.14, VCIT:.04, VCSH:.04, IGSB:.04, IGIB:.04, VCLT:.04, SPBO:.06, HYG:.49, JNK:.40, USHY:.08, SHYG:.30, VWEHX:.23, MBB:.04, VMBS:.04, BILS:.1356,
+  /* equity factor / dividend / sector */
+  SPMO:.13, MTUM:.15, PDP:.62, VFMO:.13, FDMO:.15, QMOM:.29, JMOM:.12,
+  QUAL:.15, SPHQ:.15, USMV:.15, SPLV:.25, VFQY:.13, OMFL:.29,
+  DGRO:.08, NOBL:.35, DGRW:.28, DVY:.38, SDY:.35, HDV:.08, SPYD:.07, FDVV:.15,
+  MOAT:.46, COWZ:.49, CALF:.59, VONG:.07, VONV:.07, IWF:.19, IWD:.19,
+  XLK:.09, XLF:.09, XLE:.09, XLV:.09, XLY:.09, XLP:.09, XLI:.09, XLB:.09, XLU:.09, XLC:.09, SMH:.35, SOXX:.35, VGT:.09, VHT:.09, VDE:.09,
+  IMTM:.18, EFAV:.20, IQLT:.30, VIGI:.12, VYMI:.22, IDMO:.18,
+  /* alternatives (auto-category funds) */
+  GLD:.40, IAU:.25, GLDM:.10, SGOL:.17, AAAU:.18, BAR:.1749, OUNZ:.25, IAUM:.09,
+  SLV:.50, SIVR:.30, PSLV:.62, PPLT:.60, PALL:.60,
+  PDBC:.59, DBC:.85, GSG:.48, COMT:.48, BCI:.25, DJP:.45, FTGC:.76, PDBA:.29,
+  VNQ:.13, SCHH:.07, USRT:.08, XLRE:.09, FREL:.084, IYR:.38, RWR:.25, VNQI:.12, REET:.14, RWX:.59, O:0,
+  IBIT:.25, FBTC:.25, GBTC:1.50, BITB:.20, ARKB:.21, ETHA:.25,
+  DBMF:.85, KMLM:.90, CTA:.90, RSST:.99,
+};
+/* IRS contribution limits; updated via fund-data.json each year */
+let LIMITS = {
+  year: 2026,
+  '401k': 24500, '401k_catchup': 8000,
+  ira: 7500, ira_catchup: 1100,
+  hsa_self: 4400, hsa_family: 8750, hsa_catchup: 1000,
+};
+
+/* global equity market weight: % of world stocks that are international (as of SPLITS_ASOF) */
+let MARKET_INTL = 38;
+/* presets are parameterized by the stock/bond dial and the international slider */
+const PRESETS = ['Market portfolio', 'Factor tilt', 'Custom'];
+const PRESET_NOTES = {
+  'Market portfolio':'Total-market funds at whatever US and international mix you choose. Hold it as one world fund like VT or as a pair like VTI and VXUS, the math treats them the same. Total-market funds already own small caps and emerging markets at market weight — if you want a dedicated small-cap value sleeve on top, that lives on the Factor tilt tab.',
+  'Factor tilt':'Adds dedicated small-cap value funds on top of a total-market core, based on the Fama-French factor research (1992, 1993, and the 2015 five-factor model). The research documents the premium but never names a percentage. Most research-based portfolios use somewhere between 10% and 30% of stocks. The default here is 22%.',
+  'Custom':'Your numbers, your call. Add your own categories — gold, REITs, momentum, TIPS, anything a total-market fund doesn\'t cover — give each a target, and tag your funds with them. The sliders rescale the standard classes proportionally.',
+};
+
+/* ---------- state ---------- */
+let S = null;
+let FIRST_VISIT = false;
+const DEFAULT = () => ({
+  accounts: [],
+  equityPct: 90,
+  intlPct: MARKET_INTL,   // international share of the stock side
+  tiltPct: 0,             // % of stocks in dedicated small-cap value sleeves
+  preset: 'Market portfolio',
+  targets: null, // computed from preset unless custom
+  customClasses: [], // user-defined categories: {id, name, color}
+  plan: { income: 0, savePct: 20, monthly: 0, target: 1000000 },
+  ytd: {}, // accountId -> dollars contributed this year
+});
+let uid = () => Math.random().toString(36).slice(2,9);
+
+function computeTargetsRaw(){
+  /* unified model: three dials — stocks/bonds, intl share, SCV tilt.
+     Market portfolio is simply tilt = 0. */
+  const eq = S.equityPct, s = (S.intlPct==null?MARKET_INTL:S.intlPct), tilt = (S.tiltPct||0);
+  const t = {}; for(const k in CLASSES) t[k]=0;
+  t.BOND = 100-eq;
+  const mkt = eq*(100-tilt)/100;   /* stock dollars in total-market funds */
+  const scv = eq*tilt/100;         /* stock dollars in dedicated SCV sleeves */
+  t.US      = mkt*(100-s)/100;
+  t.INTL    = mkt*(s/100)*0.75;    /* intl bucket = developed + EM at market proportions (matches VXUS ~75/25) */
+  t.EM      = mkt*(s/100)*0.25;
+  t.USSCV   = scv*(100-s)/100;     /* tilt applied symmetrically across the US/intl split */
+  t.INTLSCV = scv*(s/100);
+  return t;
+}
+function computeTargets(){ /* rounded for display */
+  const t = computeTargetsRaw();
+  for(const k in t) t[k] = +t[k].toFixed(1);
+  const sum = Object.values(t).reduce((a,b)=>a+b,0);
+  t.US = +(t.US + (100-sum)).toFixed(1);
+  return t;
+}
+function targets(){ return S.preset==='Custom' ? (S.targets || computeTargets()) : computeTargets(); }
+/* engine uses full precision; Custom targets are exactly what the user typed */
+function targetsRaw(){ return S.preset==='Custom' ? (S.targets || computeTargetsRaw()) : computeTargetsRaw(); }
+
+/* ---------- persistence ---------- */
+function save(){ try{ localStorage.setItem('driftcalc-v1', JSON.stringify(S)); }catch(e){} }
+function load(){
+  try{
+    const raw = localStorage.getItem('driftcalc-v1') || localStorage.getItem('nextdollar-v1') || localStorage.getItem('allocate-v1');
+    if(raw){ S = JSON.parse(raw); migrate(); return; }
+  }catch(e){}
+  FIRST_VISIT = true;
+  S = DEFAULT(); loadSample(true);
+}
+function migrate(){ /* older saved states */
+  if(S.intlPct==null) S.intlPct = MARKET_INTL;
+  if(S.preset==='Three-fund' || S.preset==='Total world (VT)') S.preset='Market portfolio';
+  if(!PRESETS.includes(S.preset)) S.preset='Market portfolio';
+  if(S.tiltPct==null) S.tiltPct = (S.preset==='Factor tilt' ? 22 : 0);
+  if(!S.plan) S.plan = { income: 0, savePct: 20, monthly: 0, target: 1000000 };
+  if(S.plan.advPct==null) S.plan.advPct = 1.0;
+  if(S.plan.waitK==null) S.plan.waitK = 10000;
+  if(S.plan.waitM==null) S.plan.waitM = 12;
+  if(!S.ytd) S.ytd = {};
+  if(!S.customClasses) S.customClasses = [];
+}
+function exportJSON(){
+  const blob = new Blob([JSON.stringify(S,null,2)],{type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'driftcalc-backup-' + new Date().toISOString().slice(0,10) + '.json';
+  a.click(); toast('Backup downloaded. Keep it somewhere safe.');
+}
+function importJSON(inp){
+  const f = inp.files[0]; if(!f) return;
+  const r = new FileReader();
+  r.onload = e => { try{ S = JSON.parse(e.target.result); save(); renderAll(); toast('Data imported'); }catch(err){ toast('Could not read that file'); } };
+  r.readAsText(f); inp.value='';
+}
+function loadSample(silent){
+  S = DEFAULT();
+  S.accounts = [
+    {id:uid(), name:'Employer 401(k)', type:'401(k)', holdings:[
+      {id:uid(), ticker:'FXAIX', cls:'US', bal:38500},
+      {id:uid(), ticker:'FXNAX', cls:'BOND', bal:6100},
+    ]},
+    {id:uid(), name:'Roth IRA', type:'Roth IRA', holdings:[
+      {id:uid(), ticker:'VTI', cls:'US', bal:14200},
+      {id:uid(), ticker:'AVUV', cls:'USSCV', bal:4800},
+      {id:uid(), ticker:'AVDV', cls:'INTLSCV', bal:2300},
+    ]},
+    {id:uid(), name:'Taxable brokerage', type:'Taxable', holdings:[
+      {id:uid(), ticker:'VTI', cls:'US', bal:9800},
+      {id:uid(), ticker:'VXUS', cls:'INTL', bal:5200},
+    ]},
+  ];
+  S.preset = 'Factor tilt'; S.equityPct = 90; S.tiltPct = 22;
+  S.contrib = {}; S.isSample = true;
+  save(); if(!silent){ renderAll(); toast('Sample portfolio loaded'); }
+}
+
+/* ---------- exposure math ---------- */
+function exposure(h){
+  const t = (h.ticker||'').toUpperCase().trim();
+  if(SPLITS[t]){ const out={}; for(const c in SPLITS[t]) out[c]=(h.bal||0)*SPLITS[t][c]; return out; }
+  return {[h.cls||'US']:(h.bal||0)};
+}
+function buyExposure(h){ /* per-dollar class weights for buying this fund */
+  const t=(h.ticker||'').toUpperCase().trim();
+  if(SPLITS[t]) return SPLITS[t];
+  return {[h.cls||'US']:1};
+}
+const SHORT = {US:'US', INTL:'intl', EM:'EM', USSCV:'US SCV', INTLSCV:'intl SCV', BOND:'bonds'};
+function splitNote(ticker){
+  const sp = SPLITS[(ticker||'').toUpperCase().trim()];
+  if(!sp) return '';
+  const parts = Object.keys(sp).map(c=>(+(sp[c]*100).toFixed(1))+'% '+(SHORT[c]||c));
+  return '<div style="font-size:10.5px;color:var(--faint);padding-left:7px" title="Approximate market-cap weights as of '+SPLITS_ASOF+'">counts as '+parts.join(' + ')+' <span style="opacity:.7">(as of '+SPLITS_ASOF+')</span></div>';
+}
+function currentByClass(){
+  const cur={}; for(const k in CLASSES) cur[k]=0;
+  S.accounts.forEach(a=>a.holdings.forEach(h=>{ const e=exposure(h); for(const c in e) cur[c]=(cur[c]||0)+e[c]; }));
+  return cur;
+}
+const fmt$ = n => '$' + Math.round(n).toLocaleString('en-US');
+const fmtPct = n => (Math.round(n*10)/10).toFixed(1) + '%';
+
+/* ---------- allocation engine ---------- */
+function allocate(contribs){
+  const cur = currentByClass();
+  const curTotal = Object.values(cur).reduce((a,b)=>a+b,0);
+  const totalC = Object.values(contribs).reduce((a,b)=>a+(+b||0),0);
+  const T2 = curTotal + totalC;
+  const tgt = targetsRaw();
+  const tgt$ = {}; for(const k in CLASSES) tgt$[k] = (tgt[k]||0)/100*T2;
+
+  const running = {...cur};
+  const buys = {}; // acctId -> {holdingId: amt}
+  const remaining = {};
+  S.accounts.forEach(a=>{ remaining[a.id] = +contribs[a.id]||0; buys[a.id]={}; });
+
+  const step = Math.max(1, Math.round(totalC/500));
+  let guard = 0;
+  while(guard++ < 100000){
+    let best=null, bestScore=-Infinity;
+    for(const a of S.accounts){
+      if(remaining[a.id] < 0.5) continue;
+      for(const h of a.holdings){
+        const w = buyExposure(h);
+        let score = 0;
+        for(const c in w) score += w[c] * ((tgt$[c]-running[c]) / Math.max(T2,1));
+        if(score > bestScore){ bestScore=score; best={a,h,w}; }
+      }
+    }
+    if(!best) break;
+    const amt = Math.min(step, remaining[best.a.id]);
+    remaining[best.a.id] -= amt;
+    for(const c in best.w) running[c] += amt*best.w[c];
+    buys[best.a.id][best.h.id] = (buys[best.a.id][best.h.id]||0) + amt;
+    if(S.accounts.every(a=>remaining[a.id] < 0.5)) break;
+  }
+  return {cur, running, tgt$, T2, buys, totalC};
+}
+
+/* ---------- overview dashboard ---------- */
+const short$ = n => n>=1e6 ? '$'+(n/1e6).toFixed(2)+'M' : n>=1e4 ? '$'+Math.round(n/1000)+'k' : fmt$(n);
+let DONUT = null, GROWTH = null;
+function donutHover(c){
+  if(!DONUT) return;
+  document.querySelectorAll('#donut .dseg').forEach(el=>{
+    const mine = el.getAttribute('data-c')===c;
+    el.style.opacity = mine ? '1' : '.28';
+    el.setAttribute('stroke-width', mine ? '19' : '15');
+  });
+  const v = document.getElementById('donutVal'), l = document.getElementById('donutLbl');
+  if(v){ v.textContent = short$(DONUT.cur[c]); v.setAttribute('fill', CLASSES[c].color); }
+  if(l){ l.textContent = ((DONUT.cur[c]/DONUT.total*100).toFixed(1)+'% · '+shortName(c)).toUpperCase(); }
+}
+function donutLeave(){
+  if(!DONUT) return;
+  document.querySelectorAll('#donut .dseg').forEach(el=>{ el.style.opacity='1'; el.setAttribute('stroke-width','15'); });
+  const v = document.getElementById('donutVal'), l = document.getElementById('donutLbl');
+  if(v){ v.textContent = short$(DONUT.total); v.setAttribute('fill','#0B1F3B'); }
+  if(l){ l.textContent = 'TOTAL'; }
+}
+function growthMove(ev){
+  if(!GROWTH) return;
+  const svg = document.getElementById('growth'), tip = document.getElementById('gtip');
+  const rect = svg.getBoundingClientRect();
+  const {yrs,W,padL,padR,total,rates} = GROWTH;
+  const xpx = (ev.clientX-rect.left)/rect.width*W;
+  const yr = Math.max(0, Math.min(yrs, Math.round((xpx-padL)/(W-padL-padR)*yrs)));
+  const xline = padL + yr/yrs*(W-padL-padR);
+  let g = svg.querySelector('#ghover');
+  if(!g){ g = document.createElementNS('http://www.w3.org/2000/svg','line'); g.id='ghover'; g.setAttribute('stroke','#0B1F3B'); g.setAttribute('stroke-width','1'); g.setAttribute('stroke-dasharray','3 3'); g.setAttribute('opacity','.5'); svg.appendChild(g); }
+  g.setAttribute('x1',xline); g.setAttribute('x2',xline); g.setAttribute('y1',10); g.setAttribute('y2',132);
+  tip.style.display='block';
+  const rows = rates.map(({r,c,l})=>`<span style="color:#8FB3F5">■</span> <span style="color:#C7D4E8">${l} ${Math.round(r*100)}%:</span> <b>${fmt$(fv(total,r,yr,GROWTH.m||0))}</b>`.replace('#8FB3F5',c)).join('<br>');
+  tip.innerHTML = `<b>Year ${yr}</b><br>${rows}`;
+  const wrapRect = svg.parentElement.getBoundingClientRect();
+  let left = ev.clientX-wrapRect.left+14;
+  if(left > wrapRect.width-150) left = ev.clientX-wrapRect.left-150;
+  tip.style.left = left+'px';
+  tip.style.top = '8px';
+}
+function growthLeave(){
+  const tip = document.getElementById('gtip'); if(tip) tip.style.display='none';
+  const g = document.querySelector('#growth #ghover'); if(g) g.remove();
+}
+function renderOverview(){
+  const ov = document.getElementById('overview'); if(!ov) return;
+  const cur = currentByClass();
+  const total = Object.values(cur).reduce((a,b)=>a+b,0);
+  if(total<=0){ ov.style.display='none'; return; }
+  ov.style.display='block';
+  let sb = document.getElementById('sampleBanner');
+  if(S.isSample){
+    if(!sb){ sb = document.createElement('div'); sb.id='sampleBanner';
+      sb.style.cssText='margin-bottom:14px;font-size:13px;background:#FBF3E4;color:#8a5a00;border:1px solid #F0DFB8;border-radius:10px;padding:10px 14px';
+      sb.innerHTML = '<b>You\'re looking at sample data.</b> Every number on this page is made up. Edit any account below, or start fresh, and it becomes yours.';
+      ov.parentNode.insertBefore(sb, ov); }
+    sb.style.display='block';
+  } else if(sb) sb.style.display='none';
+  /* --- stat strip --- */
+  const eqNow = total - cur.BOND;
+  const stocksPct = eqNow/total*100;
+  const intlOfEq = eqNow>0 ? (cur.INTL+cur.EM+cur.INTLSCV)/eqNow*100 : 0;
+  const scvOfEq  = eqNow>0 ? (cur.USSCV+cur.INTLSCV)/eqNow*100 : 0;
+  const t = targetsRaw();
+  let off=0; for(const c in CLASSES) off += Math.abs((t[c]||0)/100*total - cur[c]);
+  off/=2; /* one-way dollars off target */
+  const stat = (k,v,s) => `<div class="stat"><div class="k">${k}</div><div class="v num">${v}</div>${s?`<div class="s num">${s}</div>`:''}</div>`;
+  document.getElementById('statStrip').innerHTML =
+    stat('Portfolio', fmt$(total), `${S.accounts.length} account${S.accounts.length===1?'':'s'}`) +
+    stat('Stocks / bonds', `${Math.round(stocksPct)} / ${Math.round(100-stocksPct)}`, `target ${S.equityPct} / ${100-S.equityPct}`) +
+    stat('Intl share of stocks', Math.round(intlOfEq)+'%', `target ${(S.intlPct==null?MARKET_INTL:S.intlPct)}%`) +
+    stat('SCV tilt', Math.round(scvOfEq)+'%', `target ${S.tiltPct||0}%`) +
+    stat('Off target', fmt$(off), (off/total*100).toFixed(1)+'% of portfolio');
+  /* --- donut (interactive) --- */
+  DONUT = {cur:{...cur}, total};
+  const R=54;
+  let acc=0, segs='';
+  Object.keys(CLASSES).forEach(c=>{
+    const f = cur[c]/total; if(f<=0.0005) return;
+    segs += `<circle class="dseg" data-c="${c}" r="${R}" cx="70" cy="70" fill="none" stroke="${CLASSES[c].color}" stroke-width="15" pathLength="100" stroke-dasharray="${(f*100-0.4).toFixed(2)} ${(100-f*100+0.4).toFixed(2)}" stroke-dashoffset="${(25-acc*100).toFixed(2)}" stroke-linecap="butt" onmouseenter="donutHover('${c}')" onmouseleave="donutLeave()"></circle>`;
+    acc += f;
+  });
+  document.getElementById('donut').innerHTML = segs +
+    `<text id="donutVal" x="70" y="67" text-anchor="middle" font-size="16" font-weight="800" fill="#0B1F3B" font-family="Manrope,Inter,sans-serif">${short$(total)}</text>` +
+    `<text id="donutLbl" x="70" y="83" text-anchor="middle" font-size="8.5" letter-spacing="1" fill="#93A1B5" font-family="Inter,sans-serif">TOTAL</text>`;
+  document.getElementById('donutLegend').innerHTML = Object.keys(CLASSES).map(c=>{
+    const f = cur[c]/total; if(f<=0.0005) return '';
+    return `<div class="lrow"><span class="cls-dot" style="background:${CLASSES[c].color}"></span>${CLASSES[c].name}<span class="lp num">${(f*100).toFixed(1)}%</span><b class="num">${fmt$(cur[c])}</b></div>`;
+  }).join('');
+  /* --- account bars --- */
+  document.getElementById('acctBars').innerHTML = S.accounts.map(a=>{
+    const e={}; let tot=0;
+    a.holdings.forEach(h=>{ const x=exposure(h); for(const c in x){ e[c]=(e[c]||0)+x[c]; tot+=x[c]; } });
+    if(tot<=0) return '';
+    const segs2 = Object.keys(CLASSES).filter(c=>e[c]>0).map(c=>`<div style="width:${(e[c]/tot*100)}%;background:${CLASSES[c].color}" title="${CLASSES[c].name}: ${fmt$(e[c])}"></div>`).join('');
+    return `<div class="arow"><div class="alab"><span>${esc(a.name)} <span style="color:var(--faint)">· ${(tot/total*100).toFixed(0)}% of portfolio</span></span><b class="num">${fmt$(tot)}</b></div><div class="stackbar">${segs2}</div></div>`;
+  }).join('') || '<div class="empty">Add balances to see accounts.</div>';
+  /* --- growth chart --- */
+  renderGrowth(total);
+}
+function fv(total, r, i, m){ /* future value with monthly additions (annual approximation) */
+  return total*Math.pow(1+r,i) + (m>0 && r>0 ? m*12*((Math.pow(1+r,i)-1)/r) : m*12*i);
+}
+function renderGrowth(total){
+  const svg = document.getElementById('growth'); if(!svg) return;
+  const m = (S.plan&&S.plan.monthly)||0, T = (S.plan&&S.plan.target)||0;
+  const gm = document.getElementById('gMonthly'), gt = document.getElementById('gTarget');
+  if(gm && document.activeElement!==gm) gm.value = m||'';
+  if(gt && document.activeElement!==gt) gt.value = T||'';
+  const yrs=30, W=720, H=150, padL=8, padR=86, padT=12, padB=18;
+  const rates=[{r:.10,c:'#2E6BE6',l:'Bull'},{r:.07,c:'#14B8A6',l:'Moderate'},{r:.04,c:'#7C8DA6',l:'Bear'}];
+  GROWTH = {yrs, W, padL, padR, total, rates, m};
+  const maxV = fv(total,.10,yrs,m);
+  const x = i => padL + i/yrs*(W-padL-padR);
+  const y = v => H-padB - (v/maxV)*(H-padT-padB);
+  let out = '';
+  [10,20,30].forEach(g=>{ out += `<line x1="${x(g)}" y1="${padT}" x2="${x(g)}" y2="${H-padB}" stroke="#EEF2F7" stroke-width="1"></line><text x="${x(g)}" y="${H-4}" text-anchor="middle" font-size="9" fill="#93A1B5" font-family="Inter,sans-serif">${g}y</text>`; });
+  /* goal line */
+  if(T>0 && T<=maxV){
+    out += `<line x1="${padL}" y1="${y(T)}" x2="${x(yrs)}" y2="${y(T)}" stroke="#0B1F3B" stroke-width="1" stroke-dasharray="5 4" opacity=".4"></line>`;
+    out += `<text x="${padL+2}" y="${y(T)-4}" font-size="9.5" fill="#5B6B83" font-family="Inter,sans-serif">goal ${short$(T)}</text>`;
+  }
+  let crossNote = '';
+  rates.forEach(({r,c,l})=>{
+    let pts='', cross=null;
+    for(let i=0;i<=yrs;i++){
+      const v = fv(total,r,i,m);
+      pts += `${x(i).toFixed(1)},${y(Math.min(v,maxV)).toFixed(1)} `;
+      if(cross===null && T>0 && v>=T) cross=i;
+    }
+    const end = fv(total,r,yrs,m);
+    out += `<polyline points="${pts}" fill="none" stroke="${c}" stroke-width="2"></polyline>`;
+    out += `<text x="${x(yrs)+6}" y="${(y(Math.min(end,maxV))+3).toFixed(1)}" font-size="10.5" font-weight="600" fill="${c}" font-family="Inter,sans-serif">${short$(end)} ${l.toLowerCase()}</text>`;
+    if(cross!==null && r===.07) crossNote = ` In the moderate case you'd cross ${short$(T)} around year ${cross} (${new Date().getFullYear()+cross}).`;
+    if(cross!==null && T>0) out += `<circle cx="${x(cross)}" cy="${y(T)}" r="3" fill="${c}"></circle>`;
+  });
+  svg.innerHTML = out;
+  document.getElementById('growthNote').textContent =
+    `This is today's ${fmt$(total)}${m>0?` plus ${fmt$(m)} a month`:''} compounding through three cases: bear 4%, moderate 7%, bull 10% a year, nominal.${crossNote} The US market's long-run average sits near the bull case, but individual decades land all over this range. Arithmetic, not a forecast: real returns bounce around, show up out of order, and include drops like the one on the risk dial.`;
+}
+
+/* ---------- planning tools ---------- */
+function renderFees(){
+  const el = document.getElementById('feesBody'); if(!el) return;
+  const rows = [];
+  let known$=0, fee$=0, unknown=[];
+  S.accounts.forEach(a=>a.holdings.forEach(h=>{
+    const t=(h.ticker||'').toUpperCase().trim(), b=+h.bal||0;
+    if(b<=0) return;
+    if(ERS[t]!=null){ known$+=b; fee$+=b*ERS[t]/100; rows.push({t, b, er:ERS[t], f:b*ERS[t]/100}); }
+    else if(t) unknown.push(t);
+  }));
+  if(known$<=0){ el.innerHTML='<div class="empty">Add holdings with balances to see what they cost.</div>'; return; }
+  const wER = fee$/known$*100;
+  /* what fees compound to over 30y at the moderate 7% case */
+  const g = 1.07;
+  const cost30 = known$*Math.pow(g,30) - known$*Math.pow(g - wER/100,30);
+  /* cost ladder: same portfolio at three fee levels */
+  const ladder = [
+    {name:'Rock-bottom index funds', er:0.03},
+    {name:'Your funds today', er:wER, you:true},
+    {name:'Typical active fund / 1% fee', er:1.00},
+  ].map(row=>({...row, end: known$*Math.pow(g - row.er/100, 30)}));
+  const yourEnd = ladder.find(r=>r.you).end;
+  const merged = {};
+  rows.forEach(r=>{ merged[r.t]=merged[r.t]||{t:r.t,b:0,f:0,er:r.er}; merged[r.t].b+=r.b; merged[r.t].f+=r.f; });
+  const top = Object.values(merged).sort((a,b2)=>b2.f-a.f).slice(0,5);
+  el.innerHTML = `
+    <div style="display:flex;gap:26px;flex-wrap:wrap;margin-bottom:12px">
+      <div><div class="stat-k" style="font-size:10.5px;text-transform:uppercase;letter-spacing:.07em;color:var(--faint)">Weighted expense ratio</div><div class="num" style="font-family:var(--disp);font-size:22px;font-weight:800">${wER.toFixed(3)}%</div></div>
+      <div><div style="font-size:10.5px;text-transform:uppercase;letter-spacing:.07em;color:var(--faint)">Fees this year</div><div class="num" style="font-family:var(--disp);font-size:22px;font-weight:800">~${fmt$(fee$)}</div></div>
+      <div><div style="font-size:10.5px;text-transform:uppercase;letter-spacing:.07em;color:var(--faint)">30-year cost of those fees</div><div class="num" style="font-family:var(--disp);font-size:22px;font-weight:800;color:var(--red)">~${fmt$(cost30)}</div></div>
+    </div>
+    <table class="tgt" style="font-size:13px">${top.map(r=>`
+      <tr><td>${esc(r.t)}${r.er>=0.4?' <span style="color:#B8860B" title="On the pricey side for an index portfolio">●</span>':''}</td>
+      <td class="num" style="text-align:right;color:var(--muted)">${r.er.toFixed(3)}%</td>
+      <td class="num" style="text-align:right;font-weight:600">${fmt$(r.f)}/yr</td></tr>`).join('')}
+    </table>
+    <div style="font-size:12px;font-weight:600;color:var(--muted);margin:14px 0 6px;text-transform:uppercase;letter-spacing:.06em">Where 30 years lands at different fee levels</div>
+    <table class="tgt" style="font-size:13px">${ladder.map(row=>{
+      const diff = row.end - yourEnd;
+      return `<tr${row.you?' style="background:var(--accent-soft)"':''}>
+        <td>${row.name}${row.you?' <b style="color:var(--accent)">← you</b>':''}</td>
+        <td class="num" style="text-align:right;color:var(--muted)">${row.er.toFixed(2)}%</td>
+        <td class="num" style="text-align:right;font-weight:600">${short$(row.end)}</td>
+        <td class="num" style="text-align:right;font-size:12px;color:${diff>0.5?'var(--green)':diff<-0.5?'var(--red)':'var(--faint)'}">${Math.abs(diff)<1?'—':(diff>0?'+':'−')+short$(Math.abs(diff)).replace('$','$')}</td></tr>`;
+    }).join('')}</table>
+    ${unknown.length?`<div style="font-size:12px;color:var(--faint);margin-top:8px">No expense data for: ${[...new Set(unknown)].map(esc).join(', ')}</div>`:''}
+    <div style="font-size:12px;color:var(--faint);margin-top:8px">Approximate ratios as of ${SPLITS_ASOF}. All 30-year figures grow today's balance at the moderate 7% case minus fees. Costs are one of the few things in investing you control.</div>`;
+}
+function renderAum(){
+  const el = document.getElementById('aumBody'); if(!el) return;
+  const cur = currentByClass();
+  const total = Object.values(cur).reduce((a,b)=>a+b,0) || 100000;
+  const p = (S.plan && S.plan.advPct!=null) ? S.plan.advPct : 1.0;
+  const feeNow = total*p/100;
+  const diff30 = total*Math.pow(1.07,30) - total*Math.pow(1.07-p/100,30);
+  el.innerHTML = `
+    <div class="slider-row" style="margin-bottom:12px">
+      <span class="end">0.25%</span>
+      <input type="range" min="0.25" max="2" step="0.05" value="${p}" oninput="S.plan.advPct=+this.value;save();renderAum()">
+      <span class="end">2%</span>
+      <span class="split-read num">${p.toFixed(2)}%</span>
+    </div>
+    <div style="font-size:14px;line-height:1.7">On ${total===100000&&Object.values(cur).reduce((a,b)=>a+b,0)===0?'a $100,000 portfolio':'your '+fmt$(total)+' portfolio'}, a ${p.toFixed(2)}% assets-under-management fee is <b class="num" style="font-family:var(--disp)">${fmt$(feeNow)}</b> this year. Compounded over 30 years in the moderate case, that fee stream works out to roughly <b class="num" style="font-family:var(--disp);color:var(--red)">${short$(diff30)}</b> less in the account.</div>
+    <div style="font-size:12px;color:var(--faint);margin-top:10px">Some advisors earn their fee many times over in planning, taxes, and talking you off ledges in a crash. The point isn't "never pay," it's "know the number." Flat-fee and hourly advisors exist too.</div>`;
+}
+function renderWait(){
+  const el = document.getElementById('waitBody'); if(!el) return;
+  const A = (S.plan && S.plan.waitK!=null) ? S.plan.waitK : 10000;
+  const mo = (S.plan && S.plan.waitM!=null) ? S.plan.waitM : 12;
+  const cost = A*Math.pow(1.07,30) - A*Math.pow(1.07, 30 - mo/12);
+  el.innerHTML = `
+    <div class="contrib-grid" style="margin-bottom:12px">
+      <div class="c-inp"><label>Cash on the sidelines</label>
+        <div class="money-wrap"><span>$</span><input class="money num" inputmode="numeric" value="${A||''}" onchange="S.plan.waitK=+this.value||0;save();renderWait()"></div></div>
+      <div class="c-inp"><label>Months of waiting: <b class="num">${mo}</b></label>
+        <input type="range" min="1" max="36" step="1" value="${mo}" style="margin-top:12px" oninput="S.plan.waitM=+this.value;save();renderWait()"></div>
+    </div>
+    <div style="font-size:14px;line-height:1.7">Investing ${fmt$(A)} today versus sitting on it for ${mo} month${mo===1?'':'s'}: in the moderate 7% case, the 30-year difference is about <b class="num" style="font-family:var(--disp);color:var(--red)">${fmt$(cost)}</b>.</div>
+    <div style="font-size:12px;color:var(--faint);margin-top:10px">This is the arithmetic behind "time in the market beats timing the market." It assumes the moderate case holds during the wait, which no one can know in advance — sometimes waiting wins. On average, historically, it hasn't.</div>`;
+}
+function renderPlanner(){
+  const el = document.getElementById('plannerBody'); if(!el) return;
+  const p = S.plan||{};
+  const monthlyFromIncome = Math.round((+p.income||0)*(+p.savePct||0)/100);
+  el.innerHTML = `
+    <div class="contrib-grid" style="margin-bottom:12px">
+      <div class="c-inp"><label>Monthly take-home pay</label>
+        <div class="money-wrap"><span>$</span><input class="money num" inputmode="numeric" value="${p.income||''}" onchange="S.plan.income=+this.value||0;save();renderPlanner()"></div></div>
+      <div class="c-inp"><label>Share you invest: <b class="num" id="spRead">${p.savePct||0}%</b></label>
+        <input type="range" min="0" max="60" step="1" value="${p.savePct||0}" style="margin-top:12px" oninput="S.plan.savePct=+this.value;document.getElementById('spRead').textContent=this.value+'%';save();renderPlanner()"></div>
+    </div>
+    ${(+p.income>0)?`
+      <div style="font-size:14px;margin-bottom:10px">That's <b class="num" style="font-family:var(--disp)">${fmt$(monthlyFromIncome)}</b> a month into investments${p.savePct>=20?' — a 20%+ savings rate, the benchmark a lot of the FIRE crowd aims for':p.savePct>=10?' — in the range many planners consider a solid baseline':''}.
+      <button class="btn tiny" style="margin-left:8px" onclick="S.plan.monthly=${monthlyFromIncome};save();renderOverview();renderPlanner();toast('Projection updated to ${fmt$(monthlyFromIncome)}/month')">Use in projection</button></div>`
+    : `<div class="empty" style="padding:6px 0">Enter your take-home pay to see what a given savings rate means in dollars.</div>`}
+    <div style="font-size:12.5px;color:var(--muted);border-top:1px solid var(--hairline);padding-top:10px;margin-top:4px">
+      A common order many index investors follow with new money: emergency fund first, then 401(k) up to any employer match, then HSA if eligible, then IRA, then the rest of the 401(k), then taxable. It's a popular framework, not a rule and not advice — situations differ.</div>`;
+}
+function renderRoom(){
+  const el = document.getElementById('roomBody'); if(!el) return;
+  document.getElementById('limitYear').textContent = LIMITS.year;
+  const limitFor = t => t==='401(k)'||t==='403(b)' ? LIMITS['401k'] : (t==='Traditional IRA'||t==='Roth IRA') ? LIMITS.ira : t==='HSA' ? LIMITS.hsa_self : null;
+  const eligible = S.accounts.filter(a=>limitFor(a.type)!=null);
+  if(!eligible.length){ el.innerHTML='<div class="empty">Add a 401(k), IRA, or HSA account to track contribution room.</div>'; return; }
+  el.innerHTML = `<div class="contrib-grid">` + eligible.map(a=>{
+    const lim = limitFor(a.type);
+    const done = +(S.ytd[a.id]||0);
+    const pct = Math.min(100, done/lim*100);
+    const left = Math.max(0, lim-done);
+    return `<div class="c-inp">
+      <label>${esc(a.name)} <span style="color:var(--faint)">· ${a.type} · limit ${fmt$(lim)}</span></label>
+      <div class="money-wrap"><span>$</span><input class="money num" inputmode="numeric" placeholder="0" value="${done||''}" onchange="S.ytd['${a.id}']=+this.value||0;save();renderRoom()"></div>
+      <div class="stackbar" style="margin-top:7px"><div style="width:${pct}%;background:${pct>=100?'var(--green)':'var(--accent)'}"></div></div>
+      <div style="font-size:12px;color:${left>0?'var(--muted)':'var(--green)'};margin-top:3px" class="num">${left>0?fmt$(left)+' of room left':'Maxed for '+LIMITS.year+' 🎉'}</div>
+    </div>`;
+  }).join('') + `</div>
+  <div style="font-size:12px;color:var(--faint);margin-top:10px">${LIMITS.year} IRS limits: 401(k)/403(b) ${fmt$(LIMITS['401k'])} (+${fmt$(LIMITS['401k_catchup'])} if 50+), IRA ${fmt$(LIMITS.ira)} combined across traditional and Roth per person (+${fmt$(LIMITS.ira_catchup)} if 50+), HSA ${fmt$(LIMITS.hsa_self)} self / ${fmt$(LIMITS.hsa_family)} family (+${fmt$(LIMITS.hsa_catchup)} if 55+). Employer 401(k) match doesn't count against your deferral limit.</div>`;
+}
+
+function overlapNote(a){
+  const byCls = {};
+  a.holdings.forEach(h=>{
+    if((+h.bal||0)<=0) return;
+    const t=(h.ticker||'').toUpperCase().trim();
+    if(SPLITS[t]) return; /* multi-region funds judged separately */
+    (byCls[h.cls]=byCls[h.cls]||[]).push(esc(t)||'?');
+  });
+  const dupes = Object.keys(byCls).filter(c=>byCls[c].length>1 && c!=='BOND');
+  if(!dupes.length) return '';
+  return `<div style="margin-top:10px;font-size:12px;color:var(--muted);background:var(--hairline);border-radius:8px;padding:8px 11px">${dupes.map(c=>`${byCls[c].join(' and ')} cover the same class (${CLASSES[c].name}) — heavy overlap, which is fine, just redundant.`).join(' ')}</div>`;
+}
+
+/* ---------- rendering ---------- */
+function renderAccounts(){
+  const el = document.getElementById('accounts');
+  el.innerHTML = '';
+  if(!S.accounts.length){ el.innerHTML = '<div class="empty">No accounts yet. Add one, or load the sample data from the top bar.</div>'; }
+  S.accounts.forEach(a=>{
+    const total = a.holdings.reduce((s,h)=>s+(+h.bal||0),0);
+    const card = document.createElement('div'); card.className='card';
+    card.innerHTML = `
+      <div class="acc-head">
+        <div>
+          <input class="inp" style="font-weight:600;font-size:15px;padding-left:0;width:auto;min-width:120px" value="${esc(a.name)}" onchange="upAcct('${a.id}','name',this.value)">
+          <div class="acc-type"><select class="inp" style="font-size:11.5px;padding:1px 24px 1px 0;color:var(--muted);text-transform:uppercase;letter-spacing:.06em" onchange="upAcct('${a.id}','type',this.value)">
+            ${ACCT_TYPES.map(t=>`<option ${t===a.type?'selected':''}>${t}</option>`).join('')}
+          </select></div>
+        </div>
+        <button class="x" title="Remove account" onclick="delAcct('${a.id}')">×</button>
+      </div>
+      <div class="acc-total num">Balance <b>${fmt$(total)}</b></div>
+      <table class="hold">
+        <tr><th style="width:26%">Fund</th><th>Asset class</th><th style="width:26%;text-align:right">Balance</th><th style="width:26px"></th></tr>
+        ${a.holdings.map(h=>`<tr>
+          <td><input class="inp" value="${esc(h.ticker)}" placeholder="VTI" onchange="upHold('${a.id}','${h.id}','ticker',this.value)"></td>
+          <td><select class="inp" onchange="upHold('${a.id}','${h.id}','cls',this.value)">
+            ${Object.keys(BUILTIN_CLASSES).map(c=>`<option value="${c}" ${c===h.cls?'selected':''}>${CLASSES[c].name}</option>`).join('')}
+            ${Object.keys(CUSTOM_CLASSES).length?`<optgroup label="Your categories">${Object.keys(CUSTOM_CLASSES).map(c=>`<option value="${c}" ${c===h.cls?'selected':''}>${esc(CLASSES[c].name)}</option>`).join('')}</optgroup>`:''}
+          </select>${splitNote(h.ticker)}</td>
+          <td><input class="inp right num" value="${h.bal||''}" placeholder="0" inputmode="numeric" onchange="upHold('${a.id}','${h.id}','bal',this.value)"></td>
+          <td><button class="x" onclick="delHold('${a.id}','${h.id}')">×</button></td>
+        </tr>`).join('')}
+      </table>
+      <div class="addrow"><button class="btn tiny" onclick="addHold('${a.id}')">+ Add fund</button></div>
+      ${overlapNote(a)}`;
+    el.appendChild(card);
+  });
+  const grand = S.accounts.reduce((s,a)=>s+a.holdings.reduce((x,h)=>x+(+h.bal||0),0),0);
+  const sm = document.getElementById('s1sum');
+  if(sm) sm.textContent = grand>0
+    ? `${S.accounts.length} account${S.accounts.length===1?'':'s'} · ${fmt$(grand)}`
+    : 'Add each account and the funds you hold (or could buy) in it.';
+  renderContribs();
+}
+function renderPresets(){
+  const el = document.getElementById('presets');
+  el.innerHTML = PRESETS.map(p=>`<button class="pill ${S.preset===p?'on':''}" onclick="setPreset('${p}')">${p}</button>`).join('');
+}
+function renderIntl(){
+  const s = (S.intlPct==null?MARKET_INTL:S.intlPct);
+  document.getElementById('intlSlider').value = s;
+  document.getElementById('intlLbl').textContent = s + '%';
+  document.getElementById('intlRead').textContent = (100-s) + ' / ' + s;
+  const atMarket = Math.abs(s-MARKET_INTL) <= 1;
+  document.getElementById('intlNote').innerHTML =
+    `The global market is about <span style="font-weight:600;color:var(--ink)">${MARKET_INTL}% international</span> right now (as of ${SPLITS_ASOF}). That's what a total-world fund holds. `
+    + (atMarket ? `You're at market weight.` : `You hold ${s>MARKET_INTL?'more':'less'} international than the market does.`)
+    + ` <button class="btn tiny" style="margin-left:6px" onclick="setIntlMarket()">Set to market</button>`
+    + `<br>You can hold this as one world fund like VT, or as a US fund plus an international fund like VTI and VXUS. The calculator handles both.`;
+}
+function setIntlMarket(){ onIntlSlider(MARKET_INTL); }
+function tiltLabel(t){
+  if(t<=0) return 'None';
+  if(t<=10) return 'Light';
+  if(t<=25) return 'Moderate';
+  return 'Strong';
+}
+function renderTilt(){
+  const tp = S.tiltPct||0;
+  const adv = document.getElementById('advTilt'), sum = document.getElementById('advSummary');
+  /* the Market portfolio tab is tilt-free by design — the slider lives on the Factor tilt tab */
+  if(S.preset==='Market portfolio'){ adv.style.display='none'; return; }
+  adv.style.display='block';
+  if(S.preset==='Factor tilt'){ adv.open = true; if(sum) sum.textContent='Small-cap value tilt'; }
+  else if(sum) sum.textContent='Advanced: small-cap value tilt';
+  if(tp>0) adv.open = true;
+  document.getElementById('tiltSlider').value = tp;
+  document.getElementById('tiltLbl').textContent = tiltLabel(tp);
+  document.getElementById('tiltRead').textContent = tp + '%';
+  document.getElementById('tiltNote').innerHTML =
+    tp===0
+    ? `No dedicated small-cap value sleeve, just the market portfolio. Total-market funds still hold small caps at their market weight. The backstory, if you want it: Fama and French's factor research (1992, 1993, and the 2015 five-factor model) found higher long-run expected returns in small value stocks, paid for with long stretches of trailing the market.`
+    : `<span style="font-weight:600;color:var(--ink)">${tp}% of your stocks</span> goes to dedicated small-cap value funds like AVUV and AVDV, split across US and international to match your mix. The research never names an exact number. Most research-based portfolios land between 10% and 30%. A bigger tilt raises expected returns and also the odds of trailing the market for years at a stretch. The premium only pays if you stay in for it.`;
+}
+/* sum of user-defined categories — the sliders leave these fixed and only
+   redistribute the built-in (non-custom) budget among the 6 standard classes */
+function reservedCustom(t){ return Object.keys(CUSTOM_CLASSES).reduce((s,k)=>s+(+t[k]||0),0); }
+function fixResidual(nt){ /* nudge the largest built-in so it sums to exactly 100 */
+  const sum = Object.values(nt).reduce((a,b)=>a+(+b||0),0);
+  const order=['US','BOND','INTL','EM','USSCV','INTLSCV'];
+  const k = order.find(x=>(+nt[x]||0) + (100-sum) >= 0) || 'US';
+  nt[k] = +((+nt[k]||0) + (100-sum)).toFixed(1);
+  return nt;
+}
+function onTiltSlider(v){
+  const tp = +v;
+  if(S.preset==='Custom'){
+    const t = S.targets || computeTargets();
+    const s = (S.intlPct==null?MARKET_INTL:S.intlPct);
+    const bond = +t.BOND||0, reserved = reservedCustom(t);
+    const eqB = Math.max(0, 100 - bond - reserved);   /* built-in equity budget */
+    const scvKeys=['USSCV','INTLSCV'], mktKeys=['US','INTL','EM'];
+    const scvOld = scvKeys.reduce((a,k)=>a+(+t[k]||0),0), mktOld = mktKeys.reduce((a,k)=>a+(+t[k]||0),0);
+    const scvNew = eqB*tp/100, mktNew = eqB-scvNew;
+    const nt = {...t}; /* preserves BOND + custom categories */
+    scvKeys.forEach(k=>nt[k] = scvOld>0 ? +((+t[k]||0)/scvOld*scvNew).toFixed(1)
+      : +(scvNew*(k==='USSCV'?(100-s)/100:s/100)).toFixed(1));
+    mktKeys.forEach(k=>nt[k] = mktOld>0 ? +((+t[k]||0)/mktOld*mktNew).toFixed(1)
+      : +((k==='US'?mktNew*(100-s)/100 : k==='INTL'?mktNew*(s/100)*0.75 : mktNew*(s/100)*0.25)).toFixed(1));
+    S.targets = fixResidual(nt);
+  } else {
+    S.preset = tp>0 ? 'Factor tilt' : 'Market portfolio';
+  }
+  S.tiltPct = tp;
+  save(); renderPresets(); renderTargets(); renderDrift();
+}
+function onIntlSlider(v){
+  const s = +v;
+  if(S.preset==='Custom'){
+    const t = S.targets || computeTargets();
+    const usKeys=['US','USSCV'], inKeys=['INTL','EM','INTLSCV'];
+    const bond = +t.BOND||0, reserved = reservedCustom(t);
+    const eqB = Math.max(0, 100 - bond - reserved);   /* built-in equity budget, custom held fixed */
+    const usOld = usKeys.reduce((a,k)=>a+(+t[k]||0),0), inOld = inKeys.reduce((a,k)=>a+(+t[k]||0),0);
+    const nt = {...t};
+    usKeys.forEach(k=>nt[k] = usOld>0 ? +((+t[k]||0)/usOld*eqB*(100-s)/100).toFixed(1) : (k==='US'? +(eqB*(100-s)/100).toFixed(1):0));
+    inKeys.forEach(k=>nt[k] = inOld>0 ? +((+t[k]||0)/inOld*eqB*s/100).toFixed(1) : (k==='INTL'? +(eqB*s/100).toFixed(1):0));
+    S.targets = fixResidual(nt);
+  }
+  S.intlPct = s;
+  save(); renderTargets(); renderDrift();
+}
+function riskLabel(eq){
+  if(eq>=95) return 'Very aggressive';
+  if(eq>=80) return 'Aggressive';
+  if(eq>=60) return 'Balanced';
+  if(eq>=40) return 'Conservative';
+  return 'Very conservative';
+}
+function renderRisk(){
+  const eq = S.equityPct;
+  document.getElementById('riskLbl').textContent = riskLabel(eq);
+  const cur = currentByClass();
+  const total = Object.values(cur).reduce((a,b)=>a+b,0);
+  const base = total>0 ? total : 100000;
+  /* 2008-style stress: equities roughly halved, quality bonds roughly held (~+5%) */
+  const stressed = base*(eq/100)*0.5 + base*((100-eq)/100)*1.05;
+  const lossPct = (1 - stressed/base)*100;
+  document.getElementById('riskDraw').innerHTML =
+    `In a crash like 2008, with stocks down about half and quality bonds roughly flat, ${total>0?'your':'a'} <span class="num">${fmt$(base)}</span> portfolio would sit near <b class="num">${fmt$(stressed)}</b> (−${lossPct.toFixed(0)}%) until the recovery. The hard part isn't the math, it's not selling at the bottom. Pick a split you could sit through.`;
+}
+function renderTargets(){
+  const t = targets();
+  document.getElementById('eqSlider').value = S.equityPct;
+  document.getElementById('splitRead').textContent = `${S.equityPct} / ${100-S.equityPct}`;
+  renderRisk(); renderIntl(); renderTilt();
+  const isCustom = S.preset==='Custom';
+  renderCustomCats();
+  const tbl = document.getElementById('tgtTable');
+  const visible = Object.keys(CLASSES).filter(c=>{
+    if(CUSTOM_CLASSES[c] && !isCustom && !((+t[c]||0)>0)) return false; /* custom cats live on the Custom tab */
+    if(S.preset==='Market portfolio' && (c==='USSCV'||c==='INTLSCV') && (+t[c]||0)===0) return false;
+    return true;
+  });
+  tbl.innerHTML = visible.map(c=>`
+    <tr>
+      <td><span class="cls-dot" style="background:${CLASSES[c].color}"></span>${CLASSES[c].name}</td>
+      <td style="text-align:right">
+        ${isCustom
+          ? `<input class="inp right num tgt-pct" value="${t[c]}" inputmode="decimal" onchange="upTarget('${c}',this.value)" style="border:1px solid var(--border);background:#fff">`
+          : `<span class="num" style="font-weight:600">${t[c]}%</span>`}
+      </td>
+    </tr>`).join('');
+  const sum = Object.values(t).reduce((a,b)=>a+(+b||0),0);
+  const sl = document.getElementById('sumLine');
+  if(Math.abs(sum-100) > 0.11){ sl.className='sum-line bad'; sl.textContent = `Targets add up to ${sum.toFixed(1)}%. Adjust them to reach 100%.`; }
+  else { sl.className='sum-line'; sl.textContent = PRESET_NOTES[S.preset]; }
+  const s2s = document.getElementById('s2sum');
+  if(s2s){
+    const tp = S.tiltPct||0, s = (S.intlPct==null?MARKET_INTL:S.intlPct);
+    s2s.textContent = S.preset==='Custom'
+      ? `Custom targets · ${S.equityPct}/${100-S.equityPct} stocks/bonds`
+      : `${S.equityPct}/${100-S.equityPct} stocks/bonds · ${s}% intl${tp>0?` · ${tp}% SCV tilt`:''}`;
+  }
+}
+function renderCustomCats(){
+  const el = document.getElementById('customCats'); if(!el) return;
+  if(S.preset!=='Custom'){ el.style.display='none'; return; }
+  el.style.display='block';
+  const list = (S.customClasses||[]).map(c=>`
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:7px">
+      <input type="color" value="${c.color}" onchange="upCategory('${c.id}','color',this.value)" style="width:30px;height:28px;border:1px solid var(--border);border-radius:6px;background:none;cursor:pointer;padding:1px" title="Pick a color">
+      <input class="inp" value="${esc(c.name)}" onchange="upCategory('${c.id}','name',this.value)" style="border:1px solid var(--border);background:#fff;flex:1" placeholder="Gold, REITs, momentum…">
+      <button class="x" title="Remove category" onclick="delCategory('${c.id}')">×</button>
+    </div>`).join('');
+  el.innerHTML =
+    `<div style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:9px">Your own categories</div>`
+    + (list || `<div style="font-size:12.5px;color:var(--faint);margin-bottom:8px">None yet. Add things a total-market fund doesn't cover on its own — gold, REITs, momentum, TIPS, whatever you track.</div>`)
+    + `<button class="btn tiny" onclick="addCategory()">+ Add category</button>`
+    + `<div style="font-size:11.5px;color:var(--faint);margin-top:9px">Add a category here and give it a target in the table below, then tag your funds with it in the accounts section above.</div>`;
+}
+function addCategory(){
+  if(S.preset!=='Custom'){ setPreset('Custom'); }
+  if(!S.targets) S.targets = computeTargets();
+  S.customClasses = S.customClasses || [];
+  const used = S.customClasses.map(c=>c.color);
+  const color = CLASS_PALETTE.find(c=>!used.includes(c)) || CLASS_PALETTE[S.customClasses.length % CLASS_PALETTE.length];
+  const id = 'x'+uid();
+  S.customClasses.push({id, name:'', color});
+  S.targets[id] = 0;
+  S.isSample = false;
+  syncClasses(); save(); renderTargets(); renderDrift(); renderAccounts();
+}
+function upCategory(id,k,v){
+  const c = (S.customClasses||[]).find(x=>x.id===id); if(!c) return;
+  if(k==='name') v = String(v).replace(/[<>]/g,'').slice(0,40);          /* no markup in category names */
+  if(k==='color') v = /^#[0-9a-fA-F]{3,6}$/.test(v) ? v : c.color;       /* hex only */
+  c[k] = v; syncClasses(); save(); renderTargets(); renderDrift(); renderAccounts(); renderOverview();
+}
+function delCategory(id){
+  S.customClasses = (S.customClasses||[]).filter(x=>x.id!==id);
+  if(S.targets){ delete S.targets[id]; normalizeTargets(); deriveSliders(); }
+  let moved = 0;
+  S.accounts.forEach(a=>a.holdings.forEach(h=>{ if(h.cls===id){ h.cls='US'; moved++; } }));
+  syncClasses(); save(); renderAll();
+  if(moved) toast(`Category removed; ${moved} holding${moved===1?'':'s'} moved to US total market`);
+}
+function renderDrift(){
+  const cur = currentByClass();
+  const total = Object.values(cur).reduce((a,b)=>a+b,0);
+  const t = targets();
+  const el = document.getElementById('driftBars');
+  if(total<=0){ el.innerHTML='<div class="empty">Add balances to see your current allocation.</div>'; return; }
+  el.innerHTML = Object.keys(CLASSES).map(c=>{
+    const curPct = cur[c]/total*100, tgtPct = t[c]||0;
+    const d = curPct - tgtPct;
+    const maxRef = Math.max(curPct, tgtPct, 1)*1.15;
+    return `<div class="bar-row">
+      <div class="lbl"><span class="cls-dot" style="background:${CLASSES[c].color}"></span>${CLASSES[c].name}</div>
+      <div class="track">
+        <div class="fill" style="width:${Math.min(100,curPct/maxRef*100)}%;background:${CLASSES[c].color}"></div>
+        <div class="tmark" style="left:${Math.min(100,tgtPct/maxRef*100)}%"></div>
+      </div>
+      <div class="bar-nums num"><b>${fmtPct(curPct)}</b> <span class="${d>=0?'delta-pos':'delta-neg'}">${d>=0?'+':''}${fmtPct(d)}</span>
+        ${Math.abs(d)*total/100 > Math.max(25,total*0.001) ? `<div style="font-size:11px;color:var(--faint)">${fmt$(Math.abs(d)*total/100)} ${d>=0?'over':'under'}</div>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+  if(S.mode==='rebal') renderRebal();
+  renderOverview();
+}
+function renderContribs(){
+  const el = document.getElementById('contribInputs');
+  S.contrib = S.contrib || {};
+  el.innerHTML = S.accounts.map(a=>`
+    <div class="c-inp">
+      <label>${esc(a.name)}</label>
+      <div class="money-wrap"><span>$</span><input class="money num" inputmode="numeric" placeholder="0" value="${S.contrib[a.id]||''}" onchange="S.contrib['${a.id}']=+this.value||0;save()"></div>
+    </div>`).join('') || '<div class="empty">Add an account first.</div>';
+}
+
+function runCalc(){
+  const t = targets();
+  const sum = Object.values(t).reduce((a,b)=>a+(+b||0),0);
+  if(Math.abs(sum-100)>0.11){ toast('Fix your targets first, they need to add up to 100%'); return; }
+  const contribs = S.contrib||{};
+  const totalC = S.accounts.reduce((s,a)=>s+(+contribs[a.id]||0),0);
+  if(totalC<=0){ toast('Enter a contribution amount'); return; }
+  const r = allocate(contribs);
+  // gaps AFTER contribution
+  const gl = document.getElementById('gapList');
+  const rows = Object.keys(CLASSES).map(c=>{
+    const gap = r.tgt$[c]-r.running[c];
+    return {c, gap};
+  }).sort((a,b)=>Math.abs(b.gap)-Math.abs(a.gap));
+  gl.innerHTML = rows.map(({c,gap})=>{
+    const label = Math.abs(gap)<Math.max(25, r.T2*0.001) ? `<span style="color:var(--green);font-weight:600">on target</span>`
+      : gap>0 ? `<span class="gap-amt under num">${fmt$(gap)} under</span>` : `<span class="gap-amt over num">${fmt$(-gap)} over</span>`;
+    return `<div class="gap-row"><div><span class="cls-dot" style="background:${CLASSES[c].color}"></span>${CLASSES[c].name}</div>${label}</div>`;
+  }).join('');
+  // buy plan
+  const bp = document.getElementById('buyPlan');
+  bp.innerHTML = S.accounts.map(a=>{
+    const b = r.buys[a.id]||{}; const tot = Object.values(b).reduce((x,y)=>x+y,0);
+    if(tot<0.5) return '';
+    return `<div class="buy-acc"><h4>${esc(a.name)} <span class="num">${fmt$(tot)}</span></h4>
+      <table class="buys">${a.holdings.filter(h=>b[h.id]>0.5).map(h=>`
+        <tr><td>${esc(h.ticker)||'—'} <span style="color:var(--faint)">· ${CLASSES[h.cls]?CLASSES[h.cls].name:''}</span></td>
+        <td class="amt num">${fmt$(b[h.id])}</td></tr>`).join('')}
+      </table></div>`;
+  }).join('') || '<div class="empty">No allocation computed.</div>';
+  // warning if gaps remain
+  const remain = rows.filter(x=>x.gap > Math.max(50, r.T2*0.002));
+  const warn = document.getElementById('resWarn');
+  if(remain.length){
+    warn.style.display='block';
+    warn.innerHTML = `This contribution can't close every gap. <b>${remain.map(x=>CLASSES[x.c].name).join(', ')}</b> would still be under target, either because those classes aren't available in the account with money to invest, or because the gap is bigger than the contribution.`;
+  } else warn.style.display='none';
+  document.getElementById('results').classList.add('show');
+  /* Quiet support note: only for people getting real value from it — their own data,
+     and not the first time they've run the math. Dismissable, and never returns. */
+  S.calcCount = (S.calcCount||0) + 1;
+  const tip = document.getElementById('tipLine');
+  if(tip) tip.style.display = (!S.tipDismissed && !S.isSample && S.calcCount >= 2) ? 'block' : 'none';
+  save();
+}
+function dismissTip(){
+  S.tipDismissed = true; save();
+  const tip = document.getElementById('tipLine'); if(tip) tip.style.display='none';
+}
+
+/* ---------- mutations ---------- */
+function addAccount(){ S.isSample=false; S.accounts.push({id:uid(), name:'New account', type:'Taxable', holdings:[]}); save(); renderAll(); }
+function delAcct(id){ S.isSample=false; S.accounts = S.accounts.filter(a=>a.id!==id); save(); renderAll(); }
+function upAcct(id,k,v){ const a=S.accounts.find(x=>x.id===id); if(a){S.isSample=false; a[k]=v; save(); renderDrift();} }
+function addHold(aid){ const a=S.accounts.find(x=>x.id===aid); if(a){a.holdings.push({id:uid(),ticker:'',cls:'US',bal:0}); save(); renderAccounts();} }
+function delHold(aid,hid){ const a=S.accounts.find(x=>x.id===aid); if(a){a.holdings=a.holdings.filter(h=>h.id!==hid); save(); renderAll();} }
+function upHold(aid,hid,k,v){
+  const a=S.accounts.find(x=>x.id===aid); if(!a) return;
+  const h=a.holdings.find(x=>x.id===hid); if(!h) return;
+  S.isSample = false;
+  if(k==='bal') v = +String(v).replace(/[^0-9.]/g,'')||0;
+  h[k]=v;
+  if(k==='ticker'){
+    const T = String(v).toUpperCase().trim();
+    if(AUTO_CATEGORY[T]){
+      /* fund with no built-in home — find or create its category, then tag the holding */
+      const {name,color} = AUTO_CATEGORY[T];
+      let cc = (S.customClasses||[]).find(c=>String(c.name).toLowerCase()===name.toLowerCase());
+      if(!cc){
+        cc = {id:'x'+uid(), name, color};
+        S.customClasses = S.customClasses||[]; S.customClasses.push(cc);
+        if(S.targets) S.targets[cc.id] = 0;
+        syncClasses();
+        toast(`Recognized ${T} as ${name} — added a ${name} category`);
+      }
+      h.cls = cc.id;
+    } else {
+      const g = TICKER_GUESS[T]; if(g) h.cls = g;
+    }
+  }
+  save(); renderAll();
+}
+function setPreset(p){
+  S.preset=p;
+  if(p==='Custom' && !S.targets) S.targets = computeTargets();
+  if(p==='Market portfolio') S.tiltPct = 0;
+  if(p==='Factor tilt' && !(S.tiltPct>0)) S.tiltPct = 22;
+  save(); renderTargets(); renderDrift(); renderPresets();
+}
+function onSlider(v){
+  S.equityPct=+v;
+  if(S.preset==='Custom'){
+    /* split the built-in budget (everything except custom categories) into stocks vs bonds,
+       keeping the standard classes' internal ratios and leaving custom categories untouched */
+    const t = S.targets || computeTargets();
+    const reserved = reservedCustom(t);
+    const avail = Math.max(0, 100 - reserved);
+    const nonBond = ['US','INTL','EM','USSCV','INTLSCV'];
+    const oldEq = nonBond.reduce((s,k)=>s+(+t[k]||0),0);
+    const newBond = avail*(100-S.equityPct)/100;
+    const newEq = avail - newBond;
+    const nt = {...t}; /* preserves custom categories */
+    nonBond.forEach(k=> nt[k] = oldEq>0 ? +((+t[k]||0)/oldEq*newEq).toFixed(1) : +((k==='US'?newEq:0)).toFixed(1));
+    nt.BOND = +newBond.toFixed(1);
+    S.targets = fixResidual(nt);
+  }
+  save(); renderTargets(); renderDrift();
+}
+/* keep the three sliders in sync after a manual target or category edit */
+function deriveSliders(){
+  const t = S.targets; if(!t) return;
+  const reserved = reservedCustom(t);
+  const avail = Math.max(0, 100 - reserved);
+  const bond = +t.BOND||0;
+  S.equityPct = avail>0 ? Math.round((avail - bond)/avail*100) : 0;
+  const usSide = (+t.US||0)+(+t.USSCV||0);
+  const inSide = (+t.INTL||0)+(+t.EM||0)+(+t.INTLSCV||0);
+  const eqTot = usSide + inSide;
+  if(eqTot>0){ S.intlPct = Math.round(inSide/eqTot*100); S.tiltPct = Math.round(((+t.USSCV||0)+(+t.INTLSCV||0))/eqTot*100); }
+}
+function normalizeTargets(){ /* after a deletion, rescale everything to sum 100 keeping ratios */
+  const t = S.targets; if(!t) return;
+  const sum = Object.values(t).reduce((a,b)=>a+(+b||0),0);
+  if(sum>0 && Math.abs(sum-100)>0.05){ for(const k in t) t[k] = +((+t[k]||0)/sum*100).toFixed(1); fixResidual(t); }
+}
+function upTarget(c,v){ S.targets = S.targets||computeTargets(); S.targets[c]=Math.max(0,+v||0); deriveSliders(); save(); renderTargets(); renderDrift(); }
+
+/* ---------- utils ---------- */
+function esc(s){ return String(s??'').replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+let toastT;
+function toast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove('show'),2600); }
+
+function toggleSec(id){ document.getElementById(id).classList.toggle('closed'); }
+
+/* ---------- rebalance check (no new money) ---------- */
+function setMode(m){
+  S.mode = m; save();
+  document.getElementById('contribPane').style.display = m==='rebal' ? 'none' : 'block';
+  document.getElementById('rebalPane').style.display   = m==='rebal' ? 'block' : 'none';
+  document.getElementById('modeContrib').className = 'pill' + (m==='rebal' ? '' : ' on');
+  document.getElementById('modeRebal').className   = 'pill' + (m==='rebal' ? ' on' : '');
+  if(m==='rebal') renderRebal();
+}
+function renderRebal(){
+  const el = document.getElementById('rebalPane'); if(!el) return;
+  const cur = currentByClass();
+  const total = Object.values(cur).reduce((a,b)=>a+b,0);
+  if(total<=0){ el.innerHTML = '<div class="empty">Add account balances first. The rebalance check reads them live.</div>'; return; }
+  const tgt = targetsRaw();
+  const thNow = 'text-align:right;font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--faint);font-weight:500;padding:5px 6px;border-bottom:1px solid var(--hairline)';
+  let rows = '', moveTotal = 0, bandFlags = [];
+  Object.keys(CLASSES).forEach(c=>{
+    const t$ = (tgt[c]||0)/100*total;
+    const d = t$ - cur[c];                       /* + = add, − = trim */
+    if(d>0) moveTotal += d;
+    const curPct = cur[c]/total*100, drift = curPct-(tgt[c]||0);
+    /* classic 5/25 bands: 5 percentage points absolute, or 25% relative for smaller sleeves */
+    const outside = (Math.abs(drift)>5) || ((tgt[c]||0)>0 && Math.abs(drift)/(tgt[c]||1)>0.25 && Math.abs(d)>Math.max(50,total*0.001));
+    if(outside && Math.abs(d)>Math.max(50,total*0.001)) bandFlags.push(CLASSES[c].name);
+    const action = Math.abs(d) < Math.max(25, total*0.001)
+      ? '<span style="color:var(--green);font-weight:600">on target</span>'
+      : d>0 ? `<span class="under num" style="font-weight:600">add ${fmt$(d)}</span>`
+            : `<span class="over num" style="font-weight:600">trim ${fmt$(-d)}</span>`;
+    rows += `<tr>
+      <td><span class="cls-dot" style="background:${CLASSES[c].color}"></span>${CLASSES[c].name}${outside?' <span title="Outside the 5/25 rebalance bands" style="color:#B8860B;cursor:help">●</span>':''}</td>
+      <td class="num" style="text-align:right;color:var(--muted)">${fmt$(cur[c])}</td>
+      <td class="num" style="text-align:right;color:var(--muted)">${fmt$(t$)}</td>
+      <td style="text-align:right">${action}</td>
+    </tr>`;
+  });
+  el.innerHTML = `
+    <div class="big-title">How far each class is from target right now</div>
+    <table class="tgt">
+      <tr><th style="${thNow};text-align:left">Asset class</th><th style="${thNow}">Now</th><th style="${thNow}">Target</th><th style="${thNow}">To rebalance</th></tr>
+      ${rows}
+    </table>
+    <div style="margin-top:12px;font-size:13.5px" class="num">Moving about <b>${fmt$(moveTotal)}</b> between classes, ${(moveTotal/total*100).toFixed(1)}% of the portfolio, would put you exactly on target.</div>
+    ${bandFlags.length ? `<div class="res-warn" style="display:block;margin-top:12px"><b>${bandFlags.join(', ')}</b> ${bandFlags.length>1?'are':'is'} outside the classic 5/25 rebalance bands. That's the threshold a lot of index investors use to decide whether a rebalance is worth doing at all. Anything inside the bands is normal drift.</div>` : `<div style="margin-top:12px;font-size:13px;color:var(--green)">Every class is inside the classic 5/25 rebalance bands. Plenty of investors would call that close enough and leave it alone.</div>`}
+    <div class="res-note" style="margin-top:12px"><b>Arithmetic, not advice.</b> Selling in a taxable account can stick you with a capital gains bill. A lot of people rebalance with new contributions instead, or only move money inside a 401k, IRA, or HSA, where exchanges have no tax consequences. This table shows distance, not instructions.</div>`;
+}
+
+function downloadReminder(){
+  const start = new Date(); start.setMonth(start.getMonth()+1); start.setHours(9,0,0,0);
+  const p = n => String(n).padStart(2,'0');
+  const local = d => d.getFullYear()+p(d.getMonth()+1)+p(d.getDate())+'T'+p(d.getHours())+p(d.getMinutes())+'00';
+  const stamp = new Date().toISOString().replace(/[-:]/g,'').split('.')[0]+'Z';
+  const ics = [
+    'BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Drift Calc//EN','CALSCALE:GREGORIAN',
+    'BEGIN:VEVENT',
+    'UID:driftcalc-'+Date.now()+'@driftcalc',
+    'DTSTAMP:'+stamp,
+    'DTSTART:'+local(start),
+    'RRULE:FREQ=MONTHLY',
+    'SUMMARY:Monthly contribution: run the math',
+    'DESCRIPTION:Open Drift Calc\\, update balances\\, and route the monthly contribution.',
+    'END:VEVENT','END:VCALENDAR'
+  ].join('\r\n');
+  const blob = new Blob([ics],{type:'text/calendar'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'driftcalc-monthly-reminder.ics';
+  a.click(); toast('Reminder downloaded. Open it to add the monthly event.');
+}
+
+/* returning users land on the monthly moment: setup collapses, contribution rises to the top */
+function applyReturningLayout(){
+  if(FIRST_VISIT) return;
+  const grand = S.accounts.reduce((s,a)=>s+a.holdings.reduce((x,h)=>x+(+h.bal||0),0),0);
+  if(!(S.accounts.length && grand>0)) return;
+  document.getElementById('s1').classList.add('closed');
+  document.getElementById('s2').classList.add('closed');
+  const wrap = document.querySelector('.wrap');
+  const s3 = document.getElementById('s3'), s1 = document.getElementById('s1');
+  wrap.insertBefore(s3, s1);
+  document.getElementById('s3').querySelector('.step-n').textContent = '↻';
+  document.getElementById('s1chip').textContent = '1';
+  document.getElementById('s2chip').textContent = '2';
+}
+
+function renderAll(){ syncClasses(); renderAccounts(); renderPresets(); renderTargets(); renderDrift(); renderFees(); renderPlanner(); renderRoom(); renderAum(); renderWait(); }
+load(); renderAll(); applyReturningLayout();
+if(S.mode==='rebal') setMode('rebal');
+function stampAsOf(){ const el=document.getElementById('asofFoot'); if(el) el.textContent=SPLITS_ASOF; }
+stampAsOf();
+
+/* fund data lives in fund-data.json next to this page. Updating that one file
+   (a quick commit on GitHub) refreshes decomposition weights, ticker
+   classifications, and the market-weight reference for every visitor.
+   If the fetch fails (offline, local file), the built-in fallbacks above apply. */
+(async function refreshFundData(){
+  try{
+    const res = await fetch('fund-data.json', {cache:'no-store'});
+    if(!res.ok) return;
+    const d = await res.json();
+    if(d.splits) Object.keys(d.splits).forEach(k=>SPLITS[k]=d.splits[k]);
+    if(d.tickers) Object.assign(TICKER_GUESS, d.tickers);
+    if(d.ers) Object.assign(ERS, d.ers);
+    if(d.limits) Object.assign(LIMITS, d.limits);
+    if(typeof d.marketIntl==='number') MARKET_INTL = d.marketIntl;
+    if(d.asOf) SPLITS_ASOF = d.asOf;
+    stampAsOf(); renderAll();
+  }catch(e){ /* fallbacks stay in effect */ }
+})();
+</script>
+</body>
+</html>
