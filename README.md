@@ -20,7 +20,9 @@ Think of it as the spreadsheet you'd have built if you were better at spreadshee
 
 ## Privacy architecture
 
-There is no backend. There are no accounts, no analytics, no cookies, and no network requests except loading the page, the fonts, and a static `fund-data.json`. Everything you enter lives in your browser's localStorage. Export a JSON backup any time; clearing browser data erases everything (that's a feature and a warning — back up).
+There is no backend and there are no accounts. Everything you enter lives in your browser's localStorage and is never transmitted anywhere — there is no server to send it to. Export a JSON backup any time; clearing browser data erases everything (that's a feature and a warning — back up).
+
+The page makes exactly three outbound requests: the page itself, Google Fonts, and a static `fund-data.json`. There is one more: a page counter via [GoatCounter](https://www.goatcounter.com), which is open source, sets no cookies, and collects no personal data. It counts visits, nothing else. A Content-Security-Policy in the page restricts outbound connections to that list, so you can verify this rather than take my word for it.
 
 ## Verify the math
 

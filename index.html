@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; frame-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'unsafe-inline' https://gc.zgo.at; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https://driftcalc.goatcounter.com; connect-src 'self' https://driftcalc.goatcounter.com; frame-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
 <title>Drift Calculator: where should this month's contribution go?</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
@@ -402,10 +402,14 @@ footer .wrap{max-width:760px}
 
 <footer><div class="wrap">
   <b>Drift Calc</b> is an educational calculator for portfolio arithmetic. It is not investment advice, tax advice, or a recommendation of any security or strategy, and it knows nothing about your situation. Every number is an estimate built from what you type in. Funds that span regions, like VT and VXUS, are broken down using approximate market weights as of <span id="asofFoot"></span>, and those weights drift over time, so check the fund provider's page if you need precision. Talk to a qualified professional before making investment decisions. Everything you enter stays in your browser's local storage. Export a backup now and then, because clearing your browser data erases it.
-  <br><br>This tool is free, runs on donations, and sells nothing. No ads, no affiliate links, no data collection. The core calculator stays free and the math will never sit behind a paywall. Down the road there may be optional paid extras for power users, things like multiple portfolios, history, and reports. If it's useful today, you can <a href="https://ko-fi.com/driftcalc" target="_blank" rel="noopener" style="color:var(--accent)">support its development</a>. It costs nothing to run, just time to maintain.
+  <br><br>This tool is free, runs on donations, and sells nothing. No ads, no affiliate links, nothing sold to anyone. The only thing measured is a page count, through <a href="https://www.goatcounter.com" target="_blank" rel="noopener" style="color:var(--accent)">GoatCounter</a>, which is open source, sets no cookies, and collects no personal data. Nothing you enter here is ever transmitted anywhere. The core calculator stays free and the math will never sit behind a paywall. Down the road there may be optional paid extras for power users, things like multiple portfolios, history, and reports. If it's useful today, you can <a href="https://ko-fi.com/driftcalc" target="_blank" rel="noopener" style="color:var(--accent)">support its development</a>. It costs nothing to run, just time to maintain.
 </div></footer>
 
 <div class="toast" id="toast"></div>
+
+<!-- Page counter only. No cookies, no personal data, and nothing you type is ever sent. -->
+<script data-goatcounter="https://driftcalc.goatcounter.com/count"
+        async src="//gc.zgo.at/count.js"></script>
 
 <script>
 'use strict';
