@@ -1379,7 +1379,23 @@ function normalizeTargets(){ /* after a deletion, rescale everything to sum 100 
   const sum = Object.values(t).reduce((a,b)=>a+(+b||0),0);
   if(sum>0 && Math.abs(sum-100)>0.05){ for(const k in t) t[k] = +((+t[k]||0)/sum*100).toFixed(1); fixResidual(t); }
 }
-function upTarget(c,v){ S.targets = S.targets||computeTargets(); S.targets[c]=Math.max(0,+v||0); deriveSliders(); save(); renderTargets(); renderDrift(); }
+function upTarget(c,v){
+  S.targets = S.targets||computeTargets();
+  const val = Math.min(100, Math.max(0, +v||0));   /* a target can't be negative or over 100% */
+  S.targets[c] = val;
+  /* Setting a custom category's target takes its room from the standard classes
+     proportionally, so the total stays at 100 instead of drifting past it. */
+  if(CUSTOM_CLASSES[c]){
+    const builtins = Object.keys(BUILTIN_CLASSES);
+    const reserved = reservedCustom(S.targets);
+    const room = Math.max(0, 100 - reserved);
+    const cur = builtins.reduce((a,k)=>a+(+S.targets[k]||0),0);
+    if(cur>0) builtins.forEach(k=>S.targets[k] = +((+S.targets[k]||0)/cur*room).toFixed(1));
+    else S.targets.US = +room.toFixed(1);
+    fixResidual(S.targets);
+  }
+  deriveSliders(); save(); renderTargets(); renderDrift();
+}
 
 /* ---------- utils ---------- */
 function esc(s){ return String(s??'').replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
@@ -1387,6 +1403,18 @@ let toastT;
 function toast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove('show'),2600); }
 
 function toggleSec(id){ document.getElementById(id).classList.toggle('closed'); }
+
+/* Results must never outlive the inputs that produced them. Any change to balances,
+   accounts, or targets hides the previous answer so nobody acts on stale numbers. */
+function invalidateResults(){
+  const r = document.getElementById('results');
+  if(r && r.classList.contains('show')){
+    r.classList.remove('show');
+    const bp = document.getElementById('buyPlan'); if(bp) bp.innerHTML='';
+    const gl = document.getElementById('gapList'); if(gl) gl.innerHTML='';
+    const w = document.getElementById('resWarn'); if(w) w.style.display='none';
+  }
+}
 
 /* ---------- rebalance check (no new money) ---------- */
 function setMode(m){
@@ -1465,15 +1493,22 @@ function applyReturningLayout(){
   if(!(S.accounts.length && grand>0)) return;
   document.getElementById('s1').classList.add('closed');
   document.getElementById('s2').classList.add('closed');
-  const wrap = document.querySelector('.wrap');
   const s3 = document.getElementById('s3'), s1 = document.getElementById('s1');
+  /* use s1's own parent — querySelector('.wrap') grabs the header's wrapper, not the content one */
+  const wrap = s1.parentNode;
+  if(!wrap || s3.parentNode!==wrap) return;
   wrap.insertBefore(s3, s1);
-  document.getElementById('s3').querySelector('.step-n').textContent = '↻';
-  document.getElementById('s1chip').textContent = '1';
-  document.getElementById('s2chip').textContent = '2';
+  const chip = s3.querySelector('.step-n'); if(chip) chip.textContent = '↻';
+  const c1 = document.getElementById('s1chip'); if(c1) c1.textContent = '1';
+  const c2 = document.getElementById('s2chip'); if(c2) c2.textContent = '2';
 }
 
 function renderAll(){ syncClasses(); renderAccounts(); renderPresets(); renderTargets(); renderDrift(); renderFees(); renderPlanner(); renderRoom(); renderAum(); renderWait(); }
+/* wrap every input-mutating function so stale results can't survive a change */
+['addAccount','delAcct','upAcct','addHold','delHold','upHold','setPreset','onSlider','onIntlSlider',
+ 'onTiltSlider','upTarget','addCategory','upCategory','delCategory','loadSample','importJSON']
+ .forEach(fn=>{ const orig=window[fn]; if(typeof orig==='function'){
+   window[fn]=function(){ const out=orig.apply(this,arguments); try{invalidateResults()}catch(e){} return out; }; } });
 load(); renderAll(); applyReturningLayout();
 if(S.mode==='rebal') setMode('rebal');
 function stampAsOf(){ const el=document.getElementById('asofFoot'); if(el) el.textContent=SPLITS_ASOF; }
