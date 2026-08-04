@@ -22,7 +22,7 @@ Think of it as the spreadsheet you'd have built if you were better at spreadshee
 
 There is no backend and there are no accounts. Everything you enter lives in your browser's localStorage and is never transmitted anywhere — there is no server to send it to. Export a JSON backup any time; clearing browser data erases everything (that's a feature and a warning — back up).
 
-The page makes exactly three outbound requests: the page itself, Google Fonts, and a static `fund-data.json`. There is one more: a page counter via [GoatCounter](https://www.goatcounter.com), which is open source, sets no cookies, and collects no personal data. It counts visits, nothing else. A Content-Security-Policy in the page restricts outbound connections to that list, so you can verify this rather than take my word for it.
+Outbound requests are limited to: the page itself, Google Fonts, a static `fund-data.json`, and a page counter via [GoatCounter](https://www.goatcounter.com) — open source, no cookies, no personal data, visit counts only. The counter script (`count.js`) is served from this repo rather than a third-party CDN, so no outside company sees your visit. A Content-Security-Policy in the page restricts outbound connections to that list, so you can verify this rather than take my word for it.
 
 ## Verify the math
 
