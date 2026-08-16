@@ -317,7 +317,7 @@ async function main() {
   check(months, series.US, '2013', 0.33, 'US 2013');
   check(months, series.US, '1974', -0.27, 'US 1974');
   check(months, series.USSCV, '2008', -0.35, 'Small value 2008');
-  check(months, series.USSCV, '2021', 0.32, 'Small value 2021');
+  check(months, series.USSCV, '2021', 0.41, 'Small value 2021');
   check(months, series.INTL, '2008', -0.43, 'International 2008');
   check(months, series.BOND, '2022', -0.17, 'Bonds 2022');
 
