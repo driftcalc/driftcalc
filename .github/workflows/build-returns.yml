@@ -1,0 +1,72 @@
+name: Build returns.json
+
+# Rebuilds the backtest history file on GitHub's servers.
+#   - Run it by hand any time: Actions tab -> this workflow -> "Run workflow"
+#   - Otherwise it runs on the 3rd of every month, after the data providers
+#     have posted the prior month.
+# If the sanity checks in build-returns.mjs fail, the job fails and nothing is
+# committed. A stale returns.json is much better than a wrong one.
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 6 3 * *'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Generate returns.json
+        run: |
+          set -o pipefail
+          node build-returns.mjs 2>&1 | tee build.log
+
+      - name: Refuse to ship data that failed its own checks
+        run: |
+          if grep -q "CHECK THIS" build.log; then
+            echo "::error::A sanity check failed. Upstream data probably changed format. Nothing was committed."
+            exit 1
+          fi
+          if [ ! -s returns.json ]; then
+            echo "::error::returns.json is missing or empty."
+            exit 1
+          fi
+          echo "Checks passed."
+
+      - name: Show what we got
+        run: |
+          node -e "
+            const d = require('./returns.json');
+            console.log('months     ', d.months.length, '(' + d.start + ' to ' + d.end + ')');
+            console.log('all classes from', d.firstMonthWithAllClasses);
+            for (const k of Object.keys(d.series)) {
+              const n = d.series[k].filter(v => v !== null).length;
+              console.log('  ' + k.padEnd(6), n, 'months');
+            }
+          "
+
+      - name: Commit if it changed
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          rm -f build.log
+          git add returns.json
+          if git diff --cached --quiet; then
+            echo "returns.json is unchanged, nothing to commit."
+          else
+            git commit -m "Update returns.json ($(date -u +%Y-%m-%d))"
+            git push
+            echo "Committed."
+          fi
+
