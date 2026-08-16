@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https://driftcalc.goatcounter.com; connect-src 'self' https://driftcalc.goatcounter.com; frame-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<title>Backtest and leverage lab — Drift Calculator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F5F7FA; --card:#FFFFFF; --ink:#0B1F3B; --muted:#5B6B83; --faint:#93A1B5;
+  --accent:#2E6BE6; --accent-soft:#E8F0FE; --border:#E3E8F0; --hairline:#EEF2F7;
+  --green:#17A374; --red:#D93B3B; --amber:#B8860B;
+  --navy:#0B1F3B; --radius:12px;
+  --shadow:0 1px 2px rgba(16,24,40,.05), 0 1px 3px rgba(16,24,40,.04);
+  --disp:'Manrope','Inter',-apple-system,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:linear-gradient(#EDF3FE 0px, var(--bg) 380px);color:var(--ink);font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
+.num{font-variant-numeric:tabular-nums}
+.wrap{max-width:1080px;margin:0 auto;padding:0 24px}
+a{color:var(--accent)}
+
+header{background:var(--navy);position:sticky;top:0;z-index:50;box-shadow:0 1px 0 rgba(255,255,255,.06), 0 2px 12px rgba(11,31,59,.25)}
+.hbar{display:flex;align-items:center;justify-content:space-between;height:60px;gap:12px}
+.logo{font-weight:700;font-size:16.5px;letter-spacing:-.02em;display:flex;align-items:center;gap:9px;color:#fff;font-family:var(--disp);text-decoration:none}
+.logo-mark{width:24px;height:24px;border-radius:7px;background:var(--accent);display:flex;align-items:center;justify-content:center}
+.hbtns{display:flex;align-items:center;gap:8px}
+.btn{font-family:inherit;font-size:13px;font-weight:500;border:1px solid var(--border);background:var(--card);color:var(--ink);border-radius:8px;padding:7px 13px;cursor:pointer;transition:all .15s;text-decoration:none;display:inline-block}
+.btn.tiny{font-size:12px;padding:5px 10px}
+.btn.ghost{border-color:rgba(255,255,255,.18);background:transparent;color:#B9C6DB}
+.btn.ghost:hover{color:#fff;background:rgba(255,255,255,.09)}
+
+.hero{padding:34px 0 8px}
+.hero h1{font-family:var(--disp);font-size:30px;font-weight:800;letter-spacing:-.03em;line-height:1.15}
+.hero p{color:var(--muted);font-size:15px;margin-top:7px;max-width:560px}
+
+.tabs{display:flex;gap:4px;margin:26px 0 20px;border-bottom:1px solid var(--border)}
+.tab{font-family:inherit;font-size:14px;font-weight:600;border:none;background:none;color:var(--faint);padding:11px 16px;cursor:pointer;position:relative;transition:color .18s}
+.tab:hover{color:var(--muted)}
+.tab.on{color:var(--ink)}
+.tab.on::after{content:'';position:absolute;left:10px;right:10px;bottom:-1px;height:2px;background:var(--accent);border-radius:2px;animation:slidein .25s ease}
+@keyframes slidein{from{transform:scaleX(.3);opacity:0}to{transform:scaleX(1);opacity:1}}
+
+.pane{display:none}
+.pane.on{display:block;animation:fade .32s cubic-bezier(.2,.7,.3,1)}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow);margin-bottom:16px}
+.big-title{font-family:var(--disp);font-size:15.5px;font-weight:700;letter-spacing:-.01em;margin-bottom:12px}
+
+.strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));border:1px solid var(--border);border-radius:var(--radius);background:var(--card);overflow:hidden;box-shadow:var(--shadow);margin-bottom:18px}
+.stat{padding:14px 17px;border-right:1px solid var(--hairline)}
+.stat:last-child{border-right:none}
+.stat .k{font-size:10.5px;text-transform:uppercase;letter-spacing:.07em;color:var(--faint);font-weight:500;white-space:nowrap}
+.stat .v{font-family:var(--disp);font-size:23px;font-weight:800;letter-spacing:-.025em;margin-top:3px;transition:color .2s}
+
+.hero-grid{display:grid;grid-template-columns:200px 1fr;gap:26px;align-items:center}
+@media(max-width:720px){.hero-grid{grid-template-columns:1fr}}
+.legend{display:flex;flex-direction:column;gap:7px;font-size:13.5px}
+.legrow{display:flex;align-items:center;gap:9px}
+.dot{width:9px;height:9px;border-radius:3px;flex:none}
+.legrow b{margin-left:auto;font-variant-numeric:tabular-nums}
+
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+th{font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--faint);font-weight:600;text-align:right;padding:0 0 9px}
+th:first-child{text-align:left}
+td{padding:9px 0;border-top:1px solid var(--hairline);text-align:right}
+td:first-child{text-align:left}
+tr.me td{font-weight:700}
+.dim{color:var(--muted)}
+
+label.ctl{display:flex;align-items:center;gap:9px;font-size:13px;color:var(--muted)}
+select,input[type=range]{font-family:inherit;font-size:13px}
+select{border:1px solid var(--border);border-radius:7px;padding:5px 8px;background:var(--card);color:var(--ink)}
+input[type=range]{-webkit-appearance:none;appearance:none;height:4px;border-radius:2px;background:var(--border);outline:none}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--accent);cursor:pointer;border:2px solid #fff;box-shadow:0 1px 4px rgba(16,24,40,.25);transition:transform .12s}
+input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15)}
+.ctlbar{display:flex;gap:20px;flex-wrap:wrap;align-items:center;margin-bottom:18px}
+
+.note{background:#F8FAFD;border:1px solid var(--hairline);border-radius:10px;padding:13px 15px;font-size:12.8px;color:var(--muted);line-height:1.7}
+.warn{background:#FFF8E8;border:1px solid #F0E0B8;border-radius:10px;padding:13px 15px;font-size:12.8px;color:#6B5410;line-height:1.7}
+.danger{background:#FCEDED;border:1px solid #F3CFCF;border-radius:10px;padding:13px 15px;font-size:12.8px;color:#8A2626;line-height:1.7}
+.up{color:var(--green)} .down{color:var(--red)}
+code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12.5px;background:var(--hairline);padding:1px 5px;border-radius:4px}
+footer{margin-top:44px;padding:26px 0 60px;border-top:1px solid var(--border);font-size:12.5px;color:var(--faint);line-height:1.75}
+.skel{color:var(--faint);font-size:13.5px;padding:8px 0}
+</style>
+</head>
+<body>
+
+<header><div class="wrap hbar">
+  <a class="logo" href="/"><span class="logo-mark"><svg width="12" height="12" viewBox="0 0 12 12"><rect x="1" y="6" width="2.4" height="5" rx="1" fill="#fff"/><rect x="4.8" y="3" width="2.4" height="8" rx="1" fill="#fff" opacity=".75"/><rect x="8.6" y="1" width="2.4" height="10" rx="1" fill="#fff" opacity=".5"/></svg></span>Drift Calculator</a>
+  <div class="hbtns">
+    <a class="btn ghost tiny" href="/">← Calculator</a>
+    <a class="btn tiny" href="https://ko-fi.com/driftcalc" target="_blank" rel="noopener"><span style="color:var(--accent)">&hearts;</span> Support</a>
+  </div>
+</div></header>
+
+<div class="wrap">
+
+  <div class="hero">
+    <h1>What your mix actually did</h1>
+    <p>Real monthly history back to 1990. No forecasts, no assumptions you didn't make.</p>
+  </div>
+
+  <div class="card" style="margin-top:20px">
+    <div class="hero-grid">
+      <svg id="donut" viewBox="0 0 200 200" style="width:100%;max-width:200px;margin:0 auto;display:block"></svg>
+      <div>
+        <div class="legend" id="legend"></div>
+        <div style="margin-top:16px;font-size:13px;color:var(--faint)" id="mixNote"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab on" id="tabHist" onclick="showTab('hist')">History</button>
+    <button class="tab" id="tabLev" onclick="showTab('lev')">Leverage lab</button>
+  </div>
+
+  <div class="pane on" id="paneHist"><div id="histBody" class="skel">Loading history…</div></div>
+  <div class="pane" id="paneLev"><div id="levBody" class="skel">Loading history…</div></div>
+
+</div>
+
+<footer><div class="wrap">
+  History, not a forecast. Index returns with no fund fees, spreads, or taxes removed, so a real portfolio did somewhat worse. Emerging markets and international small value have no free long-run series and are modelled as developed international. Bonds are a rolling par 10-year Treasury, a proxy for a bond fund rather than a match.
+  <br><br>Sources: <a href="https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/data_library.html" target="_blank" rel="noopener">Ken French Data Library</a> for stocks, <a href="https://fred.stlouisfed.org/series/GS10" target="_blank" rel="noopener">FRED</a> for Treasuries and CPI. Rebuilt monthly, <a href="https://github.com/driftcalc/driftcalc" target="_blank" rel="noopener">open source</a>.
+  <br><br>Educational arithmetic, not investment advice. Leverage can lose more than you put in.
+</div></footer>
+
+<script data-goatcounter="https://driftcalc.goatcounter.com/count" async src="/count.js"></script>
+<script src="backtest-page.js"></script>
+</body>
+</html>
+
