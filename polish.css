@@ -1,0 +1,124 @@
+/* Drift Calc — motion and polish.
+   Loaded after the inline styles in index.html, so equal-specificity rules here
+   win. Kept separate so the page markup never has to change for a visual tweak.
+   Everything degrades to the old static layout if this file fails to load. */
+
+/* ---------- sections open and close instead of snapping ---------- */
+section .sec-body{
+  overflow:hidden;
+  max-height:6000px;
+  opacity:1;
+  transition:max-height .40s cubic-bezier(.2,.7,.3,1), opacity .22s ease .06s;
+}
+section.closed .sec-body{
+  display:block;              /* beats the old display:none so it can animate */
+  max-height:0;
+  opacity:0;
+  transition:max-height .34s cubic-bezier(.4,0,.6,1), opacity .16s ease;
+}
+.sec-head.collapser .chev{transition:transform .28s cubic-bezier(.2,.7,.3,1), background .15s, color .15s}
+section.closed .sec-head.collapser .chev{transform:rotate(-180deg)}
+
+/* ---------- the hero and dashboard arrive on load ---------- */
+@keyframes riseIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.hero, #overview{animation:riseIn .5s cubic-bezier(.2,.7,.3,1) both}
+#overview{animation-delay:.05s;margin-top:26px}
+
+/* ---------- cards respond to the pointer ---------- */
+.card{transition:box-shadow .2s ease, border-color .2s ease, transform .2s cubic-bezier(.2,.7,.3,1)}
+.ovr .card:hover{box-shadow:0 4px 16px rgba(16,24,40,.07); border-color:#D3DDEC}
+
+/* ---------- controls feel alive ---------- */
+.pill{transition:all .18s cubic-bezier(.2,.7,.3,1)}
+.pill:hover{transform:translateY(-1px)}
+.pill.on{transform:none}
+.btn{transition:all .16s cubic-bezier(.2,.7,.3,1)}
+.btn:hover{transform:translateY(-1px)}
+.btn:active{transform:translateY(0) scale(.985)}
+input[type=range]::-webkit-slider-thumb{transition:transform .12s ease, box-shadow .12s ease}
+input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.18)}
+input[type=range]:active::-webkit-slider-thumb{transform:scale(1.05)}
+
+/* numbers settle in rather than blinking */
+.stat .v{transition:color .25s ease}
+@keyframes popNum{0%{opacity:.35;transform:translateY(3px)}100%{opacity:1;transform:none}}
+.stat-strip .stat .v{animation:popNum .34s cubic-bezier(.2,.7,.3,1) both}
+.stat-strip .stat:nth-child(2) .v{animation-delay:.05s}
+.stat-strip .stat:nth-child(3) .v{animation-delay:.10s}
+.stat-strip .stat:nth-child(4) .v{animation-delay:.15s}
+.stat-strip .stat:nth-child(5) .v{animation-delay:.20s}
+
+/* ---------- the allocation picture carries more weight ---------- */
+#donut{width:240px;height:240px;transition:transform .3s cubic-bezier(.2,.7,.3,1)}
+.donut-wrap{gap:32px}
+.donut-wrap:hover #donut{transform:scale(1.03)}
+@media(max-width:640px){#donut{width:190px;height:190px}}
+
+/* ---------- sections fade up as you scroll to them ----------
+   Only things below the fold get this, and only once each, so scrolling back
+   up is not twitchy. backtest.js adds .reveal, then .seen on intersection. */
+.reveal{opacity:0;transform:translateY(22px);
+  transition:opacity .55s cubic-bezier(.2,.7,.3,1), transform .55s cubic-bezier(.2,.7,.3,1)}
+.reveal.seen{opacity:1;transform:none}
+.reveal-d1{transition-delay:.06s}
+.reveal-d2{transition-delay:.12s}
+
+/* a hairline that draws itself in as a section arrives */
+.sec-head h2{position:relative}
+@media (prefers-reduced-motion: no-preference){
+  section.seen .sec-head h2::after{
+    content:'';position:absolute;left:0;right:0;bottom:-6px;height:2px;
+    background:var(--accent);border-radius:2px;transform-origin:left;
+    animation:underline .5s cubic-bezier(.2,.7,.3,1) both;
+  }
+  @keyframes underline{from{transform:scaleX(0);opacity:.5}to{transform:scaleX(1);opacity:.18}}
+}
+
+/* ---------- the backtest doorway ---------- */
+.bt-cta{
+  display:flex;align-items:center;gap:18px;flex-wrap:wrap;
+  padding:20px 22px;margin-top:18px;
+  border-radius:14px;border:1px solid #C9DAFB;
+  background:linear-gradient(105deg,#F2F7FF 0%,#EAF1FE 55%,#E4EDFD 100%);
+  box-shadow:0 1px 2px rgba(16,24,40,.04);
+  cursor:pointer;text-decoration:none;color:inherit;
+  transition:transform .2s cubic-bezier(.2,.7,.3,1), box-shadow .2s ease, border-color .2s ease,
+             opacity .55s cubic-bezier(.2,.7,.3,1);
+}
+.bt-cta:hover{
+  transform:translateY(-2px);
+  box-shadow:0 8px 24px rgba(46,107,230,.16);
+  border-color:#9FBFF8;
+}
+.bt-cta:active{transform:translateY(0)}
+.bt-cta .ic{
+  width:46px;height:46px;border-radius:12px;flex:none;
+  background:var(--accent);display:flex;align-items:center;justify-content:center;
+  box-shadow:0 3px 10px rgba(46,107,230,.32);
+}
+.bt-cta h3{font-family:var(--disp);font-size:16.5px;font-weight:800;letter-spacing:-.02em;margin-bottom:2px}
+.bt-cta p{color:var(--muted);font-size:13.5px;margin:0}
+.bt-cta .go{
+  margin-left:auto;white-space:nowrap;font-weight:600;font-size:13.5px;color:#fff;
+  background:var(--accent);padding:9px 17px;border-radius:9px;
+  box-shadow:0 2px 8px rgba(46,107,230,.28);
+  transition:background .16s ease, transform .16s ease;
+}
+.bt-cta:hover .go{background:#2456C4;transform:translateX(2px)}
+@media(max-width:560px){.bt-cta .go{margin-left:0;width:100%;text-align:center}}
+
+/* header link should read as a place to go, not another utility button */
+.hbtns .bt-nav{
+  border-color:rgba(120,170,255,.55) !important;
+  color:#DCE9FF !important;
+  background:rgba(46,107,230,.20) !important;
+  font-weight:600 !important;
+}
+.hbtns .bt-nav:hover{background:rgba(46,107,230,.38) !important;color:#fff !important}
+
+/* ---------- respect people who don't want motion ---------- */
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation-duration:.001ms !important;animation-delay:0s !important;transition-duration:.001ms !important}
+  .reveal{opacity:1 !important;transform:none !important}
+}
+
