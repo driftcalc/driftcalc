@@ -322,6 +322,7 @@ function renderLev() {
       '</select></label>' +
       '<label class="ctl">Leverage <input type="range" min="1" max="3" step="0.1" value="' + UI.lev + '" oninput="setUI(&#39;lev&#39;,this.value)" style="width:150px"><b class="num" style="color:var(--ink);min-width:34px">' + UI.lev.toFixed(1) + 'x</b></label>' +
       '<label class="ctl">Borrow cost over T-bills <input type="range" min="0" max="4" step="0.25" value="' + UI.spread + '" oninput="setUI(&#39;spread&#39;,this.value)" style="width:120px"><b class="num" style="color:var(--ink);min-width:38px">' + UI.spread.toFixed(2) + '%</b></label>' +
+      '<span style="color:var(--faint);font-size:13px">' + M[from].slice(0,4) + '&ndash;' + M[to].slice(0,4) + ', ' + Math.round(base.n/12) + ' years</span>' +
     '</div>' +
     '<div class="strip">' +
       '<div class="stat"><div class="k">Unlevered</div><div class="v num">' + pct(cagr(base.val, base.n)) + '</div></div>' +
