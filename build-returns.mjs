@@ -219,8 +219,7 @@ async function main() {
 
   console.log('Downloading FRED series...');
   const fredUrls = id => [
-    `https://fred.stlouisfed.org/data/${id}.txt`,
-    `https://fred.stlouisfed.org/graph/fredgraph.csv?id=${id}`,
+        `https://fred.stlouisfed.org/graph/fredgraph.csv?id=${id}`,
   ];
   const [gs10raw, cpiraw] = await Promise.all([
     getAny(fredUrls('GS10'), 'GS10 (10-year Treasury)'),
