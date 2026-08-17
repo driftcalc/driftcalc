@@ -77,11 +77,13 @@ section.closed .sec-body{
   opacity:0;
   transition:max-height .34s cubic-bezier(.4,0,.6,1), opacity .16s ease;
 }
-.sec-head.collapser .chev{transition:transform .28s cubic-bezier(.2,.7,.3,1), background .15s, color .15s}
-section.closed .sec-head.collapser .chev{transform:rotate(-180deg)}
+.sec-head.collapser .chev{transition:background .15s, color .15s}
 
-/* a closed section should read as one calm bar, not a heading with debris */
+/* a closed section should read as one calm bar, not a heading with debris.
+   index.html gives every section 26px of padding top and bottom, which on a
+   collapsed one is 52px of nothing between two title bars. */
 section{margin-bottom:14px}
+section.closed{padding-top:0 !important;padding-bottom:0 !important}
 section.closed .sec-head.collapser{background:#FBFCFE}
 .sec-head.collapser{gap:10px}
 .sec-head.collapser h2{flex:none}
@@ -205,4 +207,5 @@ section.closed .sec-head.collapser{background:#FBFCFE}
   }
   @keyframes underline{from{transform:scaleX(0);opacity:.5}to{transform:scaleX(1);opacity:.18}}
 }
+
 
