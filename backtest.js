@@ -47,11 +47,42 @@ function makeCollapsible(id) {
   }
   /* Own the click rather than leaving index.html's inline onclick in place, so
      open and closed always go through the same path and always get saved. */
-  head.onclick = function (e) {
-    if (e.target.closest('a,button,input,select')) return;
-    sec.classList.toggle('closed');
+  /* A div with an onclick is invisible to a keyboard and to a screen reader.
+     Announce it as a button and make Enter and Space work. */
+  var body = sec.querySelector('.sec-body');
+  if (body && !body.id) body.id = id + '-body';
+  head.setAttribute('role', 'button');
+  head.setAttribute('tabindex', '0');
+  if (body) head.setAttribute('aria-controls', body.id);
+
+  function toggle(e) {
+    if (e && e.target && e.target.closest && e.target.closest('a,button,input,select')) return;
+    setOpen(sec, sec.classList.contains('closed'));
     saveOpen();
+  }
+  head.onclick = toggle;
+  head.onkeydown = function (e) {
+    if (e.key !== 'Enter' && e.key !== ' ' && e.key !== 'Spacebar') return;
+    e.preventDefault();
+    toggle(e);
   };
+}
+
+/* The CSS animates max-height, which needs a number to animate to. A fixed
+   ceiling would silently clip a long section — Extras is five cards, and the
+   contribution results grid grows with the number of accounts. So the ceiling
+   only exists while closed; an open section is released to its natural height. */
+function setOpen(sec, open) {
+  var bd = sec.querySelector('.sec-body');
+  var hd = sec.querySelector('.sec-head');
+  if (open) {
+    sec.classList.remove('closed');
+    if (bd) bd.style.maxHeight = 'none';
+  } else {
+    sec.classList.add('closed');
+    if (bd) bd.style.maxHeight = '';
+  }
+  if (hd) hd.setAttribute('aria-expanded', String(open));
 }
 
 ['s2', 's1', 's3', 's5'].forEach(makeCollapsible);
@@ -121,7 +152,7 @@ function saveOpen() {
 function hasData() {
   try {
     var S = JSON.parse(localStorage.getItem('driftcalc-v1') || 'null');
-    if (!S || !S.accounts || !S.accounts.length) return false;
+    if (!S || S.isSample || !S.accounts || !S.accounts.length) return false;
     return S.accounts.some(function (acc) {
       return (acc.holdings || []).some(function (h) { return (+h.bal || 0) > 0; });
     });
@@ -142,9 +173,7 @@ function hasData() {
 
   IDS.forEach(function (id) {
     var el = document.getElementById(id);
-    if (!el) return;
-    if (saved.indexOf(id) > -1) el.classList.remove('closed');
-    else el.classList.add('closed');
+    if (el) setOpen(el, saved.indexOf(id) > -1);
   });
 })();
 
@@ -208,4 +237,5 @@ if (hp && /A drift calculator|Put in your accounts/.test(hp.textContent)) {
   }, 4000);
 })();
 })();
+
 
