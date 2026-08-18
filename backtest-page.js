@@ -523,9 +523,28 @@ function renderLev() {
         '</span></div>' +
       '<div class="field"><span class="lbl">How far back</span>' +
         seg('years', [['100','100'],['50','50'],['30','30'],['15','15']], String(UI.years)) +
-        '<span style="font-size:12px;color:var(--faint)">' + M0 + '&ndash;' + M1 +
-          (actualYears < UI.years ? ' &middot; only ' + actualYears + ' available' : ' &middot; ' + actualYears + ' years') +
-        '</span></div>' +
+        /* These buttons used to highlight and change nothing whenever the window
+           asked for more history than the mix has. Silent no-ops read as broken,
+           so say which sleeve is the constraint and offer the way out. */
+        (function () {
+          var have = Math.round(base.n / 12);
+          var line = '<span style="font-size:12px;color:var(--faint);max-width:260px;display:block;line-height:1.5">' + M0 + '&ndash;' + M1;
+          if (have >= UI.years) return line + ' &middot; ' + have + ' years</span>';
+          var ks = keysOf(w), MM = RET.months, SS = RET.series, worst = null, wi = -1;
+          for (var a2 = 0; a2 < ks.length; a2++) {
+            var i2 = 0;
+            while (i2 < MM.length && SS[ks[a2]][i2] == null) i2++;
+            if (i2 > wi) { wi = i2; worst = ks[a2]; }
+          }
+          var startYr = (wi > -1 && MM[wi]) ? MM[wi].slice(0, 4) : M0;
+          line += ' &middot; only ' + have + ' years available<br>' +
+            '<b style="color:var(--muted)">' + (NAMES[worst] || 'This mix') + ' data starts in ' + startYr + '.</b>';
+          if (UI.asset !== 'us') {
+            line += ' <a href="#" onclick="setUI(&#39;asset&#39;,&#39;us&#39;);return false" style="color:var(--accent)">Switch to US stocks</a> for the full 100.';
+          }
+          return line + '</span>';
+        })() +
+        '</div>' +
     '</div>' +
     '<div class="strip">' +
       '<div class="stat"><div class="k">No leverage</div><div class="v num">' + pct(baseG) + '</div><div class="s">a year</div></div>' +
@@ -618,6 +637,7 @@ fetch('returns.json', { cache:'no-store' })
   .then(function () { renderHist(); renderLev(); });
 
 })();
+
 
 
 
