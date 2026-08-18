@@ -203,6 +203,124 @@ if (hp && /A drift calculator|Put in your accounts/.test(hp.textContent)) {
   hp.textContent = 'Set a target, enter what you hold, and see where this month\u2019s money should go.';
 }
 
+/* ---------- styling for everything below ---------- */
+(function injectCss() {
+  var s = document.createElement('style');
+  s.textContent =
+    /* "Off target" is the product in one number and it was fifth of five. The
+       strip is a grid, so `order` moves it without touching the markup. */
+    '.stat-strip .stat.answer{order:-1;cursor:pointer;background:var(--accent-soft);' +
+      'border-right:1px solid #C9DAFB;position:relative;transition:background .15s}' +
+    '.stat-strip .stat.answer:hover{background:#E4EDFD}' +
+    '.stat-strip .stat.answer .k{color:var(--accent)}' +
+    '.stat-strip .stat.answer .v{font-size:26px;color:var(--accent)}' +
+    '.stat-strip .stat.answer::after{content:"Fix it \\2192";position:absolute;right:14px;bottom:13px;' +
+      'font-size:11.5px;font-weight:600;color:var(--accent);opacity:.7}' +
+    '@media(max-width:760px){.stat-strip .stat.answer::after{display:none}}' +
+    /* header overflow menu */
+    '.hmore{position:relative}' +
+    '.hmenu{position:absolute;right:0;top:calc(100% + 8px);display:none;flex-direction:column;gap:2px;' +
+      'background:var(--card);border:1px solid var(--border);border-radius:10px;padding:6px;' +
+      'box-shadow:0 10px 30px rgba(16,24,40,.20);z-index:60;min-width:180px}' +
+    '.hmore.open .hmenu{display:flex}' +
+    '.hmenu .btn{width:100%;text-align:left;color:var(--ink);border-color:transparent;background:transparent;font-size:13px}' +
+    '.hmenu .btn:hover{background:var(--hairline)}' +
+    '.hmenu .hide-sm{display:block}';
+  document.head.appendChild(s);
+})();
+
+/* ---------- lead with the answer ----------
+   renderDrift() rebuilds #statStrip's innerHTML on every change, so marking up
+   those nodes once does not survive. Re-tag on mutation, and delegate the click
+   to the container, which is never replaced. */
+(function leadWithTheAnswer() {
+  var strip = document.getElementById('statStrip');
+  if (!strip) return;
+
+  function tag() {
+    var cells = strip.querySelectorAll('.stat');
+    for (var i = 0; i < cells.length; i++) cells[i].classList.remove('answer');
+    /* identified by its label, not its position, so re-ordering the strip
+       upstream can never promote the wrong number */
+    for (var j = 0; j < cells.length; j++) {
+      var k = cells[j].querySelector('.k');
+      if (k && /off target/i.test(k.textContent)) { cells[j].classList.add('answer'); break; }
+    }
+  }
+  tag();
+  new MutationObserver(tag).observe(strip, { childList: true });
+
+  strip.addEventListener('click', function (e) {
+    var cell = e.target.closest ? e.target.closest('.stat') : null;
+    if (!cell || !cell.classList.contains('answer')) return;
+    var s3 = document.getElementById('s3');
+    if (!s3) return;
+    setOpen(s3, true);
+    saveOpen();
+    s3.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+})();
+
+/* ---------- put each tool where it is actually used ---------- */
+(function relocate() {
+  /* The compounding picture is a projection, not a decision, and it was the
+     largest thing above the fold on a page about this month. It belongs with
+     the other what-ifs. */
+  var growth = document.getElementById('growth');
+  var growthCard = growth && growth.closest && growth.closest('.card');
+  var s5body = document.querySelector('#s5 .sec-body');
+  if (growthCard && s5body) s5body.appendChild(growthCard);
+
+  /* Contribution room is not a side calculation. It is a limit on the answer
+     step 3 gives you, so it should be sitting next to the inputs, where it can
+     stop you before you over-contribute rather than after. */
+  var room = document.getElementById('roomBody');
+  var roomCard = room && room.closest && room.closest('.card');
+  var s3body = document.querySelector('#s3 .sec-body');
+  if (roomCard && s3body) s3body.appendChild(roomCard);
+})();
+
+/* ---------- header: two destinations, everything else behind one button ----------
+   It was carrying a place to go, a privacy claim, two file utilities, a demo
+   toggle and a donation link, all at equal weight — and on a phone the tail of
+   that list scrolled off screen, so it may as well not have existed. */
+(function tidyHeader() {
+  var bar = document.querySelector('header .hbtns');
+  if (!bar) return;
+  var spill = [].slice.call(bar.children).filter(function (el) {
+    if (el.tagName === 'INPUT') return false;          /* hidden file picker must stay where it is */
+    return !el.classList.contains('bt-nav') && !el.classList.contains('badge');
+  });
+  if (spill.length < 2) return;
+
+  var wrap = document.createElement('div');
+  wrap.className = 'hmore';
+  var btn = document.createElement('button');
+  btn.type = 'button';
+  btn.className = 'btn ghost tiny';
+  btn.textContent = '\u22EF';
+  btn.setAttribute('aria-label', 'More options');
+  btn.setAttribute('aria-haspopup', 'true');
+  btn.setAttribute('aria-expanded', 'false');
+  var menu = document.createElement('div');
+  menu.className = 'hmenu';
+  spill.forEach(function (el) { menu.appendChild(el); });
+  wrap.appendChild(btn);
+  wrap.appendChild(menu);
+  bar.appendChild(wrap);
+
+  function close() { wrap.classList.remove('open'); btn.setAttribute('aria-expanded', 'false'); }
+  btn.addEventListener('click', function (e) {
+    e.stopPropagation();
+    var open = !wrap.classList.contains('open');
+    wrap.classList.toggle('open', open);
+    btn.setAttribute('aria-expanded', String(open));
+  });
+  document.addEventListener('click', close);
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') close(); });
+  menu.addEventListener('click', function () { setTimeout(close, 0); });
+})();
+
 /* ---------- reveal on scroll ----------
    Marks sections as they come into view so they fade up instead of just being
    there. Fires once each. If IntersectionObserver is missing, everything is
@@ -237,5 +355,6 @@ if (hp && /A drift calculator|Put in your accounts/.test(hp.textContent)) {
   }, 4000);
 })();
 })();
+
 
 
