@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https://driftcalc.goatcounter.com; connect-src 'self' https://driftcalc.goatcounter.com; frame-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<title>What does a 1% advisor fee actually cost? — Drift Calculator</title>
+<meta name="description" content="Put in your balance and your advisor's fee. See what that percentage costs in dollars over the years you hold it. Free, no login, nothing saved.">
+<link rel="canonical" href="https://driftcalc.com/fees.html">
+
+<!-- Social preview. A link to this page should say what the page says. -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://driftcalc.com/fees.html">
+<meta property="og:site_name" content="Drift Calculator">
+<meta property="og:title" content="What does a 1% advisor fee actually cost?">
+<meta property="og:description" content="One percent sounds small. Over thirty years it is usually six figures. Put your own number in.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="What does a 1% advisor fee actually cost?">
+<meta name="twitter:description" content="One percent sounds small. Over thirty years it is usually six figures. Put your own number in.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F5F7FA; --card:#FFFFFF; --ink:#0B1F3B; --muted:#5B6B83; --faint:#93A1B5;
+  --accent:#2E6BE6; --accent-soft:#E8F0FE; --border:#E3E8F0; --hairline:#EEF2F7;
+  --green:#17A374; --red:#D93B3B;
+  --navy:#0B1F3B; --radius:12px;
+  --shadow:0 1px 2px rgba(16,24,40,.05), 0 1px 3px rgba(16,24,40,.04);
+  --disp:'Manrope','Inter',-apple-system,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:linear-gradient(#EDF3FE 0px, var(--bg) 380px);color:var(--ink);
+  font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
+.num{font-variant-numeric:tabular-nums}
+.wrap{max-width:820px;margin:0 auto;padding:0 22px}
+
+header{background:var(--navy);padding:14px 0}
+header .wrap{display:flex;align-items:center;justify-content:space-between;gap:14px}
+.logo{display:flex;align-items:center;gap:9px;color:#fff;text-decoration:none;font-family:var(--disp);font-weight:800;letter-spacing:-.02em}
+.logo .mk{width:26px;height:26px;border-radius:7px;background:var(--accent);display:flex;align-items:center;justify-content:center}
+.hbtns{display:flex;gap:8px;align-items:center}
+.btn{font-family:inherit;font-size:13px;font-weight:500;border:1px solid var(--border);background:var(--card);
+  color:var(--ink);border-radius:8px;padding:8px 14px;cursor:pointer;transition:all .15s;text-decoration:none;display:inline-block}
+.btn:hover{border-color:#CBD5E4;background:#FBFCFE}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.primary:hover{background:#2456C4}
+.btn.nav{border-color:rgba(120,170,255,.55);color:#DCE9FF;background:rgba(46,107,230,.20);font-weight:600;font-size:12px;padding:5px 11px}
+.btn.nav:hover{background:rgba(46,107,230,.38);color:#fff}
+
+.hero{padding:48px 0 26px}
+h1{font-family:var(--disp);font-size:38px;font-weight:800;letter-spacing:-.03em;line-height:1.1}
+h1 em{font-style:normal;color:var(--accent)}
+.sub{color:var(--muted);margin-top:14px;font-size:16.5px;max-width:620px}
+
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:22px}
+.controls{display:flex;gap:22px;flex-wrap:wrap;margin-bottom:4px}
+.field{display:flex;flex-direction:column;gap:7px}
+.lbl{font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--faint);font-weight:600}
+.money-wrap{position:relative;display:inline-block}
+.money-wrap span{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--faint);font-size:14px}
+input[type=text]{font-family:inherit;font-size:16px;border:1px solid var(--border);border-radius:9px;
+  padding:10px 12px 10px 24px;width:170px;color:var(--ink);background:#fff}
+input[type=text]:focus{outline:2px solid var(--accent);outline-offset:1px;border-color:transparent}
+input[type=range]{-webkit-appearance:none;appearance:none;height:28px;background:transparent;width:190px;cursor:pointer;margin:0}
+input[type=range]::-webkit-slider-runnable-track{height:5px;border-radius:99px;background:#DCE4F0}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;
+  background:var(--accent);border:2px solid #fff;box-shadow:0 1px 4px rgba(16,24,40,.28);margin-top:-7.5px}
+input[type=range]::-moz-range-track{height:5px;border-radius:99px;background:#DCE4F0}
+input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;background:var(--accent);border:2px solid #fff}
+.readout{font-family:var(--disp);font-size:16px;font-weight:800;min-width:56px;display:inline-block}
+.seg{display:inline-flex;background:var(--hairline);border-radius:10px;padding:3px;gap:2px}
+.seg button{font-family:inherit;font-size:13px;font-weight:600;border:none;background:none;color:var(--muted);
+  padding:7px 14px;border-radius:8px;cursor:pointer;transition:all .18s}
+.seg button:hover{color:var(--ink)}
+.seg button.on{background:var(--card);color:var(--ink);box-shadow:0 1px 3px rgba(16,24,40,.10)}
+
+.answer{margin:26px 0 0;padding:30px 26px;border-radius:16px;border:1px solid #C9DAFB;
+  background:linear-gradient(105deg,#F2F7FF 0%,#EAF1FE 55%,#E4EDFD 100%)}
+.answer .k{font-size:11.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--accent);font-weight:700}
+.answer .big{font-family:var(--disp);font-size:62px;font-weight:800;letter-spacing:-.035em;line-height:1.05;color:var(--accent);margin:6px 0 10px}
+.answer .say{font-size:16.5px;line-height:1.6;max-width:640px}
+.answer .say b{font-weight:700}
+@media(max-width:600px){ .answer .big{font-size:44px} h1{font-size:29px} }
+
+.bars{display:flex;flex-direction:column;gap:12px;margin-top:24px}
+.bar-row{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.bar-lab{width:150px;font-size:13.5px;color:var(--muted);flex:none}
+.bar-track{flex:1;min-width:130px;height:26px;background:var(--hairline);border-radius:7px;overflow:hidden}
+.bar-fill{height:100%;border-radius:7px;transition:width .4s cubic-bezier(.2,.7,.3,1)}
+.bar-val{width:120px;text-align:right;font-family:var(--disp);font-weight:800;font-size:15px;flex:none}
+
+.note{background:var(--hairline);border-radius:10px;padding:14px 16px;color:var(--muted);font-size:13.5px;line-height:1.6;margin-top:18px}
+.note b{color:var(--ink)}
+.share{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:22px}
+.share .ok{font-size:13px;color:var(--green);font-weight:600;opacity:0;transition:opacity .2s}
+.share .ok.on{opacity:1}
+section.blk{margin-top:34px}
+h2{font-family:var(--disp);font-size:20px;font-weight:700;letter-spacing:-.02em;margin-bottom:12px}
+footer{margin-top:56px;padding:26px 0 40px;border-top:1px solid var(--border);color:var(--faint);font-size:12.5px;line-height:1.7}
+footer a{color:var(--muted)}
+</style>
+</head>
+<body>
+
+<header><div class="wrap">
+  <a class="logo" href="/">
+    <span class="mk"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M4 20V10M10 20V4M16 20v-7M22 20V7" stroke="#fff" stroke-width="3" stroke-linecap="round"/></svg></span>
+    Drift Calculator
+  </a>
+  <div class="hbtns">
+    <a class="btn nav" href="/">Calculator</a>
+    <a class="btn nav" href="/backtest.html">Backtest</a>
+  </div>
+</div></header>
+
+<div class="wrap">
+
+  <div class="hero">
+    <h1>What does a <em>1% fee</em> actually cost?</h1>
+    <p class="sub">A percentage is not a price. Put in your balance and see the number in dollars.</p>
+  </div>
+
+  <div class="card">
+    <div class="controls">
+      <div class="field">
+        <span class="lbl">Portfolio balance</span>
+        <div class="money-wrap"><span>$</span><input type="text" id="bal" inputmode="numeric" value="250,000"></div>
+      </div>
+      <div class="field">
+        <span class="lbl">Annual fee</span>
+        <div style="display:flex;align-items:center;gap:12px">
+          <input type="range" id="fee" min="0" max="2" step="0.05" value="1">
+          <span class="readout num" id="feeOut">1.00%</span>
+        </div>
+      </div>
+      <div class="field">
+        <span class="lbl">Years you hold it</span>
+        <div class="seg" id="yrSeg"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="answer">
+    <div class="k">What the fee takes</div>
+    <div class="big num" id="big">$0</div>
+    <div class="say" id="say"></div>
+    <div class="share">
+      <button class="btn primary" id="copyBtn" type="button">Copy link to this result</button>
+      <a class="btn" href="/">Run it on your real accounts &rarr;</a>
+      <span class="ok" id="copyOk">Copied</span>
+    </div>
+  </div>
+
+  <section class="blk">
+    <h2>Where you land either way</h2>
+    <div class="bars" id="bars"></div>
+    <div class="note" id="assump"></div>
+  </section>
+
+  <section class="blk">
+    <h2>The honest version</h2>
+    <div class="note">
+      <b>A fee is not automatically a rip-off.</b> Plenty of advisors earn theirs several times over
+      in tax planning, estate work, and talking someone off a ledge in a crash — that last one alone
+      can be worth more than the fee. Flat-fee and hourly advisors exist too, and they do not scale
+      with your balance the way a percentage does.
+      <br><br>
+      <b>The point is not "never pay." It is "know the number."</b> Most people have never seen the
+      percentage converted into dollars, and the conversion is the whole argument. Once you can see
+      it, you can decide whether you are getting that much value back.
+    </div>
+  </section>
+
+  <section class="blk">
+    <h2>This applies to fund fees too</h2>
+    <div class="note">
+      An expense ratio works exactly the same way, just with a smaller number in front. Drop the fee
+      slider to <b>0.50%</b> to see what an average actively managed fund costs against an index fund
+      near <b>0.03%</b>. The gap is usually larger than people expect, and unlike market returns,
+      it is the one part of this you actually control.
+      <br><br>
+      <a href="/">The full calculator</a> reads the funds you actually hold and works out your real
+      blended expense ratio.
+    </div>
+  </section>
+
+</div>
+
+<footer><div class="wrap">
+  <b>Drift Calc</b> is an educational calculator for portfolio arithmetic. It is not investment advice,
+  tax advice, or a recommendation of any security or strategy, and it knows nothing about your situation.
+  Every number here is an estimate built from what you type in and a fixed assumed return — real returns
+  vary, arrive out of order, and include drops. Talk to a qualified professional before making decisions.
+  Nothing on this page is stored or sent anywhere.
+</div></footer>
+
+<script src="count.js" defer></script>
+<script>
+(function () {
+'use strict';
+
+/* ---------- inputs, clamped ----------
+   Everything here can arrive from a URL a stranger constructed, so each value is
+   parsed, bounded, and never trusted. Nothing is written to the DOM as HTML. */
+var YEARS = [10, 20, 30, 40];
+var ST = { bal: 250000, fee: 1.0, yrs: 30 };
+var RET = 0.07;                       /* nominal, before fees */
+
+function clamp(v, lo, hi, dflt) {
+  v = parseFloat(v);
+  if (!isFinite(v)) return dflt;
+  return Math.min(hi, Math.max(lo, v));
+}
+
+function readUrl() {
+  var q = new URLSearchParams(location.search);
+  if (q.has('bal')) ST.bal = clamp(String(q.get('bal')).replace(/[^0-9.]/g, ''), 0, 1e11, 250000);
+  if (q.has('fee')) ST.fee = clamp(q.get('fee'), 0, 2, 1);
+  if (q.has('yrs')) {
+    var y = clamp(q.get('yrs'), 1, 60, 30);
+    ST.yrs = YEARS.indexOf(Math.round(y)) > -1 ? Math.round(y) : 30;
+  }
+}
+
+/* ---------- money ---------- */
+function money(n) {
+  if (!isFinite(n)) return '$0';
+  return '$' + Math.round(n).toLocaleString('en-US');
+}
+function big(n) {
+  if (n >= 1e6) return '$' + (n / 1e6).toFixed(n < 1e7 ? 2 : 1) + 'M';
+  if (n >= 1e3) return '$' + Math.round(n / 1e3) + 'k';
+  return money(n);
+}
+
+/* Same arithmetic the main calculator uses: the fee comes straight off the
+   compounding rate, so its cost is the gap between two growth curves. */
+function endValue(bal, rate, yrs) { return bal * Math.pow(1 + rate, yrs); }
+
+function calc() {
+  var gross = endValue(ST.bal, RET, ST.yrs);
+  var net   = endValue(ST.bal, RET - ST.fee / 100, ST.yrs);
+  return { gross: gross, net: net, cost: gross - net, share: gross > 0 ? (gross - net) / gross : 0 };
+}
+
+/* ---------- render ---------- */
+function seg() {
+  var box = document.getElementById('yrSeg');
+  box.textContent = '';
+  YEARS.forEach(function (y) {
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.textContent = String(y);
+    if (y === ST.yrs) b.className = 'on';
+    b.addEventListener('click', function () { ST.yrs = y; render(); });
+    box.appendChild(b);
+  });
+}
+
+function bars(r) {
+  var box = document.getElementById('bars');
+  box.textContent = '';
+  var rows = [
+    ['With no fee at all', r.gross, '#17A374'],
+    ['After a ' + ST.fee.toFixed(2) + '% fee', r.net, 'var(--accent)'],
+    ['What the fee took', r.cost, '#D93B3B']
+  ];
+  rows.forEach(function (row) {
+    var wrapEl = document.createElement('div'); wrapEl.className = 'bar-row';
+    var lab = document.createElement('div'); lab.className = 'bar-lab'; lab.textContent = row[0];
+    var track = document.createElement('div'); track.className = 'bar-track';
+    var fill = document.createElement('div'); fill.className = 'bar-fill';
+    fill.style.width = (r.gross > 0 ? Math.max(1, row[1] / r.gross * 100) : 0) + '%';
+    fill.style.background = row[2];
+    track.appendChild(fill);
+    var val = document.createElement('div'); val.className = 'bar-val num'; val.textContent = money(row[1]);
+    wrapEl.appendChild(lab); wrapEl.appendChild(track); wrapEl.appendChild(val);
+    box.appendChild(wrapEl);
+  });
+}
+
+function render() {
+  document.getElementById('feeOut').textContent = ST.fee.toFixed(2) + '%';
+  var el = document.getElementById('bal');
+  if (document.activeElement !== el) el.value = ST.bal.toLocaleString('en-US');
+
+  var r = calc();
+  document.getElementById('big').textContent = big(r.cost);
+
+  /* built with textContent and <b> nodes, never innerHTML with user numbers */
+  var say = document.getElementById('say');
+  say.textContent = '';
+  function t(s) { say.appendChild(document.createTextNode(s)); }
+  function bd(s) { var b = document.createElement('b'); b.textContent = s; say.appendChild(b); }
+
+  if (ST.fee === 0 || ST.bal === 0) {
+    t('Set a balance and a fee above. At zero the answer is zero, which is the nice thing about index funds.');
+  } else {
+    t('A ');
+    bd(ST.fee.toFixed(2) + '%');
+    t(' fee on ');
+    bd(money(ST.bal));
+    t(' costs about ');
+    bd(money(r.cost));
+    t(' over ' + ST.yrs + ' years. That is ');
+    bd(Math.round(r.share * 100) + '%');
+    t(' of everything the money would otherwise have become — not ' + ST.fee.toFixed(2) + '%, because the fee compounds too.');
+  }
+
+  bars(r);
+
+  document.getElementById('assump').textContent =
+    'Assumes ' + (RET * 100).toFixed(0) + '% a year before fees, nominal, no new contributions, and the fee ' +
+    'charged every year on the whole balance. Real returns are lumpier than this and arrive out of order. ' +
+    'The shape of the answer does not change: a percentage taken every year compounds against you the same ' +
+    'way returns compound for you.';
+
+  syncUrl();
+}
+
+/* the URL is the product here — every state is a link someone can send */
+function syncUrl() {
+  var q = new URLSearchParams();
+  q.set('bal', String(Math.round(ST.bal)));
+  q.set('fee', ST.fee.toFixed(2));
+  q.set('yrs', String(ST.yrs));
+  history.replaceState(null, '', location.pathname + '?' + q.toString());
+}
+
+/* ---------- wiring ---------- */
+document.getElementById('fee').addEventListener('input', function () {
+  ST.fee = clamp(this.value, 0, 2, 1);
+  render();
+});
+document.getElementById('bal').addEventListener('input', function () {
+  ST.bal = clamp(this.value.replace(/[^0-9.]/g, ''), 0, 1e11, 0);
+  render();
+});
+document.getElementById('bal').addEventListener('blur', function () {
+  this.value = ST.bal.toLocaleString('en-US');
+});
+
+document.getElementById('copyBtn').addEventListener('click', function () {
+  var ok = document.getElementById('copyOk');
+  var url = location.href;
+  function flash() { ok.classList.add('on'); setTimeout(function () { ok.classList.remove('on'); }, 1600); }
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(url).then(flash, flash);
+  } else {
+    /* older Safari: a temporary field is the only reliable path */
+    var tmp = document.createElement('input');
+    tmp.value = url; document.body.appendChild(tmp); tmp.select();
+    try { document.execCommand('copy'); } catch (e) {}
+    document.body.removeChild(tmp); flash();
+  }
+});
+
+readUrl();
+document.getElementById('fee').value = ST.fee;
+seg();
+render();
+})();
+</script>
+</body>
+</html>
+
