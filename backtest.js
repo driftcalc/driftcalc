@@ -321,6 +321,52 @@ if (hp && /A drift calculator|Put in your accounts/.test(hp.textContent)) {
   menu.addEventListener('click', function () { setTimeout(close, 0); });
 })();
 
+/* ---------- Extras was a junk drawer ----------
+   Five unrelated calculators under one heading that said nothing. Two of them
+   are about what you are paying, three are about what happens if you change
+   something. Naming those two ideas is most of the work — a heading that says
+   "What this costs you" tells you whether to open it; "Extras" never did.
+   Runs after relocate(), so the compounding chart it moved in is included. */
+(function groupExtras() {
+  var body = document.querySelector('#s5 .sec-body');
+  if (!body) return;
+
+  var css = document.createElement('style');
+  css.textContent =
+    '.xgroup{font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--faint);' +
+      'font-weight:600;margin:26px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--hairline)}' +
+    '.sec-body > .xgroup:first-child{margin-top:4px}';
+  document.head.appendChild(css);
+
+  function cardOf(id) {
+    var el = document.getElementById(id);
+    return el && el.closest ? el.closest('.card') : null;
+  }
+
+  var groups = [
+    ['What this costs you', ['feesBody', 'aumBody']],
+    ['What if', ['waitBody', 'plannerBody', 'growth']]
+  ];
+
+  groups.forEach(function (g) {
+    var cards = g[1].map(cardOf).filter(Boolean);
+    if (!cards.length) return;
+    var h = document.createElement('div');
+    h.className = 'xgroup';
+    h.textContent = g[0];
+    body.appendChild(h);
+    var row = document.createElement('div');
+    row.className = 'ovr';
+    cards.forEach(function (c) { row.appendChild(c); });
+    body.appendChild(row);
+  });
+
+  /* the original two-column wrappers are empty once their cards have moved */
+  [].slice.call(body.querySelectorAll('.ovr')).forEach(function (o) {
+    if (!o.children.length && o.parentNode) o.parentNode.removeChild(o);
+  });
+})();
+
 /* ---------- reveal on scroll ----------
    Marks sections as they come into view so they fade up instead of just being
    there. Fires once each. If IntersectionObserver is missing, everything is
@@ -355,6 +401,7 @@ if (hp && /A drift calculator|Put in your accounts/.test(hp.textContent)) {
   }, 4000);
 })();
 })();
+
 
 
 
