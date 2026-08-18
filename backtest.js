@@ -19,6 +19,15 @@ if (bar) {
   a.style.textDecoration = 'none';
   a.innerHTML = '<span style="opacity:.85;margin-right:5px">&#9650;</span>Backtest';
   bar.insertBefore(a, bar.firstChild);
+
+  /* fees.html is the shareable one — the number people actually send each other.
+     It earns a slot next to Backtest rather than being buried in Extras. */
+  var fa = document.createElement('a');
+  fa.className = 'btn tiny bt-nav';
+  fa.href = '/fees.html';
+  fa.style.textDecoration = 'none';
+  fa.textContent = 'Fee cost';
+  bar.insertBefore(fa, bar.firstChild);
 }
 
 /* ---------- make every section collapse the same way ----------
@@ -344,7 +353,7 @@ if (hp && /A drift calculator|Put in your accounts/.test(hp.textContent)) {
   }
 
   var groups = [
-    ['What this costs you', ['feesBody', 'aumBody']],
+    ['What this costs you', ['feesBody', 'aumBody'], '/fees.html'],
     ['What if', ['waitBody', 'plannerBody', 'growth']]
   ];
 
@@ -354,6 +363,14 @@ if (hp && /A drift calculator|Put in your accounts/.test(hp.textContent)) {
     var h = document.createElement('div');
     h.className = 'xgroup';
     h.textContent = g[0];
+    /* the cost group has a standalone, linkable version — point at it */
+    if (g[2]) {
+      var more = document.createElement('a');
+      more.href = g[2];
+      more.textContent = 'open the shareable version \u2192';
+      more.style.cssText = 'float:right;text-transform:none;letter-spacing:0;font-weight:600;color:var(--accent);text-decoration:none';
+      h.appendChild(more);
+    }
     body.appendChild(h);
     var row = document.createElement('div');
     row.className = 'ovr';
@@ -401,6 +418,7 @@ if (hp && /A drift calculator|Put in your accounts/.test(hp.textContent)) {
   }, 4000);
 })();
 })();
+
 
 
 
