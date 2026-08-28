@@ -5,6 +5,21 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https://driftcalc.goatcounter.com; connect-src 'self' https://driftcalc.goatcounter.com; frame-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
 <title>Drift Calculator: where should this month's contribution go?</title>
+<meta name="description" content="Put in your accounts and your target allocation, and see where this month's money should go. Free, no login, and nothing you type leaves your browser.">
+<link rel="canonical" href="https://driftcalc.com/">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://driftcalc.com/">
+<meta property="og:site_name" content="Drift Calculator">
+<meta property="og:title" content="Where should this month's contribution go?">
+<meta property="og:description" content="A drift calculator for index investors. Enter what you hold and what you want to hold, and see where the new money goes.">
+<meta property="og:image" content="https://driftcalc.com/og-home.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Drift Calculator. Where should this month's contribution go?">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Where should this month's contribution go?">
+<meta name="twitter:description" content="A drift calculator for index investors. Enter what you hold and what you want to hold, and see where the new money goes.">
+<meta name="twitter:image" content="https://driftcalc.com/og-home.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="polish.css">
@@ -85,6 +100,10 @@ details.adv > summary:hover{color:var(--ink)}
 .btn.ghost{border-color:transparent;background:transparent;color:var(--muted)}
 .btn.ghost:hover{color:var(--ink);background:var(--hairline)}
 .btn.tiny{font-size:12px;padding:4px 9px}
+
+/* sample banner: the clear button needs a real touch target, not a 24px pill */
+#sampleBanner .btn{min-height:40px;padding:9px 15px;font-size:13px}
+@media (pointer:coarse){#sampleBanner .btn{min-height:44px}}
 
 /* hero */
 .hero{padding:56px 0 36px}
@@ -663,6 +682,19 @@ function loadSample(silent){
   save(); if(!silent){ renderAll(); toast('Sample portfolio loaded'); }
 }
 
+/* The sample banner used to say "start fresh" with nothing to click, so clearing
+   the sample meant deleting nine holdings by hand at 21px a button. This wipes the
+   money and keeps whatever target dials they have already set. */
+function startFresh(){
+  S.accounts = [{id:uid(), name:'My 401(k)', type:'401(k)', holdings:[{id:uid(), ticker:'', cls:'US', bal:0}]}];
+  S.contrib = {};
+  S.isSample = false;
+  save(); renderAll();
+  const s1 = document.getElementById('s1');
+  if(s1){ s1.classList.remove('closed'); s1.scrollIntoView({behavior:'smooth', block:'start'}); }
+  toast('Sample cleared. Your accounts go here.');
+}
+
 /* ---------- exposure math ---------- */
 function exposure(h){
   const t = (h.ticker||'').toUpperCase().trim();
@@ -775,15 +807,18 @@ function renderOverview(){
   const ov = document.getElementById('overview'); if(!ov) return;
   const cur = currentByClass();
   const total = Object.values(cur).reduce((a,b)=>a+b,0);
-  if(total<=0){ ov.style.display='none'; return; }
+  if(total<=0){ ov.style.display='none';
+    const sb0=document.getElementById('sampleBanner'); if(sb0) sb0.style.display = S.isSample ? 'flex' : 'none';
+    return; }
   ov.style.display='block';
   let sb = document.getElementById('sampleBanner');
   if(S.isSample){
     if(!sb){ sb = document.createElement('div'); sb.id='sampleBanner';
-      sb.style.cssText='margin-bottom:14px;font-size:13px;background:#FBF3E4;color:#8a5a00;border:1px solid #F0DFB8;border-radius:10px;padding:10px 14px';
-      sb.innerHTML = '<b>You\'re looking at sample data.</b> Every number on this page is made up. Edit any account below, or start fresh, and it becomes yours.';
+      sb.style.cssText='margin-bottom:14px;font-size:13px;background:#FBF3E4;color:#8a5a00;border:1px solid #F0DFB8;border-radius:10px;padding:10px 14px;display:flex;align-items:center;gap:12px;flex-wrap:wrap';
+      sb.innerHTML = '<span style="flex:1;min-width:230px"><b>You\'re looking at sample data.</b> Every number here is made up. Edit any account below to make it yours, or clear it and put your own in.</span>' +
+        '<button class="btn tiny" type="button" onclick="startFresh()" style="white-space:nowrap">Clear this and use my numbers</button>';
       ov.parentNode.insertBefore(sb, ov); }
-    sb.style.display='block';
+    sb.style.display='flex';
   } else if(sb) sb.style.display='none';
   /* --- stat strip --- */
   const eqNow = total - cur.BOND;
@@ -1231,7 +1266,10 @@ function renderDrift(){
   const total = Object.values(cur).reduce((a,b)=>a+b,0);
   const t = targets();
   const el = document.getElementById('driftBars');
-  if(total<=0){ el.innerHTML='<div class="empty">Add balances to see your current allocation.</div>'; return; }
+  if(total<=0){ el.innerHTML='<div class="empty">Add balances to see your current allocation.</div>';
+    /* renderOverview lives at the bottom of this function, so bailing here used to leave the
+       old donut, stat strip and sample banner on screen for a portfolio that no longer exists. */
+    renderOverview(); return; }
   el.innerHTML = Object.keys(CLASSES).map(c=>{
     const curPct = cur[c]/total*100, tgtPct = t[c]||0;
     const d = curPct - tgtPct;
@@ -1512,7 +1550,7 @@ function applyReturningLayout(){
 function renderAll(){ syncClasses(); renderAccounts(); renderPresets(); renderTargets(); renderDrift(); renderFees(); renderPlanner(); renderRoom(); renderAum(); renderWait(); }
 /* wrap every input-mutating function so stale results can't survive a change */
 ['addAccount','delAcct','upAcct','addHold','delHold','upHold','setPreset','onSlider','onIntlSlider',
- 'onTiltSlider','upTarget','addCategory','upCategory','delCategory','loadSample','importJSON']
+ 'onTiltSlider','upTarget','addCategory','upCategory','delCategory','loadSample','startFresh','importJSON']
  .forEach(fn=>{ const orig=window[fn]; if(typeof orig==='function'){
    window[fn]=function(){ const out=orig.apply(this,arguments); try{invalidateResults()}catch(e){} return out; }; } });
 load(); renderAll(); applyReturningLayout();
