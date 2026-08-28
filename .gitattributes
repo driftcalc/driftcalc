@@ -1,0 +1,4 @@
+# Keep line endings out of the diff. Without this, every file shows as
+# fully modified on Windows and real changes get lost in the noise.
+* text=auto eol=lf
+*.png binary
