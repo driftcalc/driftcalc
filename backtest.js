@@ -234,7 +234,16 @@ if (hp && /A drift calculator|Put in your accounts/.test(hp.textContent)) {
     '.hmore.open .hmenu{display:flex}' +
     '.hmenu .btn{width:100%;text-align:left;color:var(--ink);border-color:transparent;background:transparent;font-size:13px}' +
     '.hmenu .btn:hover{background:var(--hairline)}' +
-    '.hmenu .hide-sm{display:block}';
+    '.hmenu .hide-sm{display:block}' +
+    /* shared-target notice and the copy button */
+    '.sharebar{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin:0 0 14px;' +
+      'padding:13px 16px;border-radius:11px;background:var(--accent-soft);border:1px solid #C9DAFB;' +
+      'font-size:13.5px;line-height:1.55}' +
+    '.sharebar span{flex:1;min-width:240px}' +
+    '.sharerow{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:18px;' +
+      'padding-top:16px;border-top:1px solid var(--hairline)}' +
+    '.shareok{font-size:13px;color:var(--green,#17A374);font-weight:600;opacity:0;transition:opacity .2s}' +
+    '.shareok.on{opacity:1}';
   document.head.appendChild(s);
 })();
 
@@ -382,6 +391,103 @@ if (hp && /A drift calculator|Put in your accounts/.test(hp.textContent)) {
   [].slice.call(body.querySelectorAll('.ovr')).forEach(function (o) {
     if (!o.children.length && o.parentNode) o.parentNode.removeChild(o);
   });
+})();
+
+/* ---------- shareable target allocation ----------
+   The one thing on this page worth sending someone is the target: 90/10, 38%
+   international, 22% tilt. So it goes in the URL and nothing else does.
+
+   Balances stay out on purpose. "Your data never leaves this browser" is the
+   whole promise of the site, and a link carrying someone's account values would
+   quietly break it — links get pasted into group chats and screenshotted. The
+   target is an opinion about percentages. That is safe to hand around. */
+(function shareTarget() {
+  var s2 = document.getElementById('s2');
+  if (!s2 || typeof S === 'undefined' || !S) return;
+
+  function clamp(v, lo, hi) {
+    v = parseFloat(v);
+    if (!isFinite(v)) return null;
+    return Math.min(hi, Math.max(lo, Math.round(v)));
+  }
+
+  /* ---- reading a shared link ---- */
+  var q = new URLSearchParams(location.search);
+  if (q.has('eq') || q.has('intl') || q.has('tilt')) {
+    var eq = clamp(q.get('eq'), 0, 100);
+    var intl = clamp(q.get('intl'), 0, 60);
+    var tilt = clamp(q.get('tilt'), 0, 40);
+
+    /* keep what they had so arriving on a link is never destructive */
+    var prev = { preset: S.preset, equityPct: S.equityPct, intlPct: S.intlPct, tiltPct: S.tiltPct };
+
+    if (eq != null) S.equityPct = eq;
+    if (intl != null) S.intlPct = intl;
+    if (tilt != null) S.tiltPct = tilt;
+    S.preset = (S.tiltPct > 0) ? 'Factor tilt' : 'Market portfolio';
+    if (typeof save === 'function') save();
+    if (typeof renderAll === 'function') renderAll();
+
+    var bar = document.createElement('div');
+    bar.className = 'sharebar';
+    var txt = document.createElement('span');
+    txt.textContent = 'Someone shared this target with you: ' + S.equityPct + '/' + (100 - S.equityPct) +
+      ' stocks and bonds, ' + (S.intlPct == null ? 38 : S.intlPct) + '% international' +
+      ((S.tiltPct || 0) > 0 ? ', ' + S.tiltPct + '% small-cap value' : '') +
+      '. No account balances came through the link — those never leave your browser.';
+    var undo = document.createElement('button');
+    undo.className = 'btn tiny';
+    undo.type = 'button';
+    undo.textContent = 'Put mine back';
+    undo.addEventListener('click', function () {
+      S.preset = prev.preset; S.equityPct = prev.equityPct;
+      S.intlPct = prev.intlPct; S.tiltPct = prev.tiltPct;
+      if (typeof save === 'function') save();
+      if (typeof renderAll === 'function') renderAll();
+      history.replaceState(null, '', location.pathname);
+      if (bar.parentNode) bar.parentNode.removeChild(bar);
+    });
+    bar.appendChild(txt);
+    bar.appendChild(undo);
+    if (s2.parentNode) s2.parentNode.insertBefore(bar, s2);
+  }
+
+  /* ---- handing one out ---- */
+  var body = s2.querySelector('.sec-body');
+  if (!body) return;
+  var row = document.createElement('div');
+  row.className = 'sharerow';
+  var btn = document.createElement('button');
+  btn.className = 'btn';
+  btn.type = 'button';
+  btn.textContent = 'Copy a link to this target';
+  var ok = document.createElement('span');
+  ok.className = 'shareok';
+  ok.textContent = 'Copied. Balances are not in it.';
+
+  btn.addEventListener('click', function () {
+    var p = new URLSearchParams();
+    p.set('eq', String(S.equityPct));
+    p.set('intl', String(S.intlPct == null ? 38 : S.intlPct));
+    p.set('tilt', String(S.tiltPct || 0));
+    var url = location.origin + location.pathname + '?' + p.toString();
+    function flash() {
+      ok.classList.add('on');
+      setTimeout(function () { ok.classList.remove('on'); }, 2200);
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(url).then(flash, flash);
+    } else {
+      var tmp = document.createElement('input');
+      tmp.value = url; document.body.appendChild(tmp); tmp.select();
+      try { document.execCommand('copy'); } catch (e) {}
+      document.body.removeChild(tmp); flash();
+    }
+  });
+
+  row.appendChild(btn);
+  row.appendChild(ok);
+  body.appendChild(row);
 })();
 
 /* ---------- reveal on scroll ----------
