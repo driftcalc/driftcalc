@@ -375,11 +375,11 @@ footer .wrap{max-width:760px}
         <div>
           <div class="big-title" style="margin-top:22px">One way to close the gaps</div>
           <div id="buyPlan"></div>
-          <div class="res-note"><b>This is arithmetic, not advice.</b> It's one efficient way to move toward the targets you set, using only the funds you listed. A different split might suit your taxes or preferences better.</div>
+          <div class="res-note"><b>This is arithmetic and not advice.</b> It is one efficient way to move toward the targets you set, using only the funds you listed. A different split might suit your taxes or preferences better.</div>
           <div class="res-warn" id="resWarn"></div>
           <button class="btn" style="margin-top:14px" onclick="downloadReminder()">Get a monthly calendar reminder</button>
           <div id="tipLine" style="display:none;margin-top:14px;padding-top:12px;border-top:1px solid var(--hairline);font-size:12.5px;color:var(--faint);line-height:1.6">
-            Free, no ads, nothing for sale. Keeping the fund data current takes a few hours every quarter, so if this saved you some time, <a href="https://ko-fi.com/driftcalc" target="_blank" rel="noopener" style="color:var(--accent);font-weight:500">$5 toward the upkeep</a> is genuinely appreciated. Ko-fi takes 0% — low fees, obviously.
+            Free, no ads, nothing for sale. Keeping the fund data current takes a few hours every quarter, so if this saved you some time, <a href="https://ko-fi.com/driftcalc" target="_blank" rel="noopener" style="color:var(--accent);font-weight:500">$5 toward the upkeep</a> helps. Ko-fi takes 0%.
             <button class="x" title="Hide this" onclick="dismissTip()" style="float:right;margin-top:-2px">×</button>
           </div>
         </div>
@@ -422,7 +422,7 @@ footer .wrap{max-width:760px}
 
 <footer><div class="wrap">
   <b>Drift Calc</b> is an educational calculator for portfolio arithmetic. It is not investment advice, tax advice, or a recommendation of any security or strategy, and it knows nothing about your situation. Every number is an estimate built from what you type in. Funds that span regions, like VT and VXUS, are broken down using approximate market weights as of <span id="asofFoot"></span>, and those weights drift over time, so check the fund provider's page if you need precision. Talk to a qualified professional before making investment decisions. Everything you enter stays in your browser's local storage. Export a backup now and then, because clearing your browser data erases it.
-  <br><br>This tool is free, runs on donations, and sells nothing. No ads, no affiliate links, nothing sold to anyone. The only thing measured is a page count, through <a href="https://www.goatcounter.com" target="_blank" rel="noopener" style="color:var(--accent)">GoatCounter</a>, which is open source, sets no cookies, and collects no personal data. The counter script is served from this site rather than a third party, so no outside company sees your visit. Nothing you enter here is ever transmitted anywhere. The core calculator stays free and the math will never sit behind a paywall. Down the road there may be optional paid extras for power users, things like multiple portfolios, history, and reports. If it's useful today, you can <a href="https://ko-fi.com/driftcalc" target="_blank" rel="noopener" style="color:var(--accent)">support its development</a>. It costs nothing to run, just time to maintain.
+  <br><br>This tool is free and runs on donations. No ads, no affiliate links, nothing sold to anyone. The only thing measured is a page count, through <a href="https://www.goatcounter.com" target="_blank" rel="noopener" style="color:var(--accent)">GoatCounter</a>, which is open source, sets no cookies, and collects no personal data. The counter script is served from this site rather than a third party, so no outside company sees your visit. Nothing you enter here is ever transmitted anywhere. The core calculator stays free and the math will never sit behind a paywall. Down the road there may be optional paid extras for power users, things like multiple portfolios, history, and reports. If it's useful today, you can <a href="https://ko-fi.com/driftcalc" target="_blank" rel="noopener" style="color:var(--accent)">support its development</a>. It costs nothing to run, just time to maintain.
 </div></footer>
 
 <div class="toast" id="toast"></div>
@@ -578,9 +578,9 @@ let MARKET_INTL = 38;
 /* presets are parameterized by the stock/bond dial and the international slider */
 const PRESETS = ['Market portfolio', 'Factor tilt', 'Custom'];
 const PRESET_NOTES = {
-  'Market portfolio':'Total-market funds at whatever US and international mix you choose. Hold it as one world fund like VT or as a pair like VTI and VXUS, the math treats them the same. Total-market funds already own small caps and emerging markets at market weight — if you want a dedicated small-cap value sleeve on top, that lives on the Factor tilt tab.',
+  'Market portfolio':'Total-market funds at whatever US and international mix you choose. Hold it as one world fund like VT or as a pair like VTI and VXUS, the math treats them the same. Total-market funds already own small caps and emerging markets at market weight. A dedicated small-cap value sleeve on top lives on the Factor tilt tab.',
   'Factor tilt':'Adds dedicated small-cap value funds on top of a total-market core, based on the Fama-French factor research (1992, 1993, and the 2015 five-factor model). The research documents the premium but never names a percentage. Most research-based portfolios use somewhere between 10% and 30% of stocks. The default here is 22%.',
-  'Custom':'Your numbers, your call. Add your own categories — gold, REITs, momentum, TIPS, anything a total-market fund doesn\'t cover — give each a target, and tag your funds with them. The sliders rescale the standard classes proportionally.',
+  'Custom':'Add your own categories for anything a total-market fund does not cover, like gold, REITs, momentum or TIPS. Give each one a target and tag your funds with them. The sliders rescale the standard classes proportionally.',
 };
 
 /* ---------- state ---------- */
@@ -900,7 +900,7 @@ function renderGrowth(total){
   });
   svg.innerHTML = out;
   document.getElementById('growthNote').textContent =
-    `This is today's ${fmt$(total)}${m>0?` plus ${fmt$(m)} a month`:''} compounding through three cases: bear 4%, moderate 7%, bull 10% a year, nominal.${crossNote} The US market's long-run average sits near the bull case, but individual decades land all over this range. Arithmetic, not a forecast: real returns bounce around, show up out of order, and include drops like the one on the risk dial.`;
+    `This is today's ${fmt$(total)}${m>0?` plus ${fmt$(m)} a month`:''} compounding through three cases: bear 4%, moderate 7%, bull 10% a year, nominal.${crossNote} The US market's long-run average sits near the bull case, but individual decades land all over this range. Real returns bounce around and show up out of order, with drops like the one on the risk dial.`;
 }
 
 /* ---------- planning tools ---------- */
@@ -950,7 +950,7 @@ function renderFees(){
         <td class="num" style="text-align:right;font-size:12px;color:${diff>0.5?'var(--green)':diff<-0.5?'var(--red)':'var(--faint)'}">${Math.abs(diff)<1?'—':(diff>0?'+':'−')+short$(Math.abs(diff)).replace('$','$')}</td></tr>`;
     }).join('')}</table>
     ${unknown.length?`<div style="font-size:12px;color:var(--faint);margin-top:8px">No expense data for: ${[...new Set(unknown)].map(esc).join(', ')}</div>`:''}
-    <div style="font-size:12px;color:var(--faint);margin-top:8px">Approximate ratios as of ${SPLITS_ASOF}. All 30-year figures grow today's balance at the moderate 7% case minus fees. Costs are one of the few things in investing you control.</div>`;
+    <div style="font-size:12px;color:var(--faint);margin-top:8px">Approximate ratios as of ${SPLITS_ASOF}. All 30-year figures grow today's balance at the moderate 7% case minus fees. You get to choose what you pay in fees.</div>`;
 }
 function renderAum(){
   const el = document.getElementById('aumBody'); if(!el) return;
@@ -967,7 +967,7 @@ function renderAum(){
       <span class="split-read num">${p.toFixed(2)}%</span>
     </div>
     <div style="font-size:14px;line-height:1.7">On ${total===100000&&Object.values(cur).reduce((a,b)=>a+b,0)===0?'a $100,000 portfolio':'your '+fmt$(total)+' portfolio'}, a ${p.toFixed(2)}% assets-under-management fee is <b class="num" style="font-family:var(--disp)">${fmt$(feeNow)}</b> this year. Compounded over 30 years in the moderate case, that fee stream works out to roughly <b class="num" style="font-family:var(--disp);color:var(--red)">${short$(diff30)}</b> less in the account.</div>
-    <div style="font-size:12px;color:var(--faint);margin-top:10px">Some advisors earn their fee many times over in planning, taxes, and talking you off ledges in a crash. The point isn't "never pay," it's "know the number." Flat-fee and hourly advisors exist too.</div>`;
+    <div style="font-size:12px;color:var(--faint);margin-top:10px">Some advisors earn their fee many times over in planning, taxes, and talking you off ledges in a crash. Know the number before you decide. Flat-fee and hourly advisors exist too.</div>`;
 }
 function renderWait(){
   const el = document.getElementById('waitBody'); if(!el) return;
@@ -982,7 +982,7 @@ function renderWait(){
         <input type="range" min="1" max="36" step="1" value="${mo}" style="margin-top:12px" oninput="S.plan.waitM=+this.value;save();renderWait()"></div>
     </div>
     <div style="font-size:14px;line-height:1.7">Investing ${fmt$(A)} today versus sitting on it for ${mo} month${mo===1?'':'s'}: in the moderate 7% case, the 30-year difference is about <b class="num" style="font-family:var(--disp);color:var(--red)">${fmt$(cost)}</b>.</div>
-    <div style="font-size:12px;color:var(--faint);margin-top:10px">This is the arithmetic behind "time in the market beats timing the market." It assumes the moderate case holds during the wait, which no one can know in advance — sometimes waiting wins. On average, historically, it hasn't.</div>`;
+    <div style="font-size:12px;color:var(--faint);margin-top:10px">This is the arithmetic behind "time in the market beats timing the market." It assumes the moderate case holds during the wait, which nobody can know in advance. Sometimes waiting wins. Historically it usually has not.</div>`;
 }
 function renderPlanner(){
   const el = document.getElementById('plannerBody'); if(!el) return;
@@ -996,11 +996,11 @@ function renderPlanner(){
         <input type="range" min="0" max="60" step="1" value="${p.savePct||0}" style="margin-top:12px" oninput="S.plan.savePct=+this.value;document.getElementById('spRead').textContent=this.value+'%';save();renderPlanner()"></div>
     </div>
     ${(+p.income>0)?`
-      <div style="font-size:14px;margin-bottom:10px">That's <b class="num" style="font-family:var(--disp)">${fmt$(monthlyFromIncome)}</b> a month into investments${p.savePct>=20?' — a 20%+ savings rate, the benchmark a lot of the FIRE crowd aims for':p.savePct>=10?' — in the range many planners consider a solid baseline':''}.
+      <div style="font-size:14px;margin-bottom:10px">That's <b class="num" style="font-family:var(--disp)">${fmt$(monthlyFromIncome)}</b> a month into investments${p.savePct>=20?', a 20%+ savings rate and the benchmark a lot of the FIRE crowd aims for':p.savePct>=10?', in the range many planners consider a solid baseline':''}.
       <button class="btn tiny" style="margin-left:8px" onclick="S.plan.monthly=${monthlyFromIncome};save();renderOverview();renderPlanner();toast('Projection updated to ${fmt$(monthlyFromIncome)}/month')">Use in projection</button></div>`
     : `<div class="empty" style="padding:6px 0">Enter your take-home pay to see what a given savings rate means in dollars.</div>`}
     <div style="font-size:12.5px;color:var(--muted);border-top:1px solid var(--hairline);padding-top:10px;margin-top:4px">
-      A common order many index investors follow with new money: emergency fund first, then 401(k) up to any employer match, then HSA if eligible, then IRA, then the rest of the 401(k), then taxable. It's a popular framework, not a rule and not advice — situations differ.</div>`;
+      A common order many index investors follow with new money: emergency fund first, then 401(k) up to any employer match, then HSA if eligible, then IRA, then the rest of the 401(k), then taxable. It is a popular framework. Plenty of situations call for a different order.</div>`;
 }
 function renderRoom(){
   const el = document.getElementById('roomBody'); if(!el) return;
@@ -1033,7 +1033,7 @@ function overlapNote(a){
   });
   const dupes = Object.keys(byCls).filter(c=>byCls[c].length>1 && c!=='BOND');
   if(!dupes.length) return '';
-  return `<div style="margin-top:10px;font-size:12px;color:var(--muted);background:var(--hairline);border-radius:8px;padding:8px 11px">${dupes.map(c=>`${byCls[c].join(' and ')} cover the same class (${CLASSES[c].name}) — heavy overlap, which is fine, just redundant.`).join(' ')}</div>`;
+  return `<div style="margin-top:10px;font-size:12px;color:var(--muted);background:var(--hairline);border-radius:8px;padding:8px 11px">${dupes.map(c=>`${byCls[c].join(' and ')} cover the same class (${CLASSES[c].name}). Heavy overlap, which is fine and also redundant.`).join(' ')}</div>`;
 }
 
 /* ---------- rendering ---------- */
@@ -1116,7 +1116,7 @@ function renderTilt(){
   document.getElementById('tiltNote').innerHTML =
     tp===0
     ? `No dedicated small-cap value sleeve, just the market portfolio. Total-market funds still hold small caps at their market weight. The backstory, if you want it: Fama and French's factor research (1992, 1993, and the 2015 five-factor model) found higher long-run expected returns in small value stocks, paid for with long stretches of trailing the market.`
-    : `<span style="font-weight:600;color:var(--ink)">${tp}% of your stocks</span> goes to dedicated small-cap value funds like AVUV and AVDV, split across US and international to match your mix. The research never names an exact number. Most research-based portfolios land between 10% and 30%. A bigger tilt raises expected returns and also the odds of trailing the market for years at a stretch. The premium only pays if you stay in for it.`;
+    : `<span style="font-weight:600;color:var(--ink)">${tp}% of your stocks</span> goes to dedicated small-cap value funds like AVUV and AVDV, split across US and international to match your mix. The research never names an exact number. Most research-based portfolios land between 10% and 30%. A bigger tilt raises expected returns and also the odds of trailing the market for years at a stretch. You have to hold it through those stretches to get paid.`;
 }
 /* sum of user-defined categories — the sliders leave these fixed and only
    redistribute the built-in (non-custom) budget among the 6 standard classes */
@@ -1183,7 +1183,7 @@ function renderRisk(){
   const stressed = base*(eq/100)*0.5 + base*((100-eq)/100)*1.05;
   const lossPct = (1 - stressed/base)*100;
   document.getElementById('riskDraw').innerHTML =
-    `In a crash like 2008, with stocks down about half and quality bonds roughly flat, ${total>0?'your':'a'} <span class="num">${fmt$(base)}</span> portfolio would sit near <b class="num">${fmt$(stressed)}</b> (−${lossPct.toFixed(0)}%) until the recovery. The hard part isn't the math, it's not selling at the bottom. Pick a split you could sit through.`;
+    `In a crash like 2008, with stocks down about half and quality bonds roughly flat, ${total>0?'your':'a'} <span class="num">${fmt$(base)}</span> portfolio would sit near <b class="num">${fmt$(stressed)}</b> (−${lossPct.toFixed(0)}%) until the recovery. Sitting through that without selling is the hard part. Pick a split you could hold.`;
 }
 function renderTargets(){
   const t = targets();
@@ -1231,7 +1231,7 @@ function renderCustomCats(){
     </div>`).join('');
   el.innerHTML =
     `<div style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:9px">Your own categories</div>`
-    + (list || `<div style="font-size:12.5px;color:var(--faint);margin-bottom:8px">None yet. Add things a total-market fund doesn't cover on its own — gold, REITs, momentum, TIPS, whatever you track.</div>`)
+    + (list || `<div style="font-size:12.5px;color:var(--faint);margin-bottom:8px">None yet. Add anything a total-market fund does not cover on its own, like gold, REITs, momentum or TIPS.</div>`)
     + `<button class="btn tiny" onclick="addCategory()">+ Add category</button>`
     + `<div style="font-size:11.5px;color:var(--faint);margin-top:9px">Add a category here and give it a target in the table below, then tag your funds with it in the accounts section above.</div>`;
 }
@@ -1371,7 +1371,7 @@ function upHold(aid,hid,k,v){
         S.customClasses = S.customClasses||[]; S.customClasses.push(cc);
         if(S.targets) S.targets[cc.id] = 0;
         syncClasses();
-        toast(`Recognized ${T} as ${name} — added a ${name} category`);
+        toast(`Recognized ${T} as ${name}, so a ${name} category was added`);
       }
       h.cls = cc.id;
     } else {

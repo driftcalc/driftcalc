@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https://driftcalc.goatcounter.com; connect-src 'self' https://driftcalc.goatcounter.com; frame-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
-<title>What does a 1% advisor fee actually cost? — Drift Calculator</title>
+<title>What does a 1% advisor fee actually cost? · Drift Calculator</title>
 <meta name="description" content="Put in your balance and your advisor's fee. See what that percentage costs in dollars over the years you hold it. Free, no login, nothing saved.">
 <link rel="canonical" href="https://driftcalc.com/fees.html">
 
@@ -123,7 +123,7 @@ footer a{color:var(--muted)}
 
   <div class="hero">
     <h1>What does a <em>1% fee</em> actually cost?</h1>
-    <p class="sub">A percentage is not a price. Put in your balance and see the number in dollars.</p>
+    <p class="sub">Put in your balance and see what that percentage costs you in dollars.</p>
   </div>
 
   <div class="card">
@@ -166,27 +166,25 @@ footer a{color:var(--muted)}
   <section class="blk">
     <h2>The honest version</h2>
     <div class="note">
-      <b>A fee is not automatically a rip-off.</b> Plenty of advisors earn theirs several times over
-      in tax planning, estate work, and talking someone off a ledge in a crash — that last one alone
-      can be worth more than the fee. Flat-fee and hourly advisors exist too, and they do not scale
-      with your balance the way a percentage does.
+      <b>Plenty of advisors earn their fee several times over</b> in tax planning, estate work, and
+      talking someone off a ledge in a crash. That last one alone can be worth more than the fee.
+      Flat-fee and hourly advisors exist too, and their bill does not grow with your balance.
       <br><br>
-      <b>The point is not "never pay." It is "know the number."</b> Most people have never seen the
-      percentage converted into dollars, and the conversion is the whole argument. Once you can see
-      it, you can decide whether you are getting that much value back.
+      <b>Know the number before you decide.</b> Most people have never seen the percentage converted
+      into dollars.
     </div>
   </section>
 
   <section class="blk">
     <h2>This applies to fund fees too</h2>
     <div class="note">
-      An expense ratio works exactly the same way, just with a smaller number in front. Drop the fee
-      slider to <b>0.50%</b> to see what an average actively managed fund costs against an index fund
-      near <b>0.03%</b>. The gap is usually larger than people expect, and unlike market returns,
-      it is the one part of this you actually control.
+      An expense ratio works the same way with a smaller number in front. Drop the fee slider to
+      <b>0.50%</b> to see what an average actively managed fund costs against an index fund near
+      <b>0.03%</b>. The gap is usually bigger than people expect, and the fee is the part you get
+      to choose.
       <br><br>
-      <a href="/">The full calculator</a> reads the funds you actually hold and works out your real
-      blended expense ratio.
+      <a href="/">The full calculator</a> reads the funds you hold and works out your blended
+      expense ratio.
     </div>
   </section>
 
@@ -195,8 +193,8 @@ footer a{color:var(--muted)}
 <footer><div class="wrap">
   <b>Drift Calc</b> is an educational calculator for portfolio arithmetic. It is not investment advice,
   tax advice, or a recommendation of any security or strategy, and it knows nothing about your situation.
-  Every number here is an estimate built from what you type in and a fixed assumed return — real returns
-  vary, arrive out of order, and include drops. Talk to a qualified professional before making decisions.
+  Every number here is an estimate built from what you type in and a fixed assumed return. Real returns
+  vary and arrive out of order, with drops along the way. Talk to a qualified professional before making decisions.
   Nothing on this page is stored or sent anywhere.
 </div></footer>
 
@@ -310,7 +308,7 @@ function render() {
     bd(money(r.cost));
     t(' over ' + ST.yrs + ' years. That is ');
     bd(Math.round(r.share * 100) + '%');
-    t(' of everything the money would otherwise have become — not ' + ST.fee.toFixed(2) + '%, because the fee compounds too.');
+    t(' of everything the money would otherwise have become, because the fee compounds every year too.');
   }
 
   bars(r);
@@ -318,8 +316,7 @@ function render() {
   document.getElementById('assump').textContent =
     'Assumes ' + (RET * 100).toFixed(0) + '% a year before fees, nominal, no new contributions, and the fee ' +
     'charged every year on the whole balance. Real returns are lumpier than this and arrive out of order. ' +
-    'The shape of the answer does not change: a percentage taken every year compounds against you the same ' +
-    'way returns compound for you.';
+    'A percentage taken every year still compounds against you, so the shape of the answer holds.';
 
   syncUrl();
 }

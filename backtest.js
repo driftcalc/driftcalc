@@ -434,7 +434,7 @@ if (hp && /A drift calculator|Put in your accounts/.test(hp.textContent)) {
     txt.textContent = 'Someone shared this target with you: ' + S.equityPct + '/' + (100 - S.equityPct) +
       ' stocks and bonds, ' + (S.intlPct == null ? 38 : S.intlPct) + '% international' +
       ((S.tiltPct || 0) > 0 ? ', ' + S.tiltPct + '% small-cap value' : '') +
-      '. No account balances came through the link — those never leave your browser.';
+      '. No account balances came through the link. Those never leave your browser.';
     var undo = document.createElement('button');
     undo.className = 'btn tiny';
     undo.type = 'button';

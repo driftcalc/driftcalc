@@ -331,7 +331,7 @@ function renderHist() {
     '<div class="note" style="margin-bottom:18px">' +
       '<b>What this is.</b> Your target allocation, held every month since ' + M[from].slice(0, 4) + ' and rebalanced ' +
       (UI.rebal === 'annual' ? 'once a year' : UI.rebal === 'monthly' ? 'every month' : 'never') + '. ' +
-      'These are real returns that already happened, not a projection. Nobody actually held this exact mix the whole time, ' +
+      'These are real returns that already happened. Nobody held this exact mix the whole time, ' +
       'and the next thirty years will not look like the last.' +
     '</div>' +
     '<div class="ctlbar">' +
@@ -355,7 +355,7 @@ function renderHist() {
       '<tr><th>&nbsp;</th><th>Ended with</th><th>A year</th><th>Worst drop</th></tr>' +
       '<tr class="me"><td>Your mix</td><td class="num">' + money(1e4 * mine.val) + '</td><td class="num">' + pct(g) + '</td><td class="num">' + pct(mine.maxDD) + '</td></tr>' +
       rows + '</table>' +
-      '<div class="note" style="margin-top:12px"><b>Reading this.</b> &ldquo;Never rebalanced&rdquo; is the same mix left alone, so you can see what rebalancing actually did. &ldquo;Worst drop&rdquo; is peak to bottom, the number that decides whether you would have stuck with it.</div>' +
+      '<div class="note" style="margin-top:12px"><b>Reading this.</b> &ldquo;Never rebalanced&rdquo; is the same mix left alone, so you can see what rebalancing did. &ldquo;Worst drop&rdquo; is peak to bottom, the number that decides whether you would have stuck with it.</div>' +
     '</div>' +
     (worst ? '<div class="note">Worst year <b>' + worst.y + '</b>, ' + pct(worst.r) + '. Best <b>' + best.y + '</b>, +' + pct(best.r) +
       '. ' + yrs.length + ' full years, ' + down + ' negative.</div>' : '');
@@ -556,7 +556,7 @@ function renderLev() {
     (wiped ? '<div class="danger" style="margin-bottom:16px"><b>Gone in ' + wiped.slice(0, 4) + '.</b> At ' + UI.lev.toFixed(1) + 'x, one month down more than ' + breakeven + '% takes everything. There is no recovering from zero, and being right afterwards does not help.</div>' : '') +
     '<div class="card">' +
       '<div class="big-title">How much leverage was best?</div>' +
-      '<div class="note" style="margin-bottom:14px">Each point is a different amount of borrowing. Left edge is none, right edge is 3x. Height is what you would have earned per year. <b>The hump is the whole point:</b> borrowing helps until it does not, then it actively hurts.</div>' +
+      '<div class="note" style="margin-bottom:14px">Each point is a different amount of borrowing. Left edge is none, right edge is 3x. Height is what you would have earned per year. <b>Watch the hump.</b> Borrowing helps until it does not, and past that it hurts.</div>' +
       chart +
       '<div class="note" style="margin-top:14px">' + reading + '</div>' +
     '</div>' +
@@ -582,7 +582,7 @@ function renderLev() {
           '<td style="text-align:left" class="dim">The cheapest money a retail account can get, because you are borrowing from the market rather than a broker. Needs futures approval, and the contract rolls four times a year. Not a beginner move.</td></tr>' +
         '<tr><td><b>Box spread</b><span class="sub">SPX options</span></td>' +
           '<td class="num"><b>0.1&ndash;0.4%</b></td>' +
-          '<td style="text-align:left" class="dim">A fixed-term loan built out of four options. Cheap and clean if you get the trade right, and genuinely dangerous if you do not. Needs the highest options tier.</td></tr>' +
+          '<td style="text-align:left" class="dim">A fixed-term loan built out of four options. Cheap and clean if you get the trade right, and dangerous if you do not. Needs the highest options tier.</td></tr>' +
         '<tr><td><b>Portfolio margin</b><span class="sub">usually Interactive Brokers</span></td>' +
           '<td class="num"><b>0.5&ndash;1.5%</b></td>' +
           '<td style="text-align:left" class="dim">Nothing on top, and you keep the dividends. Needs a decent balance to qualify, and the rate falls as the balance grows.</td></tr>' +
@@ -594,7 +594,7 @@ function renderLev() {
           '<td style="text-align:left" class="dim">The rate is not quoted anywhere &mdash; it is baked into what the call costs. Add a few tenths of a percent in bid-ask each time you roll. <b>Plus you give up the dividend</b>, about 1.8% a year on the entire position, because you own options and not shares. That is usually the largest line here.</td></tr>' +
         '<tr><td><b>Ordinary margin</b><span class="sub">Schwab, Fidelity, E*TRADE, Robinhood</span></td>' +
           '<td class="num"><b>2&ndash;5%</b></td>' +
-          '<td style="text-align:left" class="dim">What most people can actually get, and where the math stops working. Drag the slider up there and watch the peak collapse toward 1x.</td></tr>' +
+          '<td style="text-align:left" class="dim">What most people can get, and where the math stops working. Drag the slider up there and watch the peak collapse toward 1x.</td></tr>' +
       '</table>' +
       '<div class="note" style="margin-bottom:10px"><b>Financing is not the whole bill.</b> The slider only moves the interest. The fund fee, the daily reset and the forgone dividend are charged separately and are already in every number on this page &mdash; which is why a leveraged ETF can show the cheapest interest and still finish behind plain margin.</div>' +
       '<div class="warn"><b>Look up your own number.</b> Every broker publishes its margin rate and it moves with the Fed. Those ranges are ballparks, not quotes. If you cannot find yours, assume it is worse than you hoped.</div>' +
@@ -616,7 +616,7 @@ function renderLev() {
       '<div class="warn" style="margin-bottom:10px"><b>Full Kelly is violent.</b> It maximises long-run growth and says nothing about the ride. Halving it costs about a quarter of the growth and removes most of the pain, which is why half Kelly is the usual advice.</div>' +
       '<div class="warn" style="margin-bottom:10px"><b>Borrowing cost decides everything.</b> Futures sit near T-bills; ordinary margin runs 3 to 5 points above, and at that price leverage stops working almost immediately.</div>' +
       '<div class="warn" style="margin-bottom:10px"><b>Surviving the path is the whole problem.</b> This rebalances monthly and cannot be margin-called mid-month. Reality can. A 2x fund through 1929 to 1932 did not come back.</div>' +
-      '<div class="danger"><b>The leveraged ETF numbers are still a best case.</b> Real funds reset every single day. This estimates that decay from monthly data, which catches most of it but not all. In a genuinely violent month the real fund does worse than shown.</div>' +
+      '<div class="danger"><b>The leveraged ETF numbers are still a best case.</b> Real funds reset every single day. This estimates that decay from monthly data, which catches most of it but not all. In a violent month the real fund does worse than shown.</div>' +
     '</div></details>' +
     '<details class="acc"><summary>Where the idea comes from<span class="hint">Kelly, Merton, Lifecycle Investing</span></summary><div class="accbody">' +
       '<div class="note"><b>Kelly (1956), later Thorp.</b> Maximise the log of wealth and you maximise long-run growth. The answer is excess return divided by variance.<br><br>' +
