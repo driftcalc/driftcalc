@@ -809,6 +809,9 @@ function renderOverview(){
   const total = Object.values(cur).reduce((a,b)=>a+b,0);
   if(total<=0){ ov.style.display='none';
     const sb0=document.getElementById('sampleBanner'); if(sb0) sb0.style.display = S.isSample ? 'flex' : 'none';
+    /* the growth card lives outside #overview, so it has to be reset by hand or it
+       keeps quoting the balance the user just deleted */
+    renderGrowth(0);
     return; }
   ov.style.display='block';
   let sb = document.getElementById('sampleBanner');
@@ -868,6 +871,14 @@ function fv(total, r, i, m){ /* future value with monthly additions (annual appr
 function renderGrowth(total){
   const svg = document.getElementById('growth'); if(!svg) return;
   const m = (S.plan&&S.plan.monthly)||0, T = (S.plan&&S.plan.target)||0;
+  if(total<=0 && m<=0){
+    /* nothing to compound, and maxV would be 0, which puts NaN in every coordinate */
+    GROWTH = null; svg.innerHTML = '';
+    const gm0 = document.getElementById('gMonthly'); if(gm0 && document.activeElement!==gm0) gm0.value = '';
+    document.getElementById('growthNote').textContent =
+      'Nothing to project yet. Add your balances above, or put in an amount you would invest each month.';
+    return;
+  }
   const gm = document.getElementById('gMonthly'), gt = document.getElementById('gTarget');
   if(gm && document.activeElement!==gm) gm.value = m||'';
   if(gt && document.activeElement!==gt) gt.value = T||'';
@@ -900,7 +911,7 @@ function renderGrowth(total){
   });
   svg.innerHTML = out;
   document.getElementById('growthNote').textContent =
-    `This is today's ${fmt$(total)}${m>0?` plus ${fmt$(m)} a month`:''} compounding through three cases: bear 4%, moderate 7%, bull 10% a year, nominal.${crossNote} The US market's long-run average sits near the bull case, but individual decades land all over this range. Real returns bounce around and show up out of order, with drops like the one on the risk dial.`;
+    `${total>0 ? `This is today's ${fmt$(total)}${m>0?` plus ${fmt$(m)} a month`:''}` : `Starting from nothing, ${fmt$(m)} a month`} compounding through three cases: bear 4%, moderate 7%, bull 10% a year, nominal.${crossNote} The US market's long-run average sits near the bull case, but individual decades land all over this range. Real returns bounce around and show up out of order, with drops like the one on the risk dial.`;
 }
 
 /* ---------- planning tools ---------- */
