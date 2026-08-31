@@ -112,7 +112,9 @@ function rollingVar(series, window) {
   document.head.appendChild(s);
 })();
 
-var RET = null, W = {}, UNKNOWN = 0;
+var RET = null, W = {}, UNKNOWN = 0, PROXIED = 0, PROXIED_NAMES = [];
+/* the classes that get modelled as something else, named for the note under the donut */
+var SRC_NAMES = { EM:'Emerging markets', INTLSCV:'International small-cap value' };
 var UI = { start:null, rebal:'annual', lev:2, spread:1.5, asset:'mix', method:'margin', years:50 };
 
 /* ---------- read the saved allocation ---------- */
@@ -138,7 +140,7 @@ function loadTargets() {
 
 function buildWeights() {
   var t = loadTargets(), known = 0;
-  W = {}; UNKNOWN = 0;
+  W = {}; UNKNOWN = 0; PROXIED = 0; PROXIED_NAMES = [];
   for (var c in t) {
     var v = +t[c];
     /* Targets are percentages. Anything not a real 0-100 number is corrupt
@@ -146,10 +148,19 @@ function buildWeights() {
        swamp the mix. (A stored 1e308 once rendered as "small value 100%".) */
     if (!isFinite(v) || v <= 0) continue;
     if (v > 100) v = 100;
-    if (PROXY[c]) { W[PROXY[c]] = (W[PROXY[c]] || 0) + v; known += v; }
+    if (PROXY[c]) {
+      W[PROXY[c]] = (W[PROXY[c]] || 0) + v; known += v;
+      /* PROXY maps two of the calculator's six classes onto a fourth. The page said
+         the mix came straight from your allocation, which was only true for four of
+         them, so track what was substituted and say so where the claim is made. */
+      if (PROXY[c] !== c) { PROXIED += v; if (SRC_NAMES[c]) PROXIED_NAMES.push(SRC_NAMES[c]); }
+    }
     else UNKNOWN += v;
   }
-  if (known > 0) for (var k in W) W[k] = W[k] / known;
+  if (known > 0) {
+    for (var k in W) W[k] = W[k] / known;
+    PROXIED = PROXIED / known;
+  }
 }
 
 /* ---------- engine ---------- */
@@ -264,9 +275,21 @@ function donut() {
   leg.innerHTML = ks.map(function (k) {
     return '<div class="legrow"><span class="dot" style="background:' + COLORS[k] + '"></span>' + NAMES[k] + '<b>' + Math.round(W[k] * 100) + '%</b></div>';
   }).join('');
-  document.getElementById('mixNote').innerHTML = UNKNOWN > 0.5
-    ? 'Rescaled: ' + Math.round(UNKNOWN) + '% of your target sits in custom sleeves (gold, REITs and the like) with no long history here.'
-    : 'Straight from the allocation you set on the calculator.';
+  var note = [];
+  if (UNKNOWN > 0.5) {
+    note.push('Rescaled: ' + Math.round(UNKNOWN) + '% of your target sits in custom sleeves (gold, REITs and the like) with no long history here.');
+  }
+  if (PROXIED > 0.005 && PROXIED_NAMES.length) {
+    var list = PROXIED_NAMES.length > 1
+      ? PROXIED_NAMES.slice(0, -1).join(', ') + ' and ' + PROXIED_NAMES[PROXIED_NAMES.length - 1]
+      : PROXIED_NAMES[0];
+    var verb = PROXIED_NAMES.length > 1 ? 'are' : 'is';
+    var why  = PROXIED_NAMES.length > 1 ? 'Neither has a free long-run series' : 'There is no free long-run series for it';
+    note.push('<b>' + list + ' ' + verb + ' modelled as developed international here.</b> ' + why +
+      ', so about ' + Math.round(PROXIED * 100) + '% of this mix is a stand-in rather than the real thing.');
+  }
+  if (!note.length) note.push('Straight from the allocation you set on the calculator.');
+  document.getElementById('mixNote').innerHTML = note.join('<br>');
 }
 
 /* ---------- tabs ---------- */
