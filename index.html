@@ -90,6 +90,15 @@ details.adv > summary::-webkit-details-marker{display:none}
 details.adv > summary::before{content:'▸';font-size:11px;color:var(--faint)}
 details.adv[open] > summary::before{content:'▾'}
 details.adv > summary:hover{color:var(--ink)}
+/* One line stays visible, the depth goes behind a labelled disclosure. None of the
+   writing is deleted, it just stops arriving all at once. */
+details.more{margin-top:9px}
+details.more > summary{cursor:pointer;font-size:12px;font-weight:600;color:var(--accent);list-style:none;display:inline-flex;align-items:center;gap:6px;padding:2px 0}
+details.more > summary::-webkit-details-marker{display:none}
+details.more > summary::before{content:'\25B8';font-size:10px}
+details.more[open] > summary::before{content:'\25BE'}
+details.more > summary:hover{text-decoration:underline}
+details.more > div{margin-top:7px}
 .badge{font-size:12px;color:var(--muted);border:1px solid var(--border);border-radius:99px;padding:3px 11px;background:var(--card);display:inline-flex;align-items:center;gap:6px}
 .badge .dot{width:6px;height:6px;border-radius:50%;background:var(--green)}
 .hbtns{display:flex;gap:8px;align-items:center}
@@ -152,7 +161,13 @@ select.inp{cursor:pointer;appearance:none;-webkit-appearance:none;background-ima
 
 /* targets */
 .tgt-layout{display:grid;gap:16px}
-@media(min-width:900px){.tgt-layout{grid-template-columns:1fr 1fr}}
+@media(min-width:900px){
+  /* Rows used to stretch, so once the tilt panel opened there was a tall empty white
+     box beside the densest text on the page. Size to content and follow the scroll,
+     so the feedback stays next to the sliders that change it. */
+  .tgt-layout{grid-template-columns:1fr 1fr;align-items:start}
+  .tgt-layout > .card:last-child{position:sticky;top:76px}
+}
 .risk-box{border:1px solid var(--border);background:var(--bg);border-radius:8px;padding:14px 16px;margin-bottom:16px}
 .risk-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px}
 .risk-top .t{font-size:13px;font-weight:600}
@@ -594,7 +609,8 @@ let MARKET_INTL = 38;
 const PRESETS = ['Market portfolio', 'Factor tilt', 'Custom'];
 const PRESET_NOTES = {
   'Market portfolio':'Total-market funds at whatever US and international mix you choose. Hold it as one world fund like VT or as a pair like VTI and VXUS, the math treats them the same. Total-market funds already own small caps and emerging markets at market weight. A dedicated small-cap value sleeve on top lives on the Factor tilt tab.',
-  'Factor tilt':'Adds dedicated small-cap value funds on top of a total-market core, based on the Fama-French factor research (1992, 1993, and the 2015 five-factor model). The research documents the premium but never names a percentage. Most research-based portfolios use somewhere between 10% and 30% of stocks. The default here is 22%.',
+  /* the tilt slider's own disclosure carries the Fama-French detail now, so this stops repeating it */
+  'Factor tilt':'Adds dedicated small-cap value funds on top of a total-market core, based on the Fama-French factor research. Use the tilt dial to set how much.',
   'Custom':'Add your own categories for anything a total-market fund does not cover, like gold, REITs, momentum or TIPS. Give each one a target and tag your funds with them. The sliders rescale the standard classes proportionally.',
 };
 
@@ -1118,9 +1134,11 @@ function renderIntl(){
     `The global market is about <span style="font-weight:600;color:var(--ink)">${MARKET_INTL}% international</span> right now (as of ${SPLITS_ASOF}). That's what a total-world fund holds. `
     + (atMarket ? `You're at market weight.` : `You hold ${s>MARKET_INTL?'more':'less'} international than the market does.`)
     + ` <button class="btn tiny" style="margin-left:6px" onclick="setIntlMarket()">Set to market</button>`
-    + `<br>You can hold this as one world fund like VT, or as a US fund plus an international fund like VTI and VXUS. The calculator handles both.`;
+    + more('How do I hold this?', `You can hold this as one world fund like VT, or as a US fund plus an international fund like VTI and VXUS. The calculator handles both.`);
 }
 function setIntlMarket(){ onIntlSlider(MARKET_INTL); }
+/* lead sentence visible, the rest one click away */
+function more(summary, html){ return `<details class="more"><summary>${summary}</summary><div>${html}</div></details>`; }
 function tiltLabel(t){
   if(t<=0) return 'None';
   if(t<=10) return 'Light';
@@ -1141,8 +1159,10 @@ function renderTilt(){
   document.getElementById('tiltRead').textContent = tp + '%';
   document.getElementById('tiltNote').innerHTML =
     tp===0
-    ? `No dedicated small-cap value sleeve, just the market portfolio. Total-market funds still hold small caps at their market weight. The backstory, if you want it: Fama and French's factor research (1992, 1993, and the 2015 five-factor model) found higher long-run expected returns in small value stocks, paid for with long stretches of trailing the market.`
-    : `<span style="font-weight:600;color:var(--ink)">${tp}% of your stocks</span> goes to dedicated small-cap value funds like AVUV and AVDV, split across US and international to match your mix. The research never names an exact number. Most research-based portfolios land between 10% and 30%. A bigger tilt raises expected returns and also the odds of trailing the market for years at a stretch. You have to hold it through those stretches to get paid.`;
+    ? `No dedicated small-cap value sleeve, just the market portfolio. Total-market funds still hold small caps at their market weight.`
+      + more('Where the tilt idea comes from', `Fama and French's factor research (1992, 1993, and the 2015 five-factor model) found higher long-run expected returns in small value stocks, paid for with long stretches of trailing the market.`)
+    : `<span style="font-weight:600;color:var(--ink)">${tp}% of your stocks</span> goes to dedicated small-cap value funds like AVUV and AVDV, split across US and international to match your mix.`
+      + more(`Why ${tp}%?`, `The research never names an exact number. Most research-based portfolios land between 10% and 30%. A bigger tilt raises expected returns and also the odds of trailing the market for years at a stretch. You have to hold it through those stretches to get paid.`);
 }
 /* sum of user-defined categories — the sliders leave these fixed and only
    redistribute the built-in (non-custom) budget among the 6 standard classes */
