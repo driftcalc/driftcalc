@@ -224,6 +224,21 @@ footer .wrap{max-width:760px}
 
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;font-size:13px;border-radius:8px;padding:9px 16px;opacity:0;pointer-events:none;transition:opacity .25s;z-index:99}
 .toast.show{opacity:1}
+.toast.has-action{pointer-events:auto}
+.toast-undo{font:inherit;font-weight:700;color:#fff;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.4);border-radius:6px;padding:3px 10px;margin-left:10px;cursor:pointer}
+.toast-undo:hover{background:rgba(255,255,255,.32)}
+/* Four :focus rules for about seventy controls meant keyboard users were
+   navigating a long financial form nearly blind. */
+a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,[tabindex]:focus-visible{
+  outline:2px solid var(--accent);outline-offset:2px;border-radius:6px}
+/* Touch: the delete buttons render at 21x19 next to a balance field. Growing the
+   hit area rather than the button keeps the table layout intact. */
+@media (pointer:coarse){
+  .x{position:relative}
+  .x::after{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:44px;height:36px}
+  .inp,select.inp{min-height:40px}
+  .btn.tiny{min-height:40px}
+}
 </style>
 </head>
 <body>
@@ -234,7 +249,7 @@ footer .wrap{max-width:760px}
     <span class="badge"><span class="dot"></span>Your data never leaves this browser</span>
     <button class="btn ghost tiny" onclick="exportJSON()">Export backup</button>
     <button class="btn ghost tiny hide-sm" onclick="document.getElementById('importFile').click()">Import</button>
-    <input type="file" id="importFile" accept=".json" style="display:none" onchange="importJSON(this)">
+    <input type="file" id="importFile" accept=".json" aria-label="Import a backup JSON file" style="display:none" onchange="importJSON(this)">
     <button class="btn ghost tiny hide-sm" onclick="loadSample()">Sample data</button>
     <a class="btn tiny" href="https://ko-fi.com/driftcalc" target="_blank" rel="noopener" style="text-decoration:none;display:inline-flex;align-items:center;gap:5px"><span style="color:var(--accent)">&hearts;</span> Support</a>
   </div>
@@ -270,9 +285,9 @@ footer .wrap{max-width:760px}
       <div class="big-title" style="margin-bottom:0">The compounding picture</div>
       <div style="display:flex;gap:10px;align-items:center;font-size:12.5px;color:var(--muted)">
         <label>Adding monthly</label>
-        <div class="money-wrap" style="width:110px"><span>$</span><input class="money num" style="padding:6px 8px 6px 22px;font-size:13px" id="gMonthly" inputmode="numeric" onchange="S.plan.monthly=+this.value||0;save();renderOverview();renderPlanner()"></div>
+        <div class="money-wrap" style="width:110px"><span>$</span><input class="money num" style="padding:6px 8px 6px 22px;font-size:13px" id="gMonthly" inputmode="numeric" aria-label="Amount added each month, in dollars" onchange="S.plan.monthly=+this.value||0;save();renderOverview();renderPlanner()"></div>
         <label>Goal</label>
-        <div class="money-wrap" style="width:130px"><span>$</span><input class="money num" style="padding:6px 8px 6px 22px;font-size:13px" id="gTarget" inputmode="numeric" onchange="S.plan.target=+this.value||0;save();renderOverview()"></div>
+        <div class="money-wrap" style="width:130px"><span>$</span><input class="money num" style="padding:6px 8px 6px 22px;font-size:13px" id="gTarget" inputmode="numeric" aria-label="Goal amount, in dollars" onchange="S.plan.target=+this.value||0;save();renderOverview()"></div>
       </div>
     </div>
     <div class="growth-wrap">
@@ -306,7 +321,7 @@ footer .wrap{max-width:760px}
         </div>
         <div class="slider-row">
           <span class="end">More bonds</span>
-          <input type="range" min="0" max="100" step="1" id="eqSlider" oninput="onSlider(this.value)">
+          <input type="range" min="0" max="100" step="1" id="eqSlider" aria-label="Percent of the portfolio held in stocks" oninput="onSlider(this.value)">
           <span class="end">More stocks</span>
           <span class="split-read num" id="splitRead">90 / 10</span>
         </div>
@@ -319,7 +334,7 @@ footer .wrap{max-width:760px}
         </div>
         <div class="slider-row">
           <span class="end">All US</span>
-          <input type="range" min="0" max="60" step="1" id="intlSlider" oninput="onIntlSlider(this.value)">
+          <input type="range" min="0" max="60" step="1" id="intlSlider" aria-label="Percent of stocks held international" oninput="onIntlSlider(this.value)">
           <span class="end">More intl</span>
           <span class="split-read num" id="intlRead">62 / 38</span>
         </div>
@@ -334,7 +349,7 @@ footer .wrap{max-width:760px}
           </div>
           <div class="slider-row">
             <span class="end">Market only</span>
-            <input type="range" min="0" max="40" step="1" id="tiltSlider" oninput="onTiltSlider(this.value)">
+            <input type="range" min="0" max="40" step="1" id="tiltSlider" aria-label="Percent of stocks in small-cap value" oninput="onTiltSlider(this.value)">
             <span class="end">More SCV</span>
             <span class="split-read num" id="tiltRead">0%</span>
           </div>
@@ -973,7 +988,7 @@ function renderAum(){
   el.innerHTML = `
     <div class="slider-row" style="margin-bottom:12px">
       <span class="end">0.25%</span>
-      <input type="range" min="0.25" max="2" step="0.05" value="${p}" oninput="S.plan.advPct=+this.value;save();renderAum()">
+      <input type="range" min="0.25" max="2" step="0.05" aria-label="Advisor fee, percent per year" value="${p}" oninput="S.plan.advPct=+this.value;save();renderAum()">
       <span class="end">2%</span>
       <span class="split-read num">${p.toFixed(2)}%</span>
     </div>
@@ -988,9 +1003,9 @@ function renderWait(){
   el.innerHTML = `
     <div class="contrib-grid" style="margin-bottom:12px">
       <div class="c-inp"><label>Cash on the sidelines</label>
-        <div class="money-wrap"><span>$</span><input class="money num" inputmode="numeric" value="${A||''}" onchange="S.plan.waitK=+this.value||0;save();renderWait()"></div></div>
+        <div class="money-wrap"><span>$</span><input class="money num" inputmode="numeric" aria-label="Cash on the sidelines, in dollars" value="${A||''}" onchange="S.plan.waitK=+this.value||0;save();renderWait()"></div></div>
       <div class="c-inp"><label>Months of waiting: <b class="num">${mo}</b></label>
-        <input type="range" min="1" max="36" step="1" value="${mo}" style="margin-top:12px" oninput="S.plan.waitM=+this.value;save();renderWait()"></div>
+        <input type="range" min="1" max="36" step="1" aria-label="Months of waiting" value="${mo}" style="margin-top:12px" oninput="S.plan.waitM=+this.value;save();renderWait()"></div>
     </div>
     <div style="font-size:14px;line-height:1.7">Investing ${fmt$(A)} today versus sitting on it for ${mo} month${mo===1?'':'s'}: in the moderate 7% case, the 30-year difference is about <b class="num" style="font-family:var(--disp);color:var(--red)">${fmt$(cost)}</b>.</div>
     <div style="font-size:12px;color:var(--faint);margin-top:10px">This is the arithmetic behind "time in the market beats timing the market." It assumes the moderate case holds during the wait, which nobody can know in advance. Sometimes waiting wins. Historically it usually has not.</div>`;
@@ -1002,9 +1017,9 @@ function renderPlanner(){
   el.innerHTML = `
     <div class="contrib-grid" style="margin-bottom:12px">
       <div class="c-inp"><label>Monthly take-home pay</label>
-        <div class="money-wrap"><span>$</span><input class="money num" inputmode="numeric" value="${p.income||''}" onchange="S.plan.income=+this.value||0;save();renderPlanner()"></div></div>
+        <div class="money-wrap"><span>$</span><input class="money num" inputmode="numeric" aria-label="Monthly take-home pay, in dollars" value="${p.income||''}" onchange="S.plan.income=+this.value||0;save();renderPlanner()"></div></div>
       <div class="c-inp"><label>Share you invest: <b class="num" id="spRead">${p.savePct||0}%</b></label>
-        <input type="range" min="0" max="60" step="1" value="${p.savePct||0}" style="margin-top:12px" oninput="S.plan.savePct=+this.value;document.getElementById('spRead').textContent=this.value+'%';save();renderPlanner()"></div>
+        <input type="range" min="0" max="60" step="1" aria-label="Share of take-home pay you invest, percent" value="${p.savePct||0}" style="margin-top:12px" oninput="S.plan.savePct=+this.value;document.getElementById('spRead').textContent=this.value+'%';save();renderPlanner()"></div>
     </div>
     ${(+p.income>0)?`
       <div style="font-size:14px;margin-bottom:10px">That's <b class="num" style="font-family:var(--disp)">${fmt$(monthlyFromIncome)}</b> a month into investments${p.savePct>=20?', a 20%+ savings rate and the benchmark a lot of the FIRE crowd aims for':p.savePct>=10?', in the range many planners consider a solid baseline':''}.
@@ -1026,7 +1041,7 @@ function renderRoom(){
     const left = Math.max(0, lim-done);
     return `<div class="c-inp">
       <label>${esc(a.name)} <span style="color:var(--faint)">· ${a.type} · limit ${fmt$(lim)}</span></label>
-      <div class="money-wrap"><span>$</span><input class="money num" inputmode="numeric" placeholder="0" value="${done||''}" onchange="S.ytd['${a.id}']=+this.value||0;save();renderRoom()"></div>
+      <div class="money-wrap"><span>$</span><input class="money num" inputmode="numeric" aria-label="Contributed so far this year to ${esc(a.name)}, in dollars" placeholder="0" value="${done||''}" onchange="S.ytd['${a.id}']=+this.value||0;save();renderRoom()"></div>
       <div class="stackbar" style="margin-top:7px"><div style="width:${pct}%;background:${pct>=100?'var(--green)':'var(--accent)'}"></div></div>
       <div style="font-size:12px;color:${left>0?'var(--muted)':'var(--green)'};margin-top:3px" class="num">${left>0?fmt$(left)+' of room left':'Maxed for '+LIMITS.year+' 🎉'}</div>
     </div>`;
@@ -1052,33 +1067,33 @@ function renderAccounts(){
   const el = document.getElementById('accounts');
   el.innerHTML = '';
   if(!S.accounts.length){ el.innerHTML = '<div class="empty">No accounts yet. Add one, or load the sample data from the top bar.</div>'; }
-  S.accounts.forEach(a=>{
+  S.accounts.forEach((a, ai)=>{
     const total = a.holdings.reduce((s,h)=>s+(+h.bal||0),0);
     const card = document.createElement('div'); card.className='card';
     card.innerHTML = `
       <div class="acc-head">
         <div>
-          <input class="inp" style="font-weight:600;font-size:15px;padding-left:0;width:auto;min-width:120px" value="${esc(a.name)}" onchange="upAcct('${a.id}','name',this.value)">
-          <div class="acc-type"><select class="inp" style="font-size:11.5px;padding:1px 24px 1px 0;color:var(--muted);text-transform:uppercase;letter-spacing:.06em" onchange="upAcct('${a.id}','type',this.value)">
+          <input class="inp" style="font-weight:600;font-size:15px;padding-left:0;width:auto;min-width:120px" aria-label="Account ${ai+1} name" value="${esc(a.name)}" onchange="upAcct('${a.id}','name',this.value)">
+          <div class="acc-type"><select class="inp" style="font-size:11.5px;padding:1px 24px 1px 0;color:var(--muted);text-transform:uppercase;letter-spacing:.06em" aria-label="Account type for ${esc(a.name)}" onchange="upAcct('${a.id}','type',this.value)">
             ${ACCT_TYPES.map(t=>`<option ${t===a.type?'selected':''}>${t}</option>`).join('')}
           </select></div>
         </div>
-        <button class="x" title="Remove account" onclick="delAcct('${a.id}')">×</button>
+        <button class="x" title="Remove account" aria-label="Remove account ${esc(a.name)}" onclick="delAcct('${a.id}')">×</button>
       </div>
       <div class="acc-total num">Balance <b>${fmt$(total)}</b></div>
       <table class="hold">
         <tr><th style="width:26%">Fund</th><th>Asset class</th><th style="width:26%;text-align:right">Balance</th><th style="width:26px"></th></tr>
-        ${a.holdings.map(h=>`<tr>
-          <td><input class="inp" value="${esc(h.ticker)}" placeholder="VTI" onchange="upHold('${a.id}','${h.id}','ticker',this.value)"></td>
-          <td><select class="inp" onchange="upHold('${a.id}','${h.id}','cls',this.value)">
+        ${a.holdings.map((h, hi)=>`<tr>
+          <td><input class="inp" aria-label="${esc(a.name)}, fund ${hi+1} ticker" value="${esc(h.ticker)}" placeholder="VTI" onchange="upHold('${a.id}','${h.id}','ticker',this.value)"></td>
+          <td><select class="inp" aria-label="${esc(a.name)}, fund ${hi+1} asset class" onchange="upHold('${a.id}','${h.id}','cls',this.value)">
             ${Object.keys(BUILTIN_CLASSES).map(c=>`<option value="${c}" ${c===h.cls?'selected':''}>${CLASSES[c].name}</option>`).join('')}
             ${Object.keys(CUSTOM_CLASSES).length?`<optgroup label="Your categories">${Object.keys(CUSTOM_CLASSES).map(c=>`<option value="${c}" ${c===h.cls?'selected':''}>${esc(CLASSES[c].name)}</option>`).join('')}</optgroup>`:''}
           </select>${splitNote(h.ticker)}</td>
-          <td><input class="inp right num" value="${h.bal||''}" placeholder="0" inputmode="numeric" onchange="upHold('${a.id}','${h.id}','bal',this.value)"></td>
-          <td><button class="x" onclick="delHold('${a.id}','${h.id}')">×</button></td>
+          <td><input class="inp right num" aria-label="${esc(a.name)}, fund ${hi+1} balance in dollars" value="${h.bal||''}" placeholder="0" inputmode="numeric" onchange="upHold('${a.id}','${h.id}','bal',this.value)"></td>
+          <td><button class="x" title="Remove fund" aria-label="Remove fund ${hi+1} from ${esc(a.name)}" onclick="delHold('${a.id}','${h.id}')">×</button></td>
         </tr>`).join('')}
       </table>
-      <div class="addrow"><button class="btn tiny" onclick="addHold('${a.id}')">+ Add fund</button></div>
+      <div class="addrow"><button class="btn tiny" aria-label="Add a fund to ${esc(a.name)}" onclick="addHold('${a.id}')">+ Add fund</button></div>
       ${overlapNote(a)}`;
     el.appendChild(card);
   });
@@ -1214,7 +1229,7 @@ function renderTargets(){
       <td><span class="cls-dot" style="background:${CLASSES[c].color}"></span>${CLASSES[c].name}</td>
       <td style="text-align:right">
         ${isCustom
-          ? `<input class="inp right num tgt-pct" value="${t[c]}" inputmode="decimal" onchange="upTarget('${c}',this.value)" style="border:1px solid var(--border);background:#fff">`
+          ? `<input class="inp right num tgt-pct" aria-label="Target percent for ${esc(CLASSES[c].name)}" value="${t[c]}" inputmode="decimal" onchange="upTarget('${c}',this.value)" style="border:1px solid var(--border);background:#fff">`
           : `<span class="num" style="font-weight:600">${t[c]}%</span>`}
       </td>
     </tr>`).join('');
@@ -1236,8 +1251,8 @@ function renderCustomCats(){
   el.style.display='block';
   const list = (S.customClasses||[]).map(c=>`
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:7px">
-      <input type="color" value="${c.color}" onchange="upCategory('${c.id}','color',this.value)" style="width:30px;height:28px;border:1px solid var(--border);border-radius:6px;background:none;cursor:pointer;padding:1px" title="Pick a color">
-      <input class="inp" value="${esc(c.name)}" onchange="upCategory('${c.id}','name',this.value)" style="border:1px solid var(--border);background:#fff;flex:1" placeholder="Gold, REITs, momentum…">
+      <input type="color" aria-label="Color for the ${esc(c.name)} category" value="${c.color}" onchange="upCategory('${c.id}','color',this.value)" style="width:30px;height:28px;border:1px solid var(--border);border-radius:6px;background:none;cursor:pointer;padding:1px" title="Pick a color">
+      <input class="inp" aria-label="Category name" value="${esc(c.name)}" onchange="upCategory('${c.id}','name',this.value)" style="border:1px solid var(--border);background:#fff;flex:1" placeholder="Gold, REITs, momentum…">
       <button class="x" title="Remove category" onclick="delCategory('${c.id}')">×</button>
     </div>`).join('');
   el.innerHTML =
@@ -1305,7 +1320,7 @@ function renderContribs(){
   el.innerHTML = S.accounts.map(a=>`
     <div class="c-inp">
       <label>${esc(a.name)}</label>
-      <div class="money-wrap"><span>$</span><input class="money num" inputmode="numeric" placeholder="0" value="${S.contrib[a.id]||''}" onchange="S.contrib['${a.id}']=+this.value||0;save()"></div>
+      <div class="money-wrap"><span>$</span><input class="money num" inputmode="numeric" aria-label="Contribution to ${esc(a.name)} this month, in dollars" placeholder="0" value="${S.contrib[a.id]||''}" onchange="S.contrib['${a.id}']=+this.value||0;save()"></div>
     </div>`).join('') || '<div class="empty">Add an account first.</div>';
 }
 
@@ -1399,10 +1414,21 @@ function dismissTip(){
 
 /* ---------- mutations ---------- */
 function addAccount(){ S.isSample=false; S.accounts.push({id:uid(), name:'New account', type:'Taxable', holdings:[]}); save(); renderAll(); }
-function delAcct(id){ S.isSample=false; S.accounts = S.accounts.filter(a=>a.id!==id); save(); renderAll(); }
+function delAcct(id){
+  const i = S.accounts.findIndex(a=>a.id===id); if(i<0) return;
+  const gone = S.accounts[i];
+  S.isSample=false; S.accounts.splice(i,1); save(); renderAll();
+  toastUndo(`Removed ${gone.name}.`, ()=>{ S.accounts.splice(i,0,gone); save(); renderAll(); });
+}
 function upAcct(id,k,v){ const a=S.accounts.find(x=>x.id===id); if(a){S.isSample=false; a[k]=v; save(); renderDrift();} }
 function addHold(aid){ const a=S.accounts.find(x=>x.id===aid); if(a){a.holdings.push({id:uid(),ticker:'',cls:'US',bal:0}); save(); renderAccounts();} }
-function delHold(aid,hid){ const a=S.accounts.find(x=>x.id===aid); if(a){a.holdings=a.holdings.filter(h=>h.id!==hid); save(); renderAll();} }
+function delHold(aid,hid){
+  const a = S.accounts.find(x=>x.id===aid); if(!a) return;
+  const i = a.holdings.findIndex(h=>h.id===hid); if(i<0) return;
+  const gone = a.holdings[i];
+  a.holdings.splice(i,1); save(); renderAll();
+  toastUndo(`Removed ${gone.ticker || 'that fund'} from ${a.name}.`, ()=>{ a.holdings.splice(i,0,gone); save(); renderAll(); });
+}
 function upHold(aid,hid,k,v){
   const a=S.accounts.find(x=>x.id===aid); if(!a) return;
   const h=a.holdings.find(x=>x.id===hid); if(!h) return;
@@ -1494,6 +1520,23 @@ function upTarget(c,v){
 function esc(s){ return String(s??'').replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
 let toastT;
 function toast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove('show'),2600); }
+
+/* Deleting an account or a fund used to be instant and final, on a button that
+   renders at 21 by 19 pixels beside a balance field. Undo is cheaper than
+   asking someone to be precise. */
+let UNDO = null, undoT;
+function toastUndo(msg, restore){
+  UNDO = restore;
+  const t = document.getElementById('toast');
+  t.textContent = msg + ' ';
+  const b = document.createElement('button');
+  b.type = 'button'; b.className = 'toast-undo'; b.textContent = 'Undo';
+  b.onclick = () => { if(UNDO){ UNDO(); UNDO = null; } t.classList.remove('show'); t.classList.remove('has-action'); };
+  t.appendChild(b);
+  t.classList.add('show'); t.classList.add('has-action');
+  clearTimeout(toastT); clearTimeout(undoT);
+  undoT = setTimeout(() => { t.classList.remove('show'); t.classList.remove('has-action'); UNDO = null; }, 7000);
+}
 
 function toggleSec(id){ document.getElementById(id).classList.toggle('closed'); }
 
