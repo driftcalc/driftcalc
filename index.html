@@ -306,7 +306,7 @@ footer .wrap{max-width:760px}
         </div>
         <div class="slider-row">
           <span class="end">More bonds</span>
-          <input type="range" min="0" max="100" step="5" id="eqSlider" oninput="onSlider(this.value)">
+          <input type="range" min="0" max="100" step="1" id="eqSlider" oninput="onSlider(this.value)">
           <span class="end">More stocks</span>
           <span class="split-read num" id="splitRead">90 / 10</span>
         </div>
@@ -1343,8 +1343,46 @@ function runCalc(){
   const remain = rows.filter(x=>x.gap > Math.max(50, r.T2*0.002));
   const warn = document.getElementById('resWarn');
   if(remain.length){
+    /* The old message listed the classes and then gave two possible reasons without
+       saying which applied. We know which: either no account being funded holds a fund
+       for that class, or the gap is simply bigger than this month's money. Those have
+       different fixes, so they get different sentences. */
+    const tgtPct = targetsRaw();
+    const funded = S.accounts.filter(a => (+contribs[a.id]||0) > 0);
+    const reachable = c => funded.some(a => a.holdings.some(h => (buyExposure(h)[c]||0) > 0));
+    const holders = c => S.accounts.filter(a => a.holdings.some(h => (buyExposure(h)[c]||0) > 0));
+    const lines = remain.map(({c, gap}) => {
+      const name = CLASSES[c].name;
+      if(!reachable(c)){
+        const other = holders(c);
+        const where = other.length
+          ? `${esc(other[0].name)} already holds one, so money sent there would go to it.`
+          : 'You do not hold a fund for it in any account yet.';
+        return `<div style="margin-top:8px"><b>${name}</b> is ${fmt$(gap)} under. None of the accounts you are adding to holds a fund for it. ${where}</div>`;
+      }
+      /* dollars this month's plan actually routes to the class, against the amount its
+         own target grows by as the portfolio gets bigger */
+      const flow = (r.running[c]||0) - (r.cur[c]||0);
+      const drift = (tgtPct[c]||0)/100 * r.totalC;
+      const net = flow - drift;
+      let when;
+      if(flow < 0.5){
+        /* the plan is greedy, so a smaller gap gets nothing while a bigger one is open.
+           Saying it never closes would be wrong. It is waiting its turn. */
+        when = 'Nothing went to it this month. The plan filled bigger gaps first, and it gets picked up as those close.';
+      } else if(net > 0.5){
+        const months = Math.ceil(gap / net);
+        when = months <= 1 ? 'About one more month at this rate.'
+             : months <= 23 ? `About ${months} more months at this rate.`
+             : months <= 120 ? `About ${Math.round(months/12)} years at this rate.`
+             : 'More than ten years at this rate.';
+      } else {
+        when = 'It does not close at this rate. Money is going in, and the target grows about as fast as you fill it.';
+      }
+      return `<div style="margin-top:8px"><b>${name}</b> is ${fmt$(gap)} under. ${when}</div>`;
+    });
     warn.style.display='block';
-    warn.innerHTML = `This contribution can't close every gap. <b>${remain.map(x=>CLASSES[x.c].name).join(', ')}</b> would still be under target, either because those classes aren't available in the account with money to invest, or because the gap is bigger than the contribution.`;
+    warn.innerHTML = '<b>This contribution does not close every gap.</b>' + lines.join('');
   } else warn.style.display='none';
   document.getElementById('results').classList.add('show');
   /* Quiet support note: only for people getting real value from it — their own data,
