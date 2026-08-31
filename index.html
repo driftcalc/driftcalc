@@ -204,6 +204,8 @@ table.tgt tr:last-child td{border-bottom:none}
 @media(min-width:760px){.contrib-grid{grid-template-columns:repeat(auto-fill,minmax(230px,1fr))}}
 .c-inp{display:flex;flex-direction:column;gap:5px}
 .c-inp label{font-size:12.5px;color:var(--muted);font-weight:500}
+.c-hint{font-size:11.5px;color:var(--faint);margin-top:1px}
+.c-hint.over{color:var(--red);font-weight:600}
 .money-wrap{position:relative}
 .money-wrap span{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--faint);font-size:14px}
 .money{font-family:inherit;font-size:15px;border:1px solid var(--border);border-radius:8px;padding:9px 12px 9px 24px;width:100%;background:var(--card)}
@@ -395,6 +397,7 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,[t
     <div id="contribPane">
     <div class="contrib-grid" id="contribInputs"></div>
     <button class="btn primary" onclick="runCalc()">Show me the math</button>
+    <div id="resStale" style="display:none;margin-top:12px;font-size:12.5px;color:var(--muted)">Your numbers changed, so the old answer is gone. Run it again.</div>
 
     <div class="results" id="results">
       <div class="res-grid">
@@ -1044,10 +1047,12 @@ function renderPlanner(){
     <div style="font-size:12.5px;color:var(--muted);border-top:1px solid var(--hairline);padding-top:10px;margin-top:4px">
       A common order many index investors follow with new money: emergency fund first, then 401(k) up to any employer match, then HSA if eligible, then IRA, then the rest of the 401(k), then taxable. It is a popular framework. Plenty of situations call for a different order.</div>`;
 }
+/* one lookup, used by the contribution field and the room panel, so they cannot disagree */
+function limitFor(t){ return t==='401(k)'||t==='403(b)' ? LIMITS['401k'] : (t==='Traditional IRA'||t==='Roth IRA') ? LIMITS.ira : t==='HSA' ? LIMITS.hsa_self : null; }
+function roomLeft(a){ const lim = limitFor(a.type); if(lim==null) return null; return Math.max(0, lim - (+(S.ytd&&S.ytd[a.id])||0)); }
 function renderRoom(){
   const el = document.getElementById('roomBody'); if(!el) return;
   document.getElementById('limitYear').textContent = LIMITS.year;
-  const limitFor = t => t==='401(k)'||t==='403(b)' ? LIMITS['401k'] : (t==='Traditional IRA'||t==='Roth IRA') ? LIMITS.ira : t==='HSA' ? LIMITS.hsa_self : null;
   const eligible = S.accounts.filter(a=>limitFor(a.type)!=null);
   if(!eligible.length){ el.innerHTML='<div class="empty">Add a 401(k), IRA, or HSA account to track contribution room.</div>'; return; }
   el.innerHTML = `<div class="contrib-grid">` + eligible.map(a=>{
@@ -1337,11 +1342,23 @@ function renderDrift(){
 function renderContribs(){
   const el = document.getElementById('contribInputs');
   S.contrib = S.contrib || {};
-  el.innerHTML = S.accounts.map(a=>`
+  el.innerHTML = S.accounts.map(a=>{
+    /* The room panel sat below this field, so you picked an amount and only then
+       found out what you were allowed to put in. */
+    const left = roomLeft(a);
+    const amt = +S.contrib[a.id]||0;
+    let hint = '';
+    if(left!=null){
+      hint = amt > left
+        ? `<div class="c-hint over">${fmt$(amt-left)} over your ${LIMITS.year} ${esc(a.type)} limit.</div>`
+        : `<div class="c-hint">${fmt$(left)} of ${LIMITS.year} room left${amt>0?`, ${fmt$(left-amt)} after this`:''}.</div>`;
+    }
+    return `
     <div class="c-inp">
       <label>${esc(a.name)}</label>
-      <div class="money-wrap"><span>$</span><input class="money num" inputmode="numeric" aria-label="Contribution to ${esc(a.name)} this month, in dollars" placeholder="0" value="${S.contrib[a.id]||''}" onchange="S.contrib['${a.id}']=+this.value||0;save()"></div>
-    </div>`).join('') || '<div class="empty">Add an account first.</div>';
+      <div class="money-wrap"><span>$</span><input class="money num" inputmode="numeric" aria-label="Contribution to ${esc(a.name)} this month, in dollars" placeholder="0" value="${S.contrib[a.id]||''}" onchange="S.contrib['${a.id}']=+this.value||0;save();renderContribs()"></div>
+      ${hint}
+    </div>`;}).join('') || '<div class="empty">Add an account first.</div>';
 }
 
 function runCalc(){
@@ -1419,7 +1436,11 @@ function runCalc(){
     warn.style.display='block';
     warn.innerHTML = '<b>This contribution does not close every gap.</b>' + lines.join('');
   } else warn.style.display='none';
-  document.getElementById('results').classList.add('show');
+  const res = document.getElementById('results');
+  res.classList.add('show');
+  const stale = document.getElementById('resStale'); if(stale) stale.style.display='none';
+  /* the answer used to render below the fold with no cue that anything had happened */
+  requestAnimationFrame(()=>{ try{ res.scrollIntoView({behavior:'smooth', block:'nearest'}); }catch(e){} });
   /* Quiet support note: only for people getting real value from it — their own data,
      and not the first time they've run the math. Dismissable, and never returns. */
   S.calcCount = (S.calcCount||0) + 1;
@@ -1569,6 +1590,8 @@ function invalidateResults(){
     const bp = document.getElementById('buyPlan'); if(bp) bp.innerHTML='';
     const gl = document.getElementById('gapList'); if(gl) gl.innerHTML='';
     const w = document.getElementById('resWarn'); if(w) w.style.display='none';
+    /* it used to just disappear, which reads as the button having failed */
+    const stale = document.getElementById('resStale'); if(stale) stale.style.display='block';
   }
 }
 
