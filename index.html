@@ -319,6 +319,7 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,[t
 <section id="s1">
   <div class="sec-head collapser" onclick="toggleSec('s1')"><span class="step-n" id="s1chip">1</span><h2>Your accounts</h2><span class="sub" id="s1sum">Add each account and the funds you hold (or could buy) in it.</span><span class="chev"></span></div>
   <div class="sec-body">
+    <div id="backupNote" style="display:none"></div>
     <div class="grid cols-acc" id="accounts"></div>
     <div class="addrow"><button class="btn" onclick="addAccount()">+ Add account</button></div>
   </div>
@@ -687,7 +688,28 @@ function exportJSON(){
   a.href = URL.createObjectURL(blob);
   a.download = 'driftcalc-backup-' + new Date().toISOString().slice(0,10) + '.json';
   a.click(); toast('Backup downloaded. Keep it somewhere safe.');
+  S.hasExported = true; save(); renderBackupNote();
 }
+
+/* The footer warned that clearing browser data erases everything, while Export sat
+   behind an unlabelled menu and was never offered. Ask once, when there is something
+   worth losing. Saying it out loud is also the moment the privacy claim stops being
+   marketing and starts being a thing the person can check. */
+function renderBackupNote(){
+  const el = document.getElementById('backupNote'); if(!el) return;
+  const grand = S.accounts.reduce((t,a)=>t+a.holdings.reduce((x,h)=>x+(+h.bal||0),0),0);
+  const worth = !S.isSample && S.accounts.length && grand > 0;
+  if(!worth || S.hasExported || S.backupDismissed){ el.style.display='none'; return; }
+  el.style.display='block';
+  el.innerHTML = `<div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px;padding:12px 15px;
+      border:1px solid var(--border);background:var(--card);border-radius:10px;font-size:13px;box-shadow:var(--shadow)">
+    <span style="flex:1;min-width:240px">These numbers live in this browser and nowhere else. Which also
+      means clearing your browser data erases them.</span>
+    <button class="btn tiny primary" type="button" onclick="exportJSON()">Save a backup file</button>
+    <button class="btn tiny" type="button" onclick="dismissBackup()">Not now</button>
+  </div>`;
+}
+function dismissBackup(){ S.backupDismissed = true; save(); renderBackupNote(); }
 function importJSON(inp){
   const f = inp.files[0]; if(!f) return;
   const r = new FileReader();
@@ -1124,6 +1146,7 @@ function renderAccounts(){
     ? `${S.accounts.length} account${S.accounts.length===1?'':'s'} · ${fmt$(grand)}`
     : 'Add each account and the funds you hold (or could buy) in it.';
   renderContribs();
+  renderBackupNote();
 }
 function renderPresets(){
   const el = document.getElementById('presets');
