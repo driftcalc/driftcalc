@@ -113,13 +113,15 @@ function setOpen(sec, open) {
     prev = el;
   });
 
-  /* renumber so the badges match the new reading order */
-  var chips = { s2:'1', s1:'2', s3:'3', s5:'+' };
-  Object.keys(chips).forEach(function (id) {
+  /* The badges read 1, 2, 3. They promised a wizard on a page that is a dashboard,
+     and index.html's returning-user path relabels them differently again, so two
+     files disagreed about what the numbers meant. The headings already say what
+     each section is, so the badges go. */
+  order.forEach(function (id) {
     var sec = document.getElementById(id);
     if (!sec) return;
     var chip = sec.querySelector('.step-n');
-    if (chip) chip.textContent = chips[id];
+    if (chip && chip.parentNode) chip.parentNode.removeChild(chip);
   });
 })();
 
@@ -525,7 +527,87 @@ if (hp && /A drift calculator|Put in your accounts/.test(hp.textContent)) {
 })();
 })();
 
+/* ---------- type an exact number into the three dials ----------
+   The dials were range inputs and nothing else, so wanting exactly 20% meant
+   dragging until the readout agreed. The number beside each slider is now
+   click-to-edit. Click it, or tab to it and press Enter, type a number, press
+   Enter. Escape backs out and changes nothing. */
+(function typeableDials() {
+  if (typeof S === 'undefined' || !S) return;
 
+  var st = document.createElement('style');
+  st.textContent =
+    '.split-read.editable{cursor:text;border-bottom:1px dashed var(--faint,#93A1B5);border-radius:3px;padding:0 3px}' +
+    '.split-read.editable:hover,.split-read.editable:focus{background:var(--accent-soft,#E8F0FE);' +
+      'border-bottom-color:var(--accent,#2E6BE6);outline:none}' +
+    '.split-read input{font:inherit;width:3.2em;text-align:center;border:1px solid var(--accent,#2E6BE6);' +
+      'border-radius:5px;padding:1px 3px;background:#fff;color:var(--ink,#0B1F3B)}';
+  document.head.appendChild(st);
 
+  var DIALS = [
+    { id:'splitRead', min:0, max:100, hint:'percent in stocks',
+      get:function(){ return S.equityPct; },
+      set:function(v){ onSlider(v); } },
+    { id:'intlRead', min:0, max:60, hint:'percent of stocks held international',
+      get:function(){ return S.intlPct == null ? 38 : S.intlPct; },
+      set:function(v){ onIntlSlider(v); } },
+    { id:'tiltRead', min:0, max:40, hint:'percent of stocks in small-cap value',
+      get:function(){ return S.tiltPct || 0; },
+      set:function(v){ onTiltSlider(v); } }
+  ];
 
+  DIALS.forEach(function (d) {
+    var el = document.getElementById(d.id);
+    if (!el) return;
+    el.classList.add('editable');
+    el.setAttribute('tabindex', '0');
+    el.setAttribute('role', 'button');
+    el.setAttribute('title', 'Click to type an exact ' + d.hint);
 
+    function open() {
+      if (el.querySelector('input')) return;
+      var was = el.textContent;
+      var inp = document.createElement('input');
+      inp.type = 'text';
+      inp.inputMode = 'numeric';
+      inp.value = String(Math.round(d.get()));
+      inp.setAttribute('aria-label', 'Exact ' + d.hint);
+      el.textContent = '';
+      el.appendChild(inp);
+      inp.focus();
+      inp.select();
+
+      var done = false;
+      function close(commit) {
+        if (done) return;
+        done = true;
+        var raw = inp.value;
+        if (el.contains(inp)) el.removeChild(inp);
+        /* put the old text back first, then let the app's own render overwrite it */
+        el.textContent = was;
+        if (!commit) return;
+        var n = parseFloat(raw);
+        if (!isFinite(n)) return;
+        n = Math.min(d.max, Math.max(d.min, Math.round(n)));
+        d.set(n);
+      }
+
+      inp.addEventListener('keydown', function (e) {
+        if (e.key !== 'Enter' && e.key !== 'Escape') return;
+        /* the same keypress bubbles to the span, whose handler opens the editor.
+           Without this it closes and immediately reopens. */
+        e.preventDefault();
+        e.stopPropagation();
+        close(e.key === 'Enter');
+        el.focus();
+      });
+      inp.addEventListener('blur', function () { close(true); });
+    }
+
+    el.addEventListener('click', open);
+    el.addEventListener('keydown', function (e) {
+      if (e.target !== el) return;
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); }
+    });
+  });
+})();
