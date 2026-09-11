@@ -4,24 +4,24 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https://driftcalc.goatcounter.com; connect-src 'self' https://driftcalc.goatcounter.com; frame-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
-<title>What does a 1% advisor fee actually cost? · Drift Calculator</title>
-<meta name="description" content="Put in your balance and your advisor's fee. See what that percentage costs in dollars over the years you hold it. Free, no login, nothing saved.">
-<link rel="canonical" href="https://driftcalc.com/fees.html">
+<title>What does waiting to invest cost? · Drift Calculator</title>
+<meta name="description" content="Put in the cash you are sitting on and how long you would wait. See what the delay costs by the time you need the money, and how often waiting actually won since 1926.">
+<link rel="canonical" href="https://driftcalc.com/waiting.html">
 
 <!-- Social preview. A link to this page should say what the page says. -->
 <meta property="og:type" content="website">
-<meta property="og:url" content="https://driftcalc.com/fees.html">
+<meta property="og:url" content="https://driftcalc.com/waiting.html">
 <meta property="og:site_name" content="Drift Calculator">
-<meta property="og:title" content="What does a 1% advisor fee actually cost?">
-<meta property="og:description" content="One percent sounds small. Over thirty years it is usually six figures. Put your own number in.">
-<meta property="og:image" content="https://driftcalc.com/og.png">
+<meta property="og:title" content="What does waiting to invest cost?">
+<meta property="og:description" content="Cash on the sidelines has a price. Put your own number in and see it, then see how often waiting actually won since 1926.">
+<meta property="og:image" content="https://driftcalc.com/og-waiting.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="A 1% advisor fee on $250,000 costs $467,191 over 30 years.">
+<meta property="og:image:alt" content="Sitting on $10,000 for 12 months costs about $4,980 by year 30.">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="What does a 1% advisor fee actually cost?">
-<meta name="twitter:description" content="One percent sounds small. Over thirty years it is usually six figures. Put your own number in.">
-<meta name="twitter:image" content="https://driftcalc.com/og.png">
+<meta name="twitter:title" content="What does waiting to invest cost?">
+<meta name="twitter:description" content="Cash on the sidelines has a price. Put your own number in and see it, then see how often waiting actually won since 1926.">
+<meta name="twitter:image" content="https://driftcalc.com/og-waiting.png">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
@@ -52,6 +52,7 @@ header .wrap{display:flex;align-items:center;justify-content:space-between;gap:1
 .btn.primary:hover{background:#2456C4}
 .btn.nav{border-color:rgba(120,170,255,.55);color:#DCE9FF;background:rgba(46,107,230,.20);font-weight:600;font-size:12px;padding:5px 11px}
 .btn.nav:hover{background:rgba(46,107,230,.38);color:#fff}
+a:focus-visible,button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:6px}
 
 .hero{padding:48px 0 26px}
 h1{font-family:var(--disp);font-size:38px;font-weight:800;letter-spacing:-.03em;line-height:1.1}
@@ -73,7 +74,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
   background:var(--accent);border:2px solid #fff;box-shadow:0 1px 4px rgba(16,24,40,.28);margin-top:-7.5px}
 input[type=range]::-moz-range-track{height:5px;border-radius:99px;background:#DCE4F0}
 input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;background:var(--accent);border:2px solid #fff}
-.readout{font-family:var(--disp);font-size:16px;font-weight:800;min-width:56px;display:inline-block}
+.readout{font-family:var(--disp);font-size:16px;font-weight:800;min-width:74px;display:inline-block}
 .assume{margin-top:10px;font-size:13px;color:var(--muted)}
 .seg{display:inline-flex;background:var(--hairline);border-radius:10px;padding:3px;gap:2px}
 .seg button{font-family:inherit;font-size:13px;font-weight:600;border:none;background:none;color:var(--muted);
@@ -91,7 +92,7 @@ input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;bac
 
 .bars{display:flex;flex-direction:column;gap:12px;margin-top:24px}
 .bar-row{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
-.bar-lab{width:150px;font-size:13.5px;color:var(--muted);flex:none}
+.bar-lab{width:170px;font-size:13.5px;color:var(--muted);flex:none}
 .bar-track{flex:1;min-width:130px;height:26px;background:var(--hairline);border-radius:7px;overflow:hidden}
 .bar-fill{height:100%;border-radius:7px;transition:width .4s cubic-bezier(.2,.7,.3,1)}
 .bar-val{width:120px;text-align:right;font-family:var(--disp);font-weight:800;font-size:15px;flex:none}
@@ -103,8 +104,20 @@ input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;bac
 .share .ok.on{opacity:1}
 section.blk{margin-top:34px}
 h2{font-family:var(--disp);font-size:20px;font-weight:700;letter-spacing:-.02em;margin-bottom:12px}
+
+.split{display:flex;gap:20px;flex-wrap:wrap;align-items:stretch;margin-top:4px}
+.stat{flex:1;min-width:180px;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px 20px;box-shadow:var(--shadow)}
+.stat .v{font-family:var(--disp);font-size:34px;font-weight:800;letter-spacing:-.03em;line-height:1.1}
+.stat .v.win{color:var(--green)}
+.stat .v.lose{color:var(--red)}
+.stat .t{font-size:12.5px;color:var(--muted);margin-top:6px;line-height:1.5}
+
 footer{margin-top:56px;padding:26px 0 40px;border-top:1px solid var(--border);color:var(--faint);font-size:12.5px;line-height:1.7}
 footer a{color:var(--muted)}
+
+@media (pointer:coarse){
+  input[type=text],input[type=number],select,textarea{font-size:16px}
+}
 </style>
 </head>
 <body>
@@ -116,7 +129,7 @@ footer a{color:var(--muted)}
   </a>
   <div class="hbtns">
     <a class="btn nav" href="/">Calculator</a>
-    <a class="btn nav" href="/waiting.html">Cost of waiting</a>
+    <a class="btn nav" href="/fees.html">Fee cost</a>
     <a class="btn nav" href="/backtest.html">Backtest</a>
   </div>
 </div></header>
@@ -124,25 +137,25 @@ footer a{color:var(--muted)}
 <div class="wrap">
 
   <div class="hero">
-    <h1>What does a <em>1% fee</em> actually cost?</h1>
-    <p class="sub">Put in your balance and see what that percentage costs you in dollars.</p>
+    <h1>What does <em>waiting</em> cost?</h1>
+    <p class="sub">Put in the cash you are sitting on and how long you would wait before investing it.</p>
   </div>
 
   <div class="card">
     <div class="controls">
       <div class="field">
-        <span class="lbl">Portfolio balance</span>
-        <div class="money-wrap"><span>$</span><input type="text" id="bal" inputmode="numeric" value="250,000"></div>
+        <span class="lbl">Cash on the sidelines</span>
+        <div class="money-wrap"><span>$</span><input type="text" id="amt" inputmode="numeric" value="10,000" aria-label="Cash on the sidelines, in dollars"></div>
       </div>
       <div class="field">
-        <span class="lbl">Annual fee</span>
+        <span class="lbl">How long you wait</span>
         <div style="display:flex;align-items:center;gap:12px">
-          <input type="range" id="fee" min="0" max="2" step="0.05" value="1">
-          <span class="readout num" id="feeOut">1.00%</span>
+          <input type="range" id="wait" min="1" max="36" step="1" value="12" aria-label="How many months you wait before investing">
+          <span class="readout num" id="waitOut">12 mo</span>
         </div>
       </div>
       <div class="field">
-        <span class="lbl">Years you hold it</span>
+        <span class="lbl">Years until you need it</span>
         <div class="seg" id="yrSeg"></div>
       </div>
       <div class="field">
@@ -156,7 +169,7 @@ footer a{color:var(--muted)}
   </div>
 
   <div class="answer">
-    <div class="k">What the fee takes</div>
+    <div class="k">What the wait costs</div>
     <div class="big num" id="big">$0</div>
     <div class="say" id="say"></div>
     <div class="assume" id="assumeShort"></div>
@@ -174,27 +187,23 @@ footer a{color:var(--muted)}
   </section>
 
   <section class="blk">
-    <h2>The honest version</h2>
-    <div class="note">
-      <b>Plenty of advisors earn their fee several times over</b> in tax planning, estate work, and
-      talking someone off a ledge in a crash. That last one alone can be worth more than the fee.
-      Flat-fee and hourly advisors exist too, and their bill does not grow with your balance.
-      <br><br>
-      <b>Know the number before you decide.</b> Most people have never seen the percentage converted
-      into dollars.
-    </div>
+    <h2>How often waiting actually won</h2>
+    <p class="sub" style="margin-top:0;margin-bottom:16px;font-size:15px" id="histLead">Checking every starting month in the real data&hellip;</p>
+    <div class="split" id="histStats"></div>
+    <div class="note" id="histNote"></div>
   </section>
 
   <section class="blk">
-    <h2>This applies to fund fees too</h2>
+    <h2>The honest version</h2>
     <div class="note">
-      An expense ratio works the same way with a smaller number in front. Drop the fee slider to
-      <b>0.50%</b> to see what an average actively managed fund costs against an index fund near
-      <b>0.03%</b>. The gap is usually bigger than people expect, and the fee is the part you get
-      to choose.
+      <b>Waiting is not always wrong.</b> It loses on average because markets go up more months than
+      they go down, so time out of the market usually costs something. In the months where it wins, it
+      wins because the market fell right after you would have bought, and nobody gets to know that in
+      advance.
       <br><br>
-      <a href="/">The full calculator</a> reads the funds you hold and works out your blended
-      expense ratio.
+      There are reasons to hold cash that have nothing to do with timing. An emergency fund, a down
+      payment next spring, a roof that needs replacing. None of that is on this page. This page is
+      only about money you have already decided to invest and have not invested yet.
     </div>
   </section>
 
@@ -203,12 +212,14 @@ footer a{color:var(--muted)}
 <footer><div class="wrap">
   <b>Drift Calc</b> is an educational calculator for portfolio arithmetic. It is not investment advice,
   tax advice, or a recommendation of any security or strategy, and it knows nothing about your situation.
-  Every number here is an estimate built from what you type in and a fixed assumed return. Real returns
-  vary and arrive out of order, with drops along the way. Talk to a qualified professional before making decisions.
-  Nothing on this page is stored or sent anywhere.
+  The projection above is an estimate built from what you type in and a fixed assumed return. Real returns
+  vary and arrive out of order, with drops along the way. The historical figures come from the same monthly
+  total-return data the <a href="/backtest.html">backtest</a> uses, with no fund fees, spreads or taxes
+  subtracted. Talk to a qualified professional before making decisions. Nothing on this page is stored or
+  sent anywhere.
 </div></footer>
 
-<script src="count.js" defer></script>
+<script src="count.js"></script>
 <script>
 (function () {
 'use strict';
@@ -217,9 +228,7 @@ footer a{color:var(--muted)}
    Everything here can arrive from a URL a stranger constructed, so each value is
    parsed, bounded, and never trusted. Nothing is written to the DOM as HTML. */
 var YEARS = [10, 20, 30, 40];
-/* The return was a hidden constant while the headline number depended entirely on
-   it. Anyone can disagree with 7%, so let them set it and watch the answer move. */
-var ST = { bal: 250000, fee: 1.0, yrs: 30, ret: 7 };
+var ST = { amt: 10000, wait: 12, yrs: 30, ret: 7 };
 
 function clamp(v, lo, hi, dflt) {
   v = parseFloat(v);
@@ -229,8 +238,8 @@ function clamp(v, lo, hi, dflt) {
 
 function readUrl() {
   var q = new URLSearchParams(location.search);
-  if (q.has('bal')) ST.bal = clamp(String(q.get('bal')).replace(/[^0-9.]/g, ''), 0, 1e11, 250000);
-  if (q.has('fee')) ST.fee = clamp(q.get('fee'), 0, 2, 1);
+  if (q.has('amt')) ST.amt = clamp(String(q.get('amt')).replace(/[^0-9.]/g, ''), 0, 1e11, 10000);
+  if (q.has('wait')) ST.wait = Math.round(clamp(q.get('wait'), 1, 36, 12));
   if (q.has('ret')) ST.ret = clamp(q.get('ret'), 3, 12, 7);
   if (q.has('yrs')) {
     var y = clamp(q.get('yrs'), 1, 60, 30);
@@ -244,65 +253,74 @@ function money(n) {
   return '$' + Math.round(n).toLocaleString('en-US');
 }
 function big(n) {
+  if (!isFinite(n)) return '$0';
   if (n >= 1e6) return '$' + (n / 1e6).toFixed(n < 1e7 ? 2 : 1) + 'M';
-  if (n >= 1e3) return '$' + Math.round(n / 1e3) + 'k';
+  if (n >= 1e4) return '$' + Math.round(n / 1000) + 'k';
   return money(n);
 }
 
-/* Same arithmetic the main calculator uses: the fee comes straight off the
-   compounding rate, so its cost is the gap between two growth curves. */
-function endValue(bal, rate, yrs) { return bal * Math.pow(1 + rate, yrs); }
-
-function calc() {
-  var R = ST.ret / 100;
-  var gross = endValue(ST.bal, R, ST.yrs);
-  var net   = endValue(ST.bal, R - ST.fee / 100, ST.yrs);
-  return { gross: gross, net: net, cost: gross - net, share: gross > 0 ? (gross - net) / gross : 0 };
+/* ---------- the arithmetic ----------
+   Both paths end on the same date. Investing now compounds for the whole term;
+   waiting compounds for the term minus the months spent in cash. The gap between
+   them is what the wait cost. */
+function compute() {
+  var r = ST.ret / 100;
+  var waitYears = ST.wait / 12;
+  var now = ST.amt * Math.pow(1 + r, ST.yrs);
+  var later = ST.amt * Math.pow(1 + r, Math.max(0, ST.yrs - waitYears));
+  var cost = now - later;
+  return { now: now, later: later, cost: cost, share: now > 0 ? cost / now : 0 };
 }
 
-/* ---------- render ---------- */
+/* ---------- bars ---------- */
+function bars(res) {
+  var el = document.getElementById('bars');
+  el.textContent = '';
+  var max = Math.max(res.now, 1);
+  var rows = [
+    ['Invested today', res.now, 'var(--green)'],
+    ['After waiting ' + ST.wait + ' month' + (ST.wait === 1 ? '' : 's'), res.later, 'var(--accent)'],
+    ['What the wait cost', res.cost, 'var(--red)']
+  ];
+  rows.forEach(function (row) {
+    var wrap = document.createElement('div'); wrap.className = 'bar-row';
+    var lab = document.createElement('div'); lab.className = 'bar-lab'; lab.textContent = row[0];
+    var track = document.createElement('div'); track.className = 'bar-track';
+    var fill = document.createElement('div'); fill.className = 'bar-fill';
+    fill.style.width = Math.max(0, Math.min(100, row[1] / max * 100)) + '%';
+    fill.style.background = row[2];
+    track.appendChild(fill);
+    var val = document.createElement('div'); val.className = 'bar-val num'; val.textContent = money(row[1]);
+    wrap.appendChild(lab); wrap.appendChild(track); wrap.appendChild(val);
+    el.appendChild(wrap);
+  });
+}
+
+/* ---------- segmented years ---------- */
 function seg() {
-  var box = document.getElementById('yrSeg');
-  box.textContent = '';
+  var el = document.getElementById('yrSeg');
+  el.textContent = '';
   YEARS.forEach(function (y) {
     var b = document.createElement('button');
     b.type = 'button';
     b.textContent = String(y);
+    b.setAttribute('aria-label', y + ' years until you need the money');
     if (y === ST.yrs) b.className = 'on';
     b.addEventListener('click', function () { ST.yrs = y; render(); });
-    box.appendChild(b);
+    el.appendChild(b);
   });
 }
 
-function bars(r) {
-  var box = document.getElementById('bars');
-  box.textContent = '';
-  var rows = [
-    ['With no fee at all', r.gross, '#17A374'],
-    ['After a ' + ST.fee.toFixed(2) + '% fee', r.net, 'var(--accent)'],
-    ['What the fee took', r.cost, '#D93B3B']
-  ];
-  rows.forEach(function (row) {
-    var wrapEl = document.createElement('div'); wrapEl.className = 'bar-row';
-    var lab = document.createElement('div'); lab.className = 'bar-lab'; lab.textContent = row[0];
-    var track = document.createElement('div'); track.className = 'bar-track';
-    var fill = document.createElement('div'); fill.className = 'bar-fill';
-    fill.style.width = (r.gross > 0 ? Math.max(1, row[1] / r.gross * 100) : 0) + '%';
-    fill.style.background = row[2];
-    track.appendChild(fill);
-    var val = document.createElement('div'); val.className = 'bar-val num'; val.textContent = money(row[1]);
-    wrapEl.appendChild(lab); wrapEl.appendChild(track); wrapEl.appendChild(val);
-    box.appendChild(wrapEl);
-  });
-}
-
+/* ---------- render ---------- */
 function render() {
-  document.getElementById('feeOut').textContent = ST.fee.toFixed(2) + '%';
-  var el = document.getElementById('bal');
-  if (document.activeElement !== el) el.value = ST.bal.toLocaleString('en-US');
+  var res = compute();
+  seg();
+  document.getElementById('waitOut').textContent = ST.wait + ' mo';
+  document.getElementById('wait').value = String(ST.wait);
+  document.getElementById('retOut').textContent = ST.ret.toFixed(1) + '%';
+  document.getElementById('ret').value = String(ST.ret);
 
-  var r = calc();
-  document.getElementById('big').textContent = big(r.cost);
+  document.getElementById('big').textContent = big(res.cost);
 
   /* built with textContent and <b> nodes, never innerHTML with user numbers */
   var say = document.getElementById('say');
@@ -310,64 +328,146 @@ function render() {
   function t(s) { say.appendChild(document.createTextNode(s)); }
   function bd(s) { var b = document.createElement('b'); b.textContent = s; say.appendChild(b); }
 
-  if (ST.fee === 0 || ST.bal === 0) {
-    t('Set a balance and a fee above. At zero the answer is zero, which is the nice thing about index funds.');
+  if (ST.amt === 0) {
+    t('Put a number in above. At zero the answer is zero, which is the one case where waiting is free.');
   } else {
-    t('A ');
-    bd(ST.fee.toFixed(2) + '%');
-    t(' fee on ');
-    bd(money(ST.bal));
+    t('Sitting on ');
+    bd(money(ST.amt));
+    t(' for ');
+    bd(ST.wait + ' month' + (ST.wait === 1 ? '' : 's'));
     t(' costs about ');
-    bd(money(r.cost));
-    t(' over ' + ST.yrs + ' years. That is ');
-    bd(Math.round(r.share * 100) + '%');
-    t(' of everything the money would otherwise have become, because the fee compounds every year too.');
+    bd(money(res.cost));
+    t(' by year ' + ST.yrs + '. That is ');
+    bd(Math.round(res.share * 100) + '%');
+    t(' of what the money would otherwise have become.');
   }
 
-  bars(r);
+  bars(res);
 
-  document.getElementById('retOut').textContent = ST.ret.toFixed(1) + '%';
-  document.getElementById('ret').value = String(ST.ret);
-
-  /* the assumption travels with the number it produced, not four screens below it */
   document.getElementById('assumeShort').textContent =
-    'Assuming ' + ST.ret.toFixed(1) + '% a year before fees and no new contributions. ' +
-    'Drag that slider if you disagree with the number.';
+    'Assuming ' + ST.ret.toFixed(1) + '% a year before fees, and cash earning nothing while it waits. ' +
+    'Drag either slider if you disagree.';
 
   document.getElementById('assump').textContent =
-    'Nominal, and the fee charged every year on the whole balance. Real returns are lumpier ' +
-    'than this and arrive out of order. A percentage taken every year still compounds against ' +
-    'you, so the shape of the answer holds at any return you pick.';
+    'Nominal, no new contributions, and both paths measured on the same date so the wait costs time ' +
+    'rather than money. Real returns are lumpier than this and arrive out of order. The shape of the ' +
+    'answer holds at any return you pick, because the cost is the compounding you skipped.';
 
   syncUrl();
+  renderHistory();
 }
 
-/* the URL is the product here — every state is a link someone can send */
+/* the URL is the product here, every state is a link someone can send */
 function syncUrl() {
   var q = new URLSearchParams();
-  q.set('bal', String(Math.round(ST.bal)));
-  q.set('fee', ST.fee.toFixed(2));
+  q.set('amt', String(Math.round(ST.amt)));
+  q.set('wait', String(ST.wait));
   q.set('yrs', String(ST.yrs));
   q.set('ret', ST.ret.toFixed(1));
   history.replaceState(null, '', location.pathname + '?' + q.toString());
 }
 
-/* ---------- wiring ---------- */
-document.getElementById('fee').addEventListener('input', function () {
-  ST.fee = clamp(this.value, 0, 2, 1);
-  render();
+/* ---------- what the real data says ----------
+   The arithmetic above assumes a steady return, which never happens. This walks
+   every starting month in the same total-return series the backtest uses and asks
+   how often investing immediately actually beat waiting. Cash earns the T-bill
+   series while it sits, because pretending it earns nothing would stack the deck. */
+var RET_DATA = null, RET_FAILED = false;
+
+function pctFmt(x) { return (x * 100).toFixed(0) + '%'; }
+
+function renderHistory() {
+  var lead = document.getElementById('histLead');
+  var stats = document.getElementById('histStats');
+  var note = document.getElementById('histNote');
+  if (RET_FAILED) {
+    lead.textContent = 'The historical check needs the return data, which did not load. The arithmetic above still works.';
+    stats.textContent = ''; note.textContent = '';
+    return;
+  }
+  if (!RET_DATA) return;
+
+  var us = RET_DATA.series.US, cash = RET_DATA.series.CASH, months = RET_DATA.months;
+  if (!us || !cash || !months) { RET_FAILED = true; return renderHistory(); }
+
+  var H = ST.yrs * 12, W = ST.wait;
+  var n = Math.min(us.length, cash.length, months.length);
+  if (H >= n) { lead.textContent = 'That horizon is longer than the data.'; stats.textContent=''; note.textContent=''; return; }
+
+  var wins = 0, total = 0, worstGap = 0, worstStart = null;
+  for (var i = 0; i + H <= n; i++) {
+    var a = 1, b = 1, k;
+    for (k = 0; k < W; k++) { a *= 1 + us[i + k]; b *= 1 + cash[i + k]; }
+    for (k = W; k < H; k++) { var g = 1 + us[i + k]; a *= g; b *= g; }
+    total++;
+    if (a > b) wins++;
+    else {
+      var gap = b / a - 1;
+      if (gap > worstGap) { worstGap = gap; worstStart = months[i]; }
+    }
+  }
+  if (!total) return;
+
+  var winRate = wins / total;
+  var loseRate = 1 - winRate;
+  var first = months[0], last = months[n - 1];
+
+  lead.textContent = 'Every ' + ST.yrs + '-year stretch in the data, from ' + ym(first) + ' to ' + ym(last) +
+    '. In each one, investing immediately is compared against holding T-bills for ' + ST.wait +
+    ' month' + (ST.wait === 1 ? '' : 's') + ' first and then buying, both measured on the same end date.';
+
+  stats.textContent = '';
+  addStat(stats, pctFmt(winRate), 'win', 'of the ' + total.toLocaleString('en-US') +
+    ' starting months, investing immediately came out ahead');
+  addStat(stats, pctFmt(loseRate), 'lose', 'of them, waiting came out ahead, because the market fell right after you would have bought');
+  if (worstStart) {
+    addStat(stats, '+' + (worstGap * 100).toFixed(0) + '%', 'lose',
+      'the best the wait ever did, starting ' + ym(worstStart));
+  }
+
+  note.textContent = 'Waiting wins often enough that anyone who did it once will tell you it works. ' +
+    'It loses more often than it wins because markets rise in more months than they fall. ' +
+    'US stocks and one-month T-bills, total returns, no fees or taxes removed.';
+}
+
+function ym(s) {
+  s = String(s);
+  var names = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  var m = parseInt(s.slice(4, 6), 10);
+  return (names[m - 1] || '') + ' ' + s.slice(0, 4);
+}
+
+function addStat(parent, value, cls, text) {
+  var d = document.createElement('div'); d.className = 'stat';
+  var v = document.createElement('div'); v.className = 'v num ' + cls; v.textContent = value;
+  var t = document.createElement('div'); t.className = 't'; t.textContent = text;
+  d.appendChild(v); d.appendChild(t); parent.appendChild(d);
+}
+
+fetch('returns.json').then(function (r) {
+  if (!r.ok) throw new Error('no data');
+  return r.json();
+}).then(function (j) {
+  RET_DATA = j; renderHistory();
+}).catch(function () {
+  RET_FAILED = true; renderHistory();
 });
 
+/* ---------- wiring ---------- */
+document.getElementById('wait').addEventListener('input', function () {
+  ST.wait = Math.round(clamp(this.value, 1, 36, 12));
+  render();
+});
 document.getElementById('ret').addEventListener('input', function () {
   ST.ret = clamp(this.value, 3, 12, 7);
   render();
 });
-document.getElementById('bal').addEventListener('input', function () {
-  ST.bal = clamp(this.value.replace(/[^0-9.]/g, ''), 0, 1e11, 0);
+document.getElementById('amt').addEventListener('input', function () {
+  ST.amt = clamp(this.value.replace(/[^0-9.]/g, ''), 0, 1e11, 0);
   render();
 });
-document.getElementById('bal').addEventListener('blur', function () {
-  this.value = ST.bal.toLocaleString('en-US');
+document.getElementById('amt').addEventListener('blur', function () {
+  this.value = ST.amt.toLocaleString('en-US');
 });
 
 document.getElementById('copyBtn').addEventListener('click', function () {
@@ -386,12 +486,11 @@ document.getElementById('copyBtn').addEventListener('click', function () {
 });
 
 readUrl();
-document.getElementById('fee').value = ST.fee;
+document.getElementById('amt').value = ST.amt.toLocaleString('en-US');
+document.getElementById('wait').value = ST.wait;
 document.getElementById('ret').value = ST.ret;
-seg();
 render();
 })();
 </script>
 </body>
 </html>
-

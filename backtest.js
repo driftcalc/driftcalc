@@ -389,6 +389,20 @@ if (hp && /A drift calculator|Put in your accounts/.test(hp.textContent)) {
     body.appendChild(row);
   });
 
+  /* One card inside "What if" has a standalone page of its own, so the link goes on
+     the card rather than the group heading. */
+  (function linkWaiting(){
+    var w = document.getElementById('waitBody');
+    var card = w && w.closest ? w.closest('.card') : null;
+    var title = card && card.querySelector('.big-title');
+    if (!title || title.querySelector('a')) return;
+    var a = document.createElement('a');
+    a.href = '/waiting.html';
+    a.textContent = 'open the shareable version \u2192';
+    a.style.cssText = 'float:right;font-size:12px;font-weight:600;color:var(--accent);text-decoration:none';
+    title.appendChild(a);
+  })();
+
   /* the original two-column wrappers are empty once their cards have moved */
   [].slice.call(body.querySelectorAll('.ovr')).forEach(function (o) {
     if (!o.children.length && o.parentNode) o.parentNode.removeChild(o);

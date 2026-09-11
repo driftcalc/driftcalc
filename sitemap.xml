@@ -3,4 +3,5 @@
   <url><loc>https://driftcalc.com/</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>
   <url><loc>https://driftcalc.com/fees.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
   <url><loc>https://driftcalc.com/backtest.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://driftcalc.com/waiting.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
 </urlset>
