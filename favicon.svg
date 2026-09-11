@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Drift Calculator">
+  <rect width="64" height="64" rx="14" fill="#2E6BE6"/>
+  <g fill="#fff">
+    <rect x="14" y="35" width="10" height="15" rx="2.5"/>
+    <rect x="27" y="19" width="10" height="31" rx="2.5"/>
+    <rect x="40" y="28" width="10" height="22" rx="2.5"/>
+  </g>
+</svg>
