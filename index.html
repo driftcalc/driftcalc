@@ -45,8 +45,14 @@ header .btn.ghost{color:#B9C6DB}
 header .btn.ghost:hover{color:#fff;background:rgba(255,255,255,.09)}
 header .btn.tiny:not(.ghost){background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.18);color:#fff}
 .hbar{display:flex;align-items:center;justify-content:space-between;height:60px;gap:12px}
-@media(max-width:860px){header .badge{display:none}}
-@media(max-width:560px){.logo{font-size:15px}.hide-sm{display:none}}
+/* Breakpoints. Three steps, and nothing else:
+     sm  600  phone
+     md  760  large phone and small tablet
+     lg  900  two-column layouts
+   The .98 on the max side keeps sm/md/lg from both matching at the exact pixel.
+   Anything about touch belongs in (pointer:coarse), not in a width. */
+@media(max-width:899.98px){header .badge{display:none}}
+@media(max-width:599.98px){.logo{font-size:15px}.hide-sm{display:none}}
 .logo{font-weight:700;font-size:16.5px;letter-spacing:-.02em;display:flex;align-items:center;gap:9px;color:#fff;font-family:var(--disp)}
 .logo-mark{width:24px;height:24px;border-radius:7px;background:var(--accent);display:inline-flex;align-items:center;justify-content:center}
 .logo-mark svg{display:block}
@@ -132,7 +138,7 @@ section{padding:26px 0}
 
 .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow)}
 .grid{display:grid;gap:14px}
-@media(min-width:820px){.grid.cols-acc{grid-template-columns:repeat(auto-fill,minmax(320px,1fr))}}
+@media(min-width:900px){.grid.cols-acc{grid-template-columns:repeat(auto-fill,minmax(320px,1fr))}}
 
 /* account cards */
 .acc-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
@@ -190,7 +196,7 @@ table.tgt tr:last-child td{border-bottom:none}
 .bars{display:flex;flex-direction:column;gap:13px}
 .bar-row{display:grid;grid-template-columns:minmax(96px,150px) 1fr minmax(84px,120px);gap:12px;align-items:center;font-size:13px}
 .bar-row .lbl{color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
-@media(max-width:520px){.bar-row{grid-template-columns:minmax(80px,1fr) 1.4fr auto;gap:8px;font-size:12px}.wrap{padding:0 16px}.card{padding:16px}}
+@media(max-width:599.98px){.bar-row{grid-template-columns:minmax(80px,1fr) 1.4fr auto;gap:8px;font-size:12px}.wrap{padding:0 16px}.card{padding:16px}}
 .track{position:relative;height:8px;background:var(--hairline);border-radius:99px;overflow:visible}
 .fill{position:absolute;left:0;top:0;height:100%;border-radius:99px;transition:width .4s ease}
 .tmark{position:absolute;top:-3px;width:2px;height:14px;background:var(--ink);opacity:.55;border-radius:2px}

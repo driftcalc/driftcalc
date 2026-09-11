@@ -56,8 +56,19 @@ input[type=range]:hover::-moz-range-thumb{transform:scale(1.12)}
 
 /* ---------- other things Safari renders differently ---------- */
 /* iOS zooms the page when a focused input is under 16px. */
-@media (max-width:640px){
-  input[type=text],input[type=number],input[type=email],select,textarea{font-size:16px}
+/* iOS zooms the page on focus for any input under 16px, whatever the viewport is,
+   so this is a touch question rather than a width one.
+
+   The old selector list was [type=text],[type=number],[type=email]. Every text input
+   on this site is written as a bare <input> with no type attribute, and an attribute
+   selector does not match a default, so the rule matched nothing but the selects. The
+   selects it did match still came out at 11.5px, because this file loads before the
+   page's own <style> and loses to .inp on specificity and to an inline style outright.
+   Hence the type exclusions and the !important. */
+@media (pointer:coarse){
+  input:not([type=range]):not([type=checkbox]):not([type=radio]):not([type=color]):not([type=file]),
+  select,
+  textarea{font-size:16px !important}
 }
 /* iOS strips styling off buttons and inputs unless told otherwise. */
 button,input,select,textarea{-webkit-appearance:none;appearance:none;border-radius:inherit}
@@ -91,7 +102,7 @@ section.closed .sec-head.collapser{background:#FBFCFE}
   flex:1 1 auto;min-width:0;
   overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
 }
-@media(max-width:640px){
+@media(max-width:759.98px){
   .sec-head.collapser{flex-wrap:wrap}
   .sec-head.collapser .sub{flex-basis:100%;white-space:normal;font-size:12.5px}
   .sec-head.collapser .chev{margin-left:auto}
@@ -131,7 +142,7 @@ section.closed .sec-head.collapser{background:#FBFCFE}
 #donut{width:240px;height:240px;transition:transform .3s cubic-bezier(.2,.7,.3,1)}
 .donut-wrap{gap:32px}
 .donut-wrap:hover #donut{transform:scale(1.03)}
-@media(max-width:640px){
+@media(max-width:759.98px){
   #donut{width:180px;height:180px}
   .donut-wrap{gap:18px;justify-content:center}
   .stat-strip{overflow-x:auto;-webkit-overflow-scrolling:touch}
@@ -167,7 +178,7 @@ section.closed .sec-head.collapser{background:#FBFCFE}
   transition:background .16s ease, transform .16s ease;
 }
 .bt-cta:hover .go{background:#2456C4;transform:translateX(2px)}
-@media(max-width:560px){
+@media(max-width:599.98px){
   .bt-cta{gap:14px;padding:16px 18px}
   .bt-cta .go{margin-left:0;width:100%;text-align:center}
 }
@@ -180,7 +191,7 @@ section.closed .sec-head.collapser{background:#FBFCFE}
 }
 .hbtns .bt-nav:hover{background:rgba(46,107,230,.38) !important;color:#fff !important}
 /* the header wraps into a wall of buttons on a phone; let it scroll instead */
-@media(max-width:720px){
+@media(max-width:759.98px){
   .hbtns{overflow-x:auto;-webkit-overflow-scrolling:touch;flex-wrap:nowrap;scrollbar-width:none}
   .hbtns::-webkit-scrollbar{display:none}
   .hbtns .btn{flex:none}
