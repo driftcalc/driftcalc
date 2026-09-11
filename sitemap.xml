@@ -5,4 +5,5 @@
   <url><loc>https://driftcalc.com/backtest.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
   <url><loc>https://driftcalc.com/waiting.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
   <url><loc>https://driftcalc.com/savings.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://driftcalc.com/compounding.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
 </urlset>

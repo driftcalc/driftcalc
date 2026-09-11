@@ -403,6 +403,19 @@ if (hp && /A drift calculator|Put in your accounts/.test(hp.textContent)) {
     title.appendChild(a);
   });
 
+  /* The compounding chart's header is a flex row with two inputs in it, so a floated
+     link inside the title lands in the wrong place. Put it under the note instead. */
+  (function () {
+    var note = document.getElementById('growthNote');
+    if (!note || note.nextSibling && note.nextSibling.className === 'x-more') return;
+    var a = document.createElement('a');
+    a.className = 'x-more';
+    a.href = '/compounding.html';
+    a.textContent = 'open the shareable version \u2192';
+    a.style.cssText = 'display:inline-block;margin-top:10px;font-size:12px;font-weight:600;color:var(--accent);text-decoration:none';
+    note.parentNode.insertBefore(a, note.nextSibling);
+  })();
+
   /* the original two-column wrappers are empty once their cards have moved */
   [].slice.call(body.querySelectorAll('.ovr')).forEach(function (o) {
     if (!o.children.length && o.parentNode) o.parentNode.removeChild(o);

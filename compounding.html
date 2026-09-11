@@ -4,24 +4,24 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https://driftcalc.goatcounter.com; connect-src 'self' https://driftcalc.goatcounter.com; frame-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
-<title>What does waiting to invest cost? · Drift Calculator</title>
-<meta name="description" content="Put in the cash you are sitting on and how long you would wait. See what the delay costs by the time you need the money, and how often waiting actually won since 1926.">
-<link rel="canonical" href="https://driftcalc.com/waiting.html">
+<title>What does investing every month turn into? &middot; Drift Calculator</title>
+<meta name="description" content="Put in what you invest each month and see what it becomes, how much of that is your own money, and what the same plan actually returned in every real stretch since 1926.">
+<link rel="canonical" href="https://driftcalc.com/compounding.html">
 
 <!-- Social preview. A link to this page should say what the page says. -->
 <meta property="og:type" content="website">
-<meta property="og:url" content="https://driftcalc.com/waiting.html">
+<meta property="og:url" content="https://driftcalc.com/compounding.html">
 <meta property="og:site_name" content="Drift Calculator">
-<meta property="og:title" content="What does waiting to invest cost?">
-<meta property="og:description" content="Cash on the sidelines has a price. Put your own number in and see it, then see how often waiting actually won since 1926.">
-<meta property="og:image" content="https://driftcalc.com/og-waiting.png">
+<meta property="og:title" content="What does investing every month turn into?">
+<meta property="og:description" content="See what a monthly amount becomes, how much of it is your own money, and what the same plan really returned in every stretch since 1926.">
+<meta property="og:image" content="https://driftcalc.com/og-home.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="Sitting on $10,000 for 12 months costs about $4,980 by year 30.">
+<meta property="og:image:alt" content="Drift Calculator: where should this month’s contribution go?">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="What does waiting to invest cost?">
-<meta name="twitter:description" content="Cash on the sidelines has a price. Put your own number in and see it, then see how often waiting actually won since 1926.">
-<meta name="twitter:image" content="https://driftcalc.com/og-waiting.png">
+<meta name="twitter:title" content="What does investing every month turn into?">
+<meta name="twitter:description" content="See what a monthly amount becomes, how much of it is your own money, and what the same plan really returned in every stretch since 1926.">
+<meta name="twitter:image" content="https://driftcalc.com/og-home.png">
 
 <link rel="icon" href="/favicon.ico" sizes="32x32">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
@@ -55,6 +55,7 @@ header .wrap{display:flex;align-items:center;justify-content:space-between;gap:1
 .btn:hover{border-color:#CBD5E4;background:#FBFCFE}
 .btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
 .btn.primary:hover{background:#2456C4}
+.btn.tiny{font-size:12px;padding:5px 10px}
 .btn.nav{border-color:rgba(120,170,255,.55);color:#DCE9FF;background:rgba(46,107,230,.20);font-weight:600;font-size:12px;padding:5px 11px;white-space:nowrap;flex:none}
 .btn.nav:hover{background:rgba(46,107,230,.38);color:#fff}
 a:focus-visible,button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:6px}
@@ -80,6 +81,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
 input[type=range]::-moz-range-track{height:5px;border-radius:99px;background:#DCE4F0}
 input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;background:var(--accent);border:2px solid #fff}
 .readout{font-family:var(--disp);font-size:16px;font-weight:800;min-width:74px;display:inline-block}
+.hist{margin-top:12px;font-size:12.5px;color:var(--muted)}
 .assume{margin-top:10px;font-size:13px;color:var(--muted)}
 .seg{display:inline-flex;background:var(--hairline);border-radius:10px;padding:3px;gap:2px}
 .seg button{font-family:inherit;font-size:13px;font-weight:600;border:none;background:none;color:var(--muted);
@@ -94,6 +96,12 @@ input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;bac
 .answer .say{font-size:16.5px;line-height:1.6;max-width:640px}
 .answer .say b{font-weight:700}
 @media(max-width:599.98px){ .answer .big{font-size:44px} h1{font-size:29px} }
+
+.mix{display:flex;height:34px;border-radius:9px;overflow:hidden;margin-top:6px;border:1px solid var(--border)}
+.mix div{display:flex;align-items:center;justify-content:center;font-size:12.5px;font-weight:600;color:#fff;white-space:nowrap;overflow:hidden}
+.mixkey{display:flex;gap:18px;flex-wrap:wrap;margin-top:10px;font-size:13px;color:var(--muted)}
+.mixkey b{color:var(--ink);font-family:var(--disp)}
+.dot{display:inline-block;width:9px;height:9px;border-radius:3px;margin-right:6px;vertical-align:middle}
 
 .bars{display:flex;flex-direction:column;gap:12px;margin-top:24px}
 .bar-row{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
@@ -135,8 +143,8 @@ footer a{color:var(--muted)}
   <div class="hbtns">
     <a class="btn nav" href="/">Calculator</a>
     <a class="btn nav" href="/fees.html">Fee cost</a>
+    <a class="btn nav" href="/waiting.html">Cost of waiting</a>
     <a class="btn nav" href="/savings.html">Savings rate</a>
-    <a class="btn nav" href="/compounding.html">Compounding</a>
     <a class="btn nav" href="/backtest.html">Backtest</a>
   </div>
 </div></header>
@@ -144,39 +152,37 @@ footer a{color:var(--muted)}
 <div class="wrap">
 
   <div class="hero">
-    <h1>What does <em>waiting</em> cost?</h1>
-    <p class="sub">Put in the cash you are sitting on and how long you would wait before investing it.</p>
+    <h1>What does investing <em>every month</em> turn into?</h1>
+    <p class="sub">Put in what you already have and what you add each month. The answer is in today&rsquo;s money, so it means the same thing in thirty years as it does now.</p>
   </div>
 
   <div class="card">
     <div class="controls">
       <div class="field">
-        <span class="lbl">Cash on the sidelines</span>
-        <div class="money-wrap"><span>$</span><input type="text" id="amt" inputmode="numeric" value="10,000" aria-label="Cash on the sidelines, in dollars"></div>
+        <span class="lbl">Already invested</span>
+        <div class="money-wrap"><span>$</span><input type="text" id="have" inputmode="numeric" value="0" aria-label="Amount already invested, in dollars"></div>
       </div>
       <div class="field">
-        <span class="lbl">How long you wait</span>
-        <div style="display:flex;align-items:center;gap:12px">
-          <input type="range" id="wait" min="1" max="36" step="1" value="12" aria-label="How many months you wait before investing">
-          <span class="readout num" id="waitOut">12 mo</span>
-        </div>
+        <span class="lbl">Adding each month</span>
+        <div class="money-wrap"><span>$</span><input type="text" id="mo" inputmode="numeric" value="500" aria-label="Amount added each month, in dollars"></div>
       </div>
       <div class="field">
-        <span class="lbl">Years until you need it</span>
+        <span class="lbl">For how long</span>
         <div class="seg" id="yrSeg"></div>
       </div>
       <div class="field">
-        <span class="lbl">Return before fees</span>
+        <span class="lbl">Return after inflation</span>
         <div style="display:flex;align-items:center;gap:12px">
-          <input type="range" id="ret" min="3" max="12" step="0.5" value="7" aria-label="Assumed return before fees, percent a year">
-          <span class="readout num" id="retOut">7.0%</span>
+          <input type="range" id="ret" min="1" max="9" step="0.5" value="5" aria-label="Assumed return after inflation, percent a year">
+          <span class="readout num" id="retOut">5.0%</span>
         </div>
       </div>
     </div>
+    <div class="hist" id="histLine"></div>
   </div>
 
   <div class="answer">
-    <div class="k">What the wait costs</div>
+    <div class="k">What it becomes</div>
     <div class="big num" id="big">$0</div>
     <div class="say" id="say"></div>
     <div class="assume" id="assumeShort"></div>
@@ -188,13 +194,15 @@ footer a{color:var(--muted)}
   </div>
 
   <section class="blk">
-    <h2>Where you land either way</h2>
+    <h2>How much of that is your own money</h2>
+    <div class="mix" id="mixBar"></div>
+    <div class="mixkey" id="mixKey"></div>
     <div class="bars" id="bars"></div>
     <div class="note" id="assump"></div>
   </section>
 
   <section class="blk">
-    <h2>How often waiting actually won</h2>
+    <h2>What the same plan actually did</h2>
     <p class="sub" style="margin-top:0;margin-bottom:16px;font-size:15px" id="histLead">Checking every starting month in the real data&hellip;</p>
     <div class="split" id="histStats"></div>
     <div class="note" id="histNote"></div>
@@ -203,14 +211,14 @@ footer a{color:var(--muted)}
   <section class="blk">
     <h2>The honest version</h2>
     <div class="note">
-      <b>Waiting is not always wrong.</b> It loses on average because markets go up more months than
-      they go down, so time out of the market usually costs something. In the months where it wins, it
-      wins because the market fell right after you would have bought, and nobody gets to know that in
-      advance.
+      <b>A single rate is a convenient lie.</b> No decade returns its average. The spread in the section
+      above is the same monthly plan run through history instead of through one number, and the gap
+      between the worst stretch and the best one is wider than most people picture when they pick 7%.
       <br><br>
-      There are reasons to hold cash that have nothing to do with timing. An emergency fund, a down
-      payment next spring, a roof that needs replacing. None of that is on this page. This page is
-      only about money you have already decided to invest and have not invested yet.
+      The early years feel like nothing is happening, because at the start almost every dollar in the
+      balance is a dollar you put there. The year growth finally passes what you have paid in is on the
+      note above, and it moves a long way when you drag the return slider. It is also the part most
+      people quit before reaching.
     </div>
   </section>
 
@@ -235,7 +243,7 @@ footer a{color:var(--muted)}
    Everything here can arrive from a URL a stranger constructed, so each value is
    parsed, bounded, and never trusted. Nothing is written to the DOM as HTML. */
 var YEARS = [10, 20, 30, 40];
-var ST = { amt: 10000, wait: 12, yrs: 30, ret: 7 };
+var ST = { have: 0, mo: 500, yrs: 30, ret: 5 };
 
 function clamp(v, lo, hi, dflt) {
   v = parseFloat(v);
@@ -245,9 +253,9 @@ function clamp(v, lo, hi, dflt) {
 
 function readUrl() {
   var q = new URLSearchParams(location.search);
-  if (q.has('amt')) ST.amt = clamp(String(q.get('amt')).replace(/[^0-9.]/g, ''), 0, 1e11, 10000);
-  if (q.has('wait')) ST.wait = Math.round(clamp(q.get('wait'), 1, 36, 12));
-  if (q.has('ret')) ST.ret = clamp(q.get('ret'), 3, 12, 7);
+  if (q.has('have')) ST.have = clamp(String(q.get('have')).replace(/[^0-9.]/g, ''), 0, 1e11, 0);
+  if (q.has('mo')) ST.mo = clamp(String(q.get('mo')).replace(/[^0-9.]/g, ''), 0, 1e9, 500);
+  if (q.has('ret')) ST.ret = clamp(q.get('ret'), 1, 9, 5);
   if (q.has('yrs')) {
     var y = clamp(q.get('yrs'), 1, 60, 30);
     ST.yrs = YEARS.indexOf(Math.round(y)) > -1 ? Math.round(y) : 30;
@@ -267,37 +275,76 @@ function big(n) {
 }
 
 /* ---------- the arithmetic ----------
-   Both paths end on the same date. Investing now compounds for the whole term;
-   waiting compounds for the term minus the months spent in cash. The gap between
-   them is what the wait cost. */
+   Monthly compounding at the annual rate, contributions at the end of each month.
+   Split out so the same numbers feed the headline, the bar and the note. */
 function compute() {
-  var r = ST.ret / 100;
-  var waitYears = ST.wait / 12;
-  var now = ST.amt * Math.pow(1 + r, ST.yrs);
-  var later = ST.amt * Math.pow(1 + r, Math.max(0, ST.yrs - waitYears));
-  var cost = now - later;
-  return { now: now, later: later, cost: cost, share: now > 0 ? cost / now : 0 };
+  var n = ST.yrs * 12;
+  var rm = Math.pow(1 + ST.ret / 100, 1 / 12) - 1;
+  var grow = Math.pow(1 + rm, n);
+  var endHave = ST.have * grow;
+  var endMo = rm > 0 ? ST.mo * (grow - 1) / rm : ST.mo * n;
+  var end = endHave + endMo;
+  var put = ST.have + ST.mo * n;
+  return { end: end, put: put, gain: end - put, share: end > 0 ? (end - put) / end : 0, cross: crossover(rm) };
 }
 
-/* ---------- bars ---------- */
+/* The month where growth in the balance first exceeds what has been paid in.
+   Walked rather than solved, because there is no clean closed form and 720
+   iterations costs nothing. */
+function crossover(rm) {
+  var bal = ST.have, put = ST.have;
+  for (var i = 1; i <= 720; i++) {
+    bal = bal * (1 + rm) + ST.mo;
+    put += ST.mo;
+    if (bal - put > put) return i;
+  }
+  return null;
+}
+
+/* ---------- the your-money / growth bar ---------- */
+function mix(res) {
+  var bar = document.getElementById('mixBar');
+  var key = document.getElementById('mixKey');
+  bar.textContent = ''; key.textContent = '';
+  if (res.end <= 0) return;
+  var pPut = Math.max(0, Math.min(100, res.put / res.end * 100));
+  var rows = [
+    ['Money you put in', res.put, pPut, '#5B6B83'],
+    ['Growth on top of it', Math.max(0, res.gain), 100 - pPut, 'var(--accent)']
+  ];
+  rows.forEach(function (row) {
+    var d = document.createElement('div');
+    d.style.width = row[2] + '%';
+    d.style.background = row[3];
+    d.textContent = row[2] >= 14 ? Math.round(row[2]) + '%' : '';
+    bar.appendChild(d);
+    var k = document.createElement('div');
+    var dot = document.createElement('span'); dot.className = 'dot'; dot.style.background = row[3];
+    var b = document.createElement('b'); b.textContent = money(row[1]);
+    k.appendChild(dot); k.appendChild(b);
+    k.appendChild(document.createTextNode(' ' + row[0].toLowerCase()));
+    key.appendChild(k);
+  });
+}
+
+/* ---------- decade bars ---------- */
 function bars(res) {
   var el = document.getElementById('bars');
   el.textContent = '';
-  var max = Math.max(res.now, 1);
-  var rows = [
-    ['Invested today', res.now, 'var(--green)'],
-    ['After waiting ' + ST.wait + ' month' + (ST.wait === 1 ? '' : 's'), res.later, 'var(--accent)'],
-    ['What the wait cost', res.cost, 'var(--red)']
-  ];
-  rows.forEach(function (row) {
+  var rm = Math.pow(1 + ST.ret / 100, 1 / 12) - 1;
+  var marks = [10, 20, 30, 40].filter(function (y) { return y <= ST.yrs; });
+  var max = res.end || 1;
+  marks.forEach(function (y) {
+    var n = y * 12, g = Math.pow(1 + rm, n);
+    var v = ST.have * g + (rm > 0 ? ST.mo * (g - 1) / rm : ST.mo * n);
     var wrap = document.createElement('div'); wrap.className = 'bar-row';
-    var lab = document.createElement('div'); lab.className = 'bar-lab'; lab.textContent = row[0];
+    var lab = document.createElement('div'); lab.className = 'bar-lab'; lab.textContent = 'After ' + y + ' years';
     var track = document.createElement('div'); track.className = 'bar-track';
     var fill = document.createElement('div'); fill.className = 'bar-fill';
-    fill.style.width = Math.max(0, Math.min(100, row[1] / max * 100)) + '%';
-    fill.style.background = row[2];
+    fill.style.width = Math.max(0, Math.min(100, v / max * 100)) + '%';
+    fill.style.background = y === ST.yrs ? 'var(--accent)' : '#A9BEDF';
     track.appendChild(fill);
-    var val = document.createElement('div'); val.className = 'bar-val num'; val.textContent = money(row[1]);
+    var val = document.createElement('div'); val.className = 'bar-val num'; val.textContent = money(v);
     wrap.appendChild(lab); wrap.appendChild(track); wrap.appendChild(val);
     el.appendChild(wrap);
   });
@@ -310,8 +357,8 @@ function seg() {
   YEARS.forEach(function (y) {
     var b = document.createElement('button');
     b.type = 'button';
-    b.textContent = String(y);
-    b.setAttribute('aria-label', y + ' years until you need the money');
+    b.textContent = String(y) + 'y';
+    b.setAttribute('aria-label', 'Invest for ' + y + ' years');
     if (y === ST.yrs) b.className = 'on';
     b.addEventListener('click', function () { ST.yrs = y; render(); });
     el.appendChild(b);
@@ -322,12 +369,9 @@ function seg() {
 function render() {
   var res = compute();
   seg();
-  document.getElementById('waitOut').textContent = ST.wait + ' mo';
-  document.getElementById('wait').value = String(ST.wait);
   document.getElementById('retOut').textContent = ST.ret.toFixed(1) + '%';
   document.getElementById('ret').value = String(ST.ret);
-
-  document.getElementById('big').textContent = big(res.cost);
+  document.getElementById('big').textContent = big(res.end);
 
   /* built with textContent and <b> nodes, never innerHTML with user numbers */
   var say = document.getElementById('say');
@@ -335,30 +379,34 @@ function render() {
   function t(s) { say.appendChild(document.createTextNode(s)); }
   function bd(s) { var b = document.createElement('b'); b.textContent = s; say.appendChild(b); }
 
-  if (ST.amt === 0) {
-    t('Put a number in above. At zero the answer is zero, which is the one case where waiting is free.');
+  if (res.put <= 0) {
+    t('Put a number in above. Nothing compounds from nothing.');
   } else {
-    t('Sitting on ');
-    bd(money(ST.amt));
-    t(' for ');
-    bd(ST.wait + ' month' + (ST.wait === 1 ? '' : 's'));
-    t(' costs about ');
-    bd(money(res.cost));
-    t(' by year ' + ST.yrs + '. That is ');
-    bd(Math.round(res.share * 100) + '%');
-    t(' of what the money would otherwise have become.');
+    t(ST.mo > 0 ? money(ST.mo) + ' a month' : 'Adding nothing');
+    if (ST.have > 0) t(' on top of the ' + money(ST.have) + ' you already have');
+    t(' comes to ');
+    bd(money(res.end));
+    t(' after ' + ST.yrs + ' years. You put in ');
+    bd(money(res.put));
+    t(' of that, so ');
+    bd(money(res.gain));
+    t(' of it is growth.');
   }
 
+  mix(res);
   bars(res);
 
+  var cross = res.cross;
   document.getElementById('assumeShort').textContent =
-    'Assuming ' + ST.ret.toFixed(1) + '% a year before fees, and cash earning nothing while it waits. ' +
-    'Drag either slider if you disagree.';
+    'Assuming ' + ST.ret.toFixed(1) + '% a year after inflation, so the answer is in today’s money. ' +
+    'Drag the slider if you disagree.';
 
   document.getElementById('assump').textContent =
-    'Nominal, no new contributions, and both paths measured on the same date so the wait costs time ' +
-    'rather than money. Real returns are lumpier than this and arrive out of order. The shape of the ' +
-    'answer holds at any return you pick, because the cost is the compounding you skipped.';
+    (cross && cross <= ST.yrs * 12
+      ? 'Growth passes what you have paid in around year ' + Math.ceil(cross / 12) + '. '
+      : 'Over this stretch you are still ahead of the growth, so most of the balance is money you paid in. ') +
+    'No fees or taxes are taken out, contributions land at the end of each month, and the amount you add ' +
+    'is held steady in today’s money, which means raising it with inflation as you go.';
 
   syncUrl();
   renderHistory();
@@ -367,21 +415,19 @@ function render() {
 /* the URL is the product here, every state is a link someone can send */
 function syncUrl() {
   var q = new URLSearchParams();
-  q.set('amt', String(Math.round(ST.amt)));
-  q.set('wait', String(ST.wait));
+  q.set('have', String(Math.round(ST.have)));
+  q.set('mo', String(Math.round(ST.mo)));
   q.set('yrs', String(ST.yrs));
   q.set('ret', ST.ret.toFixed(1));
   history.replaceState(null, '', location.pathname + '?' + q.toString());
 }
 
 /* ---------- what the real data says ----------
-   The arithmetic above assumes a steady return, which never happens. This walks
-   every starting month in the same total-return series the backtest uses and asks
-   how often investing immediately actually beat waiting. Cash earns the T-bill
-   series while it sits, because pretending it earns nothing would stack the deck. */
+   One rate is smooth and history is not. This runs the identical monthly plan
+   through every stretch of the real series, in that stretch's own dollars, and
+   reports the spread instead of a single number. 80/20 US stocks and bonds,
+   rebalanced monthly, deflated by CPI so every window is in today's money. */
 var RET_DATA = null, RET_FAILED = false;
-
-function pctFmt(x) { return (x * 100).toFixed(0) + '%'; }
 
 function renderHistory() {
   var lead = document.getElementById('histLead');
@@ -394,47 +440,53 @@ function renderHistory() {
   }
   if (!RET_DATA) return;
 
-  var us = RET_DATA.series.US, cash = RET_DATA.series.CASH, months = RET_DATA.months;
-  if (!us || !cash || !months) { RET_FAILED = true; return renderHistory(); }
+  var us = RET_DATA.series.US, bd = RET_DATA.series.BOND, cpi = RET_DATA.series.CPI, months = RET_DATA.months;
+  if (!us || !bd || !cpi || !months) { RET_FAILED = true; return renderHistory(); }
 
-  var H = ST.yrs * 12, W = ST.wait;
-  var n = Math.min(us.length, cash.length, months.length);
-  if (H >= n) { lead.textContent = 'That horizon is longer than the data.'; stats.textContent=''; note.textContent=''; return; }
-
-  var wins = 0, total = 0, worstGap = 0, worstStart = null;
-  for (var i = 0; i + H <= n; i++) {
-    var a = 1, b = 1, k;
-    for (k = 0; k < W; k++) { a *= 1 + us[i + k]; b *= 1 + cash[i + k]; }
-    for (k = W; k < H; k++) { var g = 1 + us[i + k]; a *= g; b *= g; }
-    total++;
-    if (a > b) wins++;
-    else {
-      var gap = b / a - 1;
-      if (gap > worstGap) { worstGap = gap; worstStart = months[i]; }
-    }
+  if (ST.have <= 0 && ST.mo <= 0) {
+    /* every window ends at zero, and three $0 cards with dates on them read like a result */
+    lead.textContent = 'Put an amount in above and this fills in with what that plan really did.';
+    stats.textContent = ''; note.textContent = '';
+    return;
   }
-  if (!total) return;
 
-  var winRate = wins / total;
-  var loseRate = 1 - winRate;
-  var first = months[0], last = months[n - 1];
+  var H = ST.yrs * 12;
+  var n = Math.min(us.length, bd.length, cpi.length, months.length);
+  if (H >= n) {
+    lead.textContent = 'That stretch is longer than the data goes back.';
+    stats.textContent = ''; note.textContent = '';
+    return;
+  }
 
-  lead.textContent = 'Every ' + ST.yrs + '-year stretch in the data, from ' + ym(first) + ' to ' + ym(last) +
-    '. In each one, investing immediately is compared against holding T-bills for ' + ST.wait +
-    ' month' + (ST.wait === 1 ? '' : 's') + ' first and then buying, both measured on the same end date.';
+  /* real monthly return of the mix, computed once and reused for every window */
+  var real = new Array(n);
+  for (var i = 0; i < n; i++) real[i] = (1 + (0.8 * us[i] + 0.2 * bd[i])) / (1 + cpi[i]) - 1;
+
+  var ends = [], starts = [];
+  for (var s = 0; s + H <= n; s++) {
+    var bal = ST.have;
+    for (var k = 0; k < H; k++) bal = bal * (1 + real[s + k]) + ST.mo;
+    ends.push(bal); starts.push(months[s]);
+  }
+  if (!ends.length) return;
+
+  var idx = ends.map(function (v, j) { return j; }).sort(function (a, b) { return ends[a] - ends[b]; });
+  var lo = idx[0], hi = idx[idx.length - 1], mid = idx[Math.floor(idx.length / 2)];
+  var put = ST.have + ST.mo * H;
+
+  lead.textContent = 'The same ' + ST.yrs + '-year plan run through every starting month from ' +
+    ym(months[0]) + ' to ' + ym(months[n - H]) + ', in an 80/20 mix of US stocks and bonds, with every ' +
+    'window put in today’s money. You paid in ' + money(put) + ' in all of them.';
 
   stats.textContent = '';
-  addStat(stats, pctFmt(winRate), 'win', 'of the ' + total.toLocaleString('en-US') +
-    ' starting months, investing immediately came out ahead');
-  addStat(stats, pctFmt(loseRate), 'lose', 'of them, waiting came out ahead, because the market fell right after you would have bought');
-  if (worstStart) {
-    addStat(stats, '+' + (worstGap * 100).toFixed(0) + '%', 'lose',
-      'the best the wait ever did, starting ' + ym(worstStart));
-  }
+  addStat(stats, big(ends[lo]), 'lose', 'the worst stretch, starting ' + ym(starts[lo]));
+  addStat(stats, big(ends[mid]), '', 'the middle one, with half of them above this');
+  addStat(stats, big(ends[hi]), 'win', 'the best stretch, starting ' + ym(starts[hi]));
 
-  note.textContent = 'Waiting wins often enough that anyone who did it once will tell you it works. ' +
-    'It loses more often than it wins because markets rise in more months than they fall. ' +
-    'US stocks and one-month T-bills, total returns, no fees or taxes removed.';
+  note.textContent = 'Across ' + ends.length.toLocaleString('en-US') + ' stretches, the best came out about ' +
+    (ends[lo] > 0 ? (ends[hi] / ends[lo]).toFixed(1) + ' times' : 'far') + ' ahead of the worst on identical ' +
+    'contributions. Picking one rate hides that. Total returns, no fund fees, spreads or taxes removed, ' +
+    'and monthly rebalancing that nobody actually does.';
 }
 
 function ym(s) {
@@ -451,30 +503,56 @@ function addStat(parent, value, cls, text) {
   d.appendChild(v); d.appendChild(t); parent.appendChild(d);
 }
 
+/* the long-run real return of the same mix, offered rather than assumed */
+function realCagr(j, wStock) {
+  var us = j.series.US, bd = j.series.BOND, cpi = j.series.CPI;
+  if (!us || !bd || !cpi) return null;
+  var n = Math.min(us.length, bd.length, cpi.length);
+  if (n < 120) return null;
+  var nom = 1, inf = 1;
+  for (var i = 0; i < n; i++) {
+    nom *= 1 + (wStock * us[i] + (1 - wStock) * bd[i]);
+    inf *= 1 + cpi[i];
+  }
+  return (Math.pow(nom / inf, 12 / n) - 1) * 100;
+}
+
 fetch('returns.json').then(function (r) {
   if (!r.ok) throw new Error('no data');
   return r.json();
 }).then(function (j) {
-  RET_DATA = j; renderHistory();
+  RET_DATA = j;
+  renderHistory();
+  var c = realCagr(j, 0.8);
+  if (c == null || !isFinite(c)) return;
+  var rounded = Math.round(c * 2) / 2;
+  var line = document.getElementById('histLine');
+  line.textContent = 'A plain 80/20 returned about ' + c.toFixed(1) + '% a year after inflation across the whole series, ' +
+    String(j.start).slice(0, 4) + ' to ' + String(j.end).slice(0, 4) + '. ';
+  var b = document.createElement('button');
+  b.type = 'button'; b.className = 'btn tiny';
+  b.textContent = 'Use ' + rounded.toFixed(1) + '%';
+  b.addEventListener('click', function () { ST.ret = clamp(rounded, 1, 9, 5); render(); });
+  line.appendChild(b);
 }).catch(function () {
   RET_FAILED = true; renderHistory();
 });
 
 /* ---------- wiring ---------- */
-document.getElementById('wait').addEventListener('input', function () {
-  ST.wait = Math.round(clamp(this.value, 1, 36, 12));
-  render();
-});
 document.getElementById('ret').addEventListener('input', function () {
-  ST.ret = clamp(this.value, 3, 12, 7);
-  render();
+  ST.ret = clamp(this.value, 1, 9, 5); render();
 });
-document.getElementById('amt').addEventListener('input', function () {
-  ST.amt = clamp(this.value.replace(/[^0-9.]/g, ''), 0, 1e11, 0);
-  render();
+document.getElementById('have').addEventListener('input', function () {
+  ST.have = clamp(this.value.replace(/[^0-9.]/g, ''), 0, 1e11, 0); render();
 });
-document.getElementById('amt').addEventListener('blur', function () {
-  this.value = ST.amt.toLocaleString('en-US');
+document.getElementById('have').addEventListener('blur', function () {
+  this.value = ST.have.toLocaleString('en-US');
+});
+document.getElementById('mo').addEventListener('input', function () {
+  ST.mo = clamp(this.value.replace(/[^0-9.]/g, ''), 0, 1e9, 0); render();
+});
+document.getElementById('mo').addEventListener('blur', function () {
+  this.value = ST.mo.toLocaleString('en-US');
 });
 
 document.getElementById('copyBtn').addEventListener('click', function () {
@@ -493,8 +571,8 @@ document.getElementById('copyBtn').addEventListener('click', function () {
 });
 
 readUrl();
-document.getElementById('amt').value = ST.amt.toLocaleString('en-US');
-document.getElementById('wait').value = ST.wait;
+document.getElementById('have').value = ST.have.toLocaleString('en-US');
+document.getElementById('mo').value = ST.mo.toLocaleString('en-US');
 document.getElementById('ret').value = ST.ret;
 render();
 })();
