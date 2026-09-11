@@ -44,13 +44,14 @@ header{background:var(--navy);padding:14px 0}
 header .wrap{display:flex;align-items:center;justify-content:space-between;gap:14px}
 .logo{display:flex;align-items:center;gap:9px;color:#fff;text-decoration:none;font-family:var(--disp);font-weight:800;letter-spacing:-.02em}
 .logo .mk{width:26px;height:26px;border-radius:7px;background:var(--accent);display:flex;align-items:center;justify-content:center}
-.hbtns{display:flex;gap:8px;align-items:center}
+.hbtns{display:flex;gap:8px;align-items:center;overflow-x:auto;scrollbar-width:none}
+.hbtns::-webkit-scrollbar{display:none}
 .btn{font-family:inherit;font-size:13px;font-weight:500;border:1px solid var(--border);background:var(--card);
   color:var(--ink);border-radius:8px;padding:8px 14px;cursor:pointer;transition:all .15s;text-decoration:none;display:inline-block}
 .btn:hover{border-color:#CBD5E4;background:#FBFCFE}
 .btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
 .btn.primary:hover{background:#2456C4}
-.btn.nav{border-color:rgba(120,170,255,.55);color:#DCE9FF;background:rgba(46,107,230,.20);font-weight:600;font-size:12px;padding:5px 11px}
+.btn.nav{border-color:rgba(120,170,255,.55);color:#DCE9FF;background:rgba(46,107,230,.20);font-weight:600;font-size:12px;padding:5px 11px;white-space:nowrap;flex:none}
 .btn.nav:hover{background:rgba(46,107,230,.38);color:#fff}
 
 .hero{padding:48px 0 26px}
@@ -117,6 +118,7 @@ footer a{color:var(--muted)}
   <div class="hbtns">
     <a class="btn nav" href="/">Calculator</a>
     <a class="btn nav" href="/waiting.html">Cost of waiting</a>
+    <a class="btn nav" href="/savings.html">Savings rate</a>
     <a class="btn nav" href="/backtest.html">Backtest</a>
   </div>
 </div></header>
