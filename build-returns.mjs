@@ -14,6 +14,7 @@
  *   International     Ken French, Developed ex US      monthly from 1990-07
  *   Cash              Ken French, RF (1-month T-bill)  monthly from 1926-07
  *   Bonds             FRED GS10, repriced monthly      monthly from 1953-04
+ *   Long Treasuries   FRED GS20 spliced with GS30      monthly from 1953-04
  *   Inflation         FRED CPIAUCNS                    monthly from 1913-01
  *
  * Emerging markets is deliberately absent. Ken French publishes no EM series and
@@ -182,17 +183,61 @@ export function priceBond(couponAnnualPct, yieldAnnualPct, yearsLeft) {
   return pv;                                    // dirty price, accrued included
 }
 
-export function bondReturns(gs10) {
-  const keys = [...gs10.keys()].sort();
+export function bondReturns(yields, years = 10) {
+  const keys = [...yields.keys()].sort();
   const out = new Map();
   for (let i = 1; i < keys.length; i++) {
-    const y0 = gs10.get(keys[i - 1]);
-    const y1 = gs10.get(keys[i]);
+    const y0 = yields.get(keys[i - 1]);
+    const y1 = yields.get(keys[i]);
     if (!(y0 > 0) || !(y1 > 0)) continue;
-    const p1 = priceBond(y0, y1, 10 - 1 / 12);
+    if (monthGap(keys[i - 1], keys[i]) !== 1) continue;   // never price across a hole
+    const p1 = priceBond(y0, y1, years - 1 / 12);
     out.set(keys[i], p1 / 100 - 1);
   }
   return out;
+}
+
+const monthNum = k => Number(k.slice(0, 4)) * 12 + Number(k.slice(4));
+const monthGap = (a, b) => monthNum(b) - monthNum(a);
+
+/* ---------- long Treasuries, for the 20+ year strategies ----------
+ * TMF and the rest of the HFEA family track the ICE 20+ Year index. GS10 is
+ * nowhere near that duration, so modelling them off the 10-year understates
+ * both the swings and the drawdowns, which is the entire thing being asked
+ * about. Using it would make the strategy look safer than it is.
+ *
+ * No single free series covers 1953 to now. Treasury stopped issuing the
+ * 20-year at the start of 1987 and GS20 stops with it, restarting in late
+ * 1993; GS30 covers that hole. So GS20 leads and GS30 fills in behind it.
+ *
+ * The splice is a real change of duration part-way through the series, so it
+ * is recorded in the output rather than smoothed over. A backtest should have
+ * to admit what it is made of.
+ */
+export function spliceLongYields(gs20, gs30) {
+  const months = [...new Set([...gs20.keys(), ...gs30.keys()])].sort();
+  const out = new Map();
+  const filled = [];
+  for (const m of months) {
+    const a = gs20.get(m);
+    if (a > 0) { out.set(m, a); continue; }
+    const b = gs30.get(m);
+    if (b > 0) { out.set(m, b); filled.push(m); }
+  }
+  return { yields: out, filled };
+}
+
+/* A hole here is not cosmetic: it would silently splice two yields months or
+ * years apart into one month's price change and invent a vast return. */
+export function assertContiguous(label, keys) {
+  const k = [...keys].sort();
+  if (!k.length) throw new Error(`${label}: empty`);
+  for (let i = 1; i < k.length; i++) {
+    if (monthGap(k[i - 1], k[i]) !== 1)
+      throw new Error(`${label}: gap between ${k[i - 1]} and ${k[i]}. ` +
+        'Upstream coverage changed, so the splice no longer closes. Do not ship this.');
+  }
+  return k;
 }
 
 /* ---------- does this actually look like a monthly return series? ----------
@@ -235,8 +280,10 @@ async function main() {
 
   console.log('Downloading FRED series...');
   const fredUrls = id => [`https://fred.stlouisfed.org/graph/fredgraph.csv?id=${id}`];
-  const [gs10raw, cpiraw] = await Promise.all([
+  const [gs10raw, gs20raw, gs30raw, cpiraw] = await Promise.all([
     getAny(fredUrls('GS10'), 'GS10 (10-year Treasury)'),
+    getAny(fredUrls('GS20'), 'GS20 (20-year Treasury)'),
+    getAny(fredUrls('GS30'), 'GS30 (30-year Treasury)'),
     getAny(fredUrls('CPIAUCNS'), 'CPIAUCNS (inflation)'),
   ]);
 
@@ -244,19 +291,29 @@ async function main() {
   const p6 = parseFrench(unzipFirst(p6z), ['SMALL HiBM']);
   const dev = parseFrench(unzipFirst(devz), ['Mkt-RF', 'RF']);
   const gs10 = parseFred(gs10raw.toString('utf8'));
+  const gs20 = parseFred(gs20raw.toString('utf8'));
+  const gs30 = parseFred(gs30raw.toString('utf8'));
   const cpi = parseFred(cpiraw.toString('utf8'));
-  const bonds = bondReturns(gs10);
+  const bonds = bondReturns(gs10, 10);
+
+  const { yields: longYields, filled } = spliceLongYields(gs20, gs30);
+  assertContiguous('long Treasury yields', longYields.keys());
+  const longBonds = bondReturns(longYields, 20);
 
   console.log(`  US factors   ${ff3.size} months`);
   console.log(`  6 portfolios ${p6.size} months`);
   console.log(`  Developed    ${dev.size} months`);
   console.log(`  GS10         ${gs10.size} months -> ${bonds.size} bond returns`);
+  console.log(`  GS20         ${gs20.size} months`);
+  console.log(`  GS30         ${gs30.size} months`);
+  console.log(`  Long bonds   ${longYields.size} spliced months -> ${longBonds.size} returns` +
+    (filled.length ? `  (${filled.length} taken from GS30: ${filled[0]} to ${filled[filled.length - 1]})` : ''));
   console.log(`  CPI          ${cpi.size} months`);
 
-  const all = new Set([...ff3.keys(), ...dev.keys(), ...bonds.keys()]);
+  const all = new Set([...ff3.keys(), ...dev.keys(), ...bonds.keys(), ...longBonds.keys()]);
   const months = [...all].sort();
 
-  const series = { US: [], USSCV: [], INTL: [], BOND: [], CASH: [], CPI: [] };
+  const series = { US: [], USSCV: [], INTL: [], BOND: [], LONGBOND: [], CASH: [], CPI: [] };
   const cpiKeys = [...cpi.keys()].sort();
   const cpiIdx = new Map(cpiKeys.map((k, i) => [k, i]));
 
@@ -268,6 +325,7 @@ async function main() {
     series.USSCV.push(scv && scv['SMALL HiBM'] != null ? round(scv['SMALL HiBM']) : null);
     series.INTL.push(dv ? round(dv['Mkt-RF'] + dv.RF) : null);
     series.BOND.push(bonds.has(m) ? round(bonds.get(m)) : null);
+    series.LONGBOND.push(longBonds.has(m) ? round(longBonds.get(m)) : null);
     series.CASH.push(us && us.RF != null ? round(us.RF) : null);
 
     const i = cpiIdx.has(m) ? cpiIdx.get(m) : -1;
@@ -279,6 +337,9 @@ async function main() {
   assertReturns('USSCV', series.USSCV);
   assertReturns('INTL', series.INTL);
   assertReturns('BOND', series.BOND, { minDrop: -0.02 });
+  /* a 20-year has had far worse months than the 10-year; if this series has not,
+     it is not long bonds and the splice picked up the wrong thing */
+  assertReturns('LONGBOND', series.LONGBOND, { minDrop: -0.05 });
   assertReturns('CASH', series.CASH, { minDrop: 0 });
 
   const firstFull = months.findIndex((m, i) =>
@@ -295,6 +356,7 @@ async function main() {
       USSCV: 'Ken French Data Library, 6 Portfolios on Size and Book-to-Market, value weighted (SMALL HiBM)',
       INTL: 'Ken French Data Library, Fama/French Developed ex US 3 Factors (Mkt-RF + RF)',
       BOND: 'FRED GS10, repriced monthly as a rolling par 10-year Treasury',
+      LONGBOND: 'FRED GS20, with GS30 filling the years Treasury did not issue a 20-year, repriced monthly as a rolling par 20-year Treasury',
       CASH: 'Ken French Data Library, RF (one-month Treasury bill)',
       CPI: 'FRED CPIAUCNS, month-over-month change',
     },
@@ -302,6 +364,8 @@ async function main() {
       'Emerging markets has no free long-history series, so EM is backtested as international.',
       'International starts July 1990. Backtests that include it cannot begin earlier.',
       'These are index returns with no fund fees, bid-ask spreads, or taxes subtracted.',
+      'LONGBOND is a modelled rolling par 20-year Treasury, not a tradeable index. Treasury issued no 20-year between 1987 and late 1993, so the 30-year yield stands in for those years and the duration is longer across that stretch.',
+      'LONGBOND exists for the 20+ year leveraged strategies. Modelling those on the 10-year understates both their volatility and their drawdowns.',
     ],
     months,
     series,
@@ -320,11 +384,16 @@ async function main() {
   check(months, series.USSCV, '2021', 0.41, 'Small value 2021');
   check(months, series.INTL, '2008', -0.43, 'International 2008');
   check(months, series.BOND, '2022', -0.17, 'Bonds 2022');
+  /* a constant-maturity 20y model of 2022 lands near -26% on a smooth yield path;
+     TLT itself did about -31%. The band is set to hold both, because a false
+     failure here blocks the whole monthly rebuild, not just this series. */
+  check(months, series.LONGBOND, '2022', -0.27, 'Long Treasuries 2022');
 
   console.log('\nLong-run, whole sample:');
   longRun(series.US, 'US', 0.10);
   longRun(series.USSCV, 'US small value', 0.135);
   longRun(series.CASH, 'Cash', 0.033);
+  longRun(series.LONGBOND, 'Long Treasuries', 0.055);
 }
 
 function longRun(arr, label, expected) {
