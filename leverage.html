@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https://driftcalc.goatcounter.com; connect-src 'self' https://driftcalc.goatcounter.com; frame-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<title>What does leverage cost? &middot; Drift Calculator</title>
+<meta name="description" content="Pick how you would borrow and how much, and see what it did to US stocks every month since 1926. Interest, fund fees and volatility all come out before you see the extra return.">
+<link rel="canonical" href="https://driftcalc.com/leverage.html">
+
+<!-- Social preview. A link to this page should say what the page says. -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://driftcalc.com/leverage.html">
+<meta property="og:site_name" content="Drift Calculator">
+<meta property="og:title" content="What does leverage cost?">
+<meta property="og:description" content="Two times the return is the version in your head. Run it against every month since 1926 and see what interest and volatility took back.">
+<meta property="og:image" content="https://driftcalc.com/og-leverage.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="2x on margin returned 12.1% a year since 1926, against 10.4% unlevered, and fell 98.7% on the way.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="What does leverage cost?">
+<meta name="twitter:description" content="Two times the return is the version in your head. Run it against every month since 1926 and see what interest and volatility took back.">
+<meta name="twitter:image" content="https://driftcalc.com/og-leverage.png">
+
+<link rel="icon" href="/favicon.ico" sizes="32x32">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="theme-color" content="#0B1F3B">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F5F7FA; --card:#FFFFFF; --ink:#0B1F3B; --muted:#5B6B83; --faint:#93A1B5;
+  --accent:#2E6BE6; --accent-soft:#E8F0FE; --border:#E3E8F0; --hairline:#EEF2F7;
+  --green:#17A374; --red:#D93B3B;
+  --navy:#0B1F3B; --radius:12px;
+  --shadow:0 1px 2px rgba(16,24,40,.05), 0 1px 3px rgba(16,24,40,.04);
+  --disp:'Manrope','Inter',-apple-system,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:linear-gradient(#EDF3FE 0px, var(--bg) 380px);color:var(--ink);
+  font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
+.num{font-variant-numeric:tabular-nums}
+.wrap{max-width:820px;margin:0 auto;padding:0 22px}
+
+header{background:var(--navy);padding:14px 0}
+header .wrap{display:flex;align-items:center;justify-content:space-between;gap:14px}
+.logo{display:flex;align-items:center;gap:9px;color:#fff;text-decoration:none;font-family:var(--disp);font-weight:800;letter-spacing:-.02em}
+.logo .mk{width:26px;height:26px;border-radius:7px;background:var(--accent);display:flex;align-items:center;justify-content:center}
+.hbtns{display:flex;gap:8px;align-items:center;overflow-x:auto;scrollbar-width:none}
+.hbtns::-webkit-scrollbar{display:none}
+.btn{font-family:inherit;font-size:13px;font-weight:500;border:1px solid var(--border);background:var(--card);
+  color:var(--ink);border-radius:8px;padding:8px 14px;cursor:pointer;transition:all .15s;text-decoration:none;display:inline-block}
+.btn:hover{border-color:#CBD5E4;background:#FBFCFE}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.primary:hover{background:#2456C4}
+.btn.nav{border-color:rgba(120,170,255,.55);color:#DCE9FF;background:rgba(46,107,230,.20);font-weight:600;font-size:12px;padding:5px 11px;white-space:nowrap;flex:none}
+.btn.nav:hover{background:rgba(46,107,230,.38);color:#fff}
+.btn.nav[aria-current=page]{background:#fff;border-color:#fff;color:var(--navy)}
+a:focus-visible,button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:6px}
+
+.hero{padding:48px 0 26px}
+h1{font-family:var(--disp);font-size:38px;font-weight:800;letter-spacing:-.03em;line-height:1.1}
+h1 em{font-style:normal;color:var(--accent)}
+.sub{color:var(--muted);margin-top:14px;font-size:16.5px;max-width:620px}
+
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:22px}
+.controls{display:flex;gap:22px;flex-wrap:wrap;margin-bottom:4px}
+.field{display:flex;flex-direction:column;gap:7px}
+.lbl{font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--faint);font-weight:600}
+.money-wrap{position:relative;display:inline-block}
+.money-wrap span{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--faint);font-size:14px}
+input[type=text]{font-family:inherit;font-size:16px;border:1px solid var(--border);border-radius:9px;
+  padding:10px 12px 10px 24px;width:170px;color:var(--ink);background:#fff}
+input[type=text]:focus{outline:2px solid var(--accent);outline-offset:1px;border-color:transparent}
+input[type=range]{-webkit-appearance:none;appearance:none;height:28px;background:transparent;width:190px;cursor:pointer;margin:0}
+input[type=range]::-webkit-slider-runnable-track{height:5px;border-radius:99px;background:#DCE4F0}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;
+  background:var(--accent);border:2px solid #fff;box-shadow:0 1px 4px rgba(16,24,40,.28);margin-top:-7.5px}
+input[type=range]::-moz-range-track{height:5px;border-radius:99px;background:#DCE4F0}
+input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;background:var(--accent);border:2px solid #fff}
+.readout{font-family:var(--disp);font-size:16px;font-weight:800;min-width:74px;display:inline-block}
+.assume{margin-top:10px;font-size:13px;color:var(--muted)}
+.seg{display:inline-flex;background:var(--hairline);border-radius:10px;padding:3px;gap:2px}
+.seg button{font-family:inherit;font-size:13px;font-weight:600;border:none;background:none;color:var(--muted);
+  padding:7px 14px;border-radius:8px;cursor:pointer;transition:all .18s}
+.seg button:hover{color:var(--ink)}
+.seg button.on{background:var(--card);color:var(--ink);box-shadow:0 1px 3px rgba(16,24,40,.10)}
+
+.answer{margin:26px 0 0;padding:30px 26px;border-radius:16px;border:1px solid #C9DAFB;
+  background:linear-gradient(105deg,#F2F7FF 0%,#EAF1FE 55%,#E4EDFD 100%)}
+.answer .k{font-size:11.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--accent);font-weight:700}
+.answer .big{font-family:var(--disp);font-size:62px;font-weight:800;letter-spacing:-.035em;line-height:1.05;color:var(--accent);margin:6px 0 10px}
+.answer .say{font-size:16.5px;line-height:1.6;max-width:640px}
+.answer .say b{font-weight:700}
+@media(max-width:599.98px){ .answer .big{font-size:44px} h1{font-size:29px} }
+
+.bars{display:flex;flex-direction:column;gap:12px;margin-top:24px}
+.bar-row{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.bar-lab{width:170px;font-size:13.5px;color:var(--muted);flex:none}
+.bar-track{flex:1;min-width:130px;height:26px;background:var(--hairline);border-radius:7px;overflow:hidden}
+.bar-fill{height:100%;border-radius:7px;transition:width .4s cubic-bezier(.2,.7,.3,1)}
+.bar-val{width:120px;text-align:right;font-family:var(--disp);font-weight:800;font-size:15px;flex:none}
+
+.note{background:var(--hairline);border-radius:10px;padding:14px 16px;color:var(--muted);font-size:13.5px;line-height:1.6;margin-top:18px}
+.note b{color:var(--ink)}
+.share{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:22px}
+.share .ok{font-size:13px;color:var(--green);font-weight:600;opacity:0;transition:opacity .2s}
+.share .ok.on{opacity:1}
+section.blk{margin-top:34px}
+h2{font-family:var(--disp);font-size:20px;font-weight:700;letter-spacing:-.02em;margin-bottom:12px}
+
+.split{display:flex;gap:20px;flex-wrap:wrap;align-items:stretch;margin-top:4px}
+.stat{flex:1;min-width:180px;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px 20px;box-shadow:var(--shadow)}
+.stat .v{font-family:var(--disp);font-size:34px;font-weight:800;letter-spacing:-.03em;line-height:1.1}
+.stat .v.win{color:var(--green)}
+.stat .v.lose{color:var(--red)}
+.stat .t{font-size:12.5px;color:var(--muted);margin-top:6px;line-height:1.5}
+
+footer{margin-top:56px;padding:26px 0 40px;border-top:1px solid var(--border);color:var(--faint);font-size:12.5px;line-height:1.7}
+footer a{color:var(--muted)}
+
+@media (pointer:coarse){
+  input[type=text],input[type=number],select,textarea{font-size:16px}
+}
+</style>
+</head>
+<body>
+
+<header><div class="wrap">
+  <a class="logo" href="/">
+    <span class="mk"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M4 20V10M10 20V4M16 20v-7M22 20V7" stroke="#fff" stroke-width="3" stroke-linecap="round"/></svg></span>
+    Drift Calculator
+  </a>
+  <div class="hbtns">
+    <a class="btn nav" href="/">Calculator</a>
+    <a class="btn nav" href="/tools.html">Tools</a>
+    <a class="btn nav" href="/backtest.html">Backtest</a>
+  </div>
+</div></header>
+
+<div class="wrap">
+
+  <div class="hero">
+    <h1>What does <em>leverage</em> cost?</h1>
+    <p class="sub">Two times the return is the version in your head. Interest, fund fees and the path all come out first. Pick how you would borrow and see what was left.</p>
+  </div>
+
+  <div class="card">
+    <div class="controls">
+      <div class="field">
+        <span class="lbl">How you borrow</span>
+        <div class="seg" id="methodSeg"></div>
+      </div>
+      <div class="field">
+        <span class="lbl">How much</span>
+        <div style="display:flex;align-items:center;gap:12px">
+          <input type="range" id="lev" min="1" max="3" step="0.1" value="2" aria-label="How much leverage, as a multiple of your own money">
+          <span class="readout num" id="levOut">2.0x</span>
+        </div>
+      </div>
+      <div class="field">
+        <span class="lbl">Interest over T-bills</span>
+        <div style="display:flex;align-items:center;gap:12px">
+          <input type="range" id="spread" min="0" max="5" step="0.1" value="1.5" aria-label="Interest you pay above T-bills, percentage points a year">
+          <span class="readout num" id="spreadOut">1.50%</span>
+        </div>
+      </div>
+      <div class="field">
+        <span class="lbl">Starting from</span>
+        <div class="seg" id="startSeg"></div>
+      </div>
+    </div>
+    <div class="assume" id="methodBlurb"></div>
+  </div>
+
+  <div class="answer">
+    <div class="k">What borrowing took off the top</div>
+    <div class="big num" id="big">&mdash;</div>
+    <div class="say" id="say"></div>
+    <div class="assume" id="assumeShort"></div>
+    <div class="share">
+      <button class="btn primary" id="copyBtn" type="button">Copy link to this result</button>
+      <a class="btn" href="/backtest.html">Open the full leverage lab &rarr;</a>
+      <span class="ok" id="copyOk">Copied</span>
+    </div>
+  </div>
+
+  <section class="blk">
+    <h2>What you earned a year</h2>
+    <div class="bars" id="bars"></div>
+    <div class="note" id="assump"></div>
+  </section>
+
+  <section class="blk">
+    <h2>What it felt like on the way</h2>
+    <div class="split" id="ddStats"></div>
+    <div class="note" id="ddNote"></div>
+  </section>
+
+  <section class="blk">
+    <h2>Where the curve turns</h2>
+    <p class="sub" style="margin-top:0;margin-bottom:16px;font-size:15px" id="curveLead">Running every multiple through the same months&hellip;</p>
+    <div class="bars" id="curve"></div>
+    <div class="note" id="curveNote"></div>
+  </section>
+
+  <section class="blk">
+    <h2>The honest version</h2>
+    <div class="note">
+      <b>A backtest is the best case and this one is no exception.</b> There are no taxes here, no bid-ask
+      spread, no missed rolls, and the broker never calls. A real margin account gets liquidated at the
+      bottom, which is the one moment the arithmetic above quietly assumes you held on.
+      <br><br>
+      <b>The drop is the part that decides this.</b> A hundred-year annual return is easy to read and
+      impossible to live through. Look at the worst drop above and ask whether you would have kept paying
+      interest on the way down, because everyone who sold did the arithmetic first too.
+      <br><br>
+      <b>There is a multiple that ends it outright.</b> At 2x, one month down more than 50% takes
+      everything. At 3x it only needs 33.3%. Nothing that deep has landed in a single month in this data,
+      which is a fact about the past and not a promise.
+      <br><br>
+      The <a href="/backtest.html">leverage lab</a> runs this against a mix you choose rather than US
+      stocks alone, with rebalancing, a Kelly figure, and the same three borrowing routes priced
+      separately.
+    </div>
+  </section>
+
+</div>
+
+<footer><div class="wrap">
+  <b>Drift Calc</b> is an educational calculator for portfolio arithmetic. It is not investment advice,
+  tax advice, or a recommendation of any security or strategy, and it knows nothing about your situation.
+  Leverage can lose more than you put in. The figures above come from the same monthly total-return data
+  the <a href="/backtest.html">backtest</a> uses, with no fund fees, spreads or taxes subtracted beyond
+  the borrowing costs named on the page. Talk to a qualified professional before making decisions.
+  Nothing on this page is stored or sent anywhere.
+</div></footer>
+
+<script src="count.js"></script>
+<script>
+(function () {
+'use strict';
+
+/* ---------- the three ways people actually borrow ----------
+   These constants and leveredMonth() are copied from backtest-page.js on purpose.
+   If one of them changes, change it in both places or the two pages will disagree. */
+var DIV_YIELD = 0.018;   /* dividends an options holder gives up */
+var LETF_ER   = 0.90;    /* typical levered-fund expense ratio */
+var METHODS = {
+  margin: { label:'Margin', spread:1.5, via:'on margin',
+    blurb:'You borrow cash from your broker and buy more shares. You keep the dividends, and the broker can force you out at the bottom.' },
+  letf:   { label:'Leveraged ETF', spread:0.6, via:'through a leveraged ETF',
+    blurb:'A fund like SSO or UPRO borrows for you and resets every single day. Easiest to buy, and the 0.90% fee is charged on the whole position rather than the borrowed part.' },
+  leaps:  { label:'LEAPS options', spread:1.0, via:'through LEAPS',
+    blurb:'Long-dated deep in-the-money calls. The interest is baked into the price, and you give up about 1.8% a year in dividends because you own options rather than shares.' }
+};
+var METHOD_ORDER = ['margin', 'letf', 'leaps'];
+
+function leveredMonth(r, cash, L, spreadA, method, varM) {
+  var c = cash + spreadA / 100 / 12;
+  if (method === 'margin') return L * r - (L - 1) * c;
+  if (method === 'letf') {
+    var decay = Math.exp(-(L * L - L) / 2 * varM);
+    return Math.pow(1 + r, L) * decay - 1 - (L - 1) * c - LETF_ER / 100 / 12;
+  }
+  return L * (r - DIV_YIELD / 12) - (L - 1) * c;
+}
+
+/* ---------- inputs, clamped ----------
+   Everything here can arrive from a URL a stranger constructed, so each value is
+   parsed, bounded, and never trusted. Nothing is written to the DOM as HTML. */
+var STARTS = [1926, 1950, 1990, 2010];
+var ST = { lev: 2, spread: 1.5, method: 'margin', start: 1926, touchedSpread: false };
+
+function clamp(v, lo, hi, dflt) {
+  v = parseFloat(v);
+  if (!isFinite(v)) return dflt;
+  return Math.min(hi, Math.max(lo, v));
+}
+
+function readUrl() {
+  var q = new URLSearchParams(location.search);
+  if (q.has('m') && METHODS[q.get('m')]) ST.method = q.get('m');
+  ST.spread = METHODS[ST.method].spread;
+  if (q.has('l')) ST.lev = Math.round(clamp(q.get('l'), 1, 3, 2) * 10) / 10;
+  if (q.has('s')) { ST.spread = Math.round(clamp(q.get('s'), 0, 5, 1.5) * 10) / 10; ST.touchedSpread = true; }
+  if (q.has('from')) {
+    var y = Math.round(clamp(q.get('from'), 1926, 2010, 1926));
+    ST.start = STARTS.indexOf(y) > -1 ? y : 1926;
+  }
+}
+
+function pct(x) { return (x * 100).toFixed(1) + '%'; }
+function pp(x) { return (x * 100).toFixed(1); }
+
+/* ---------- data ----------
+   Trailing months can be null when a source has not published yet, so the series
+   is cut back to the last month where both stocks and cash are real numbers. */
+var D = null, FAILED = false;
+
+function prep(j) {
+  var us = j.series && j.series.US, cash = j.series && j.series.CASH, months = j.months;
+  if (!us || !cash || !months) return null;
+  var n = Math.min(us.length, cash.length, months.length);
+  while (n > 0 && (us[n - 1] === null || cash[n - 1] === null)) n--;
+  var i;
+  for (i = 0; i < n; i++) if (us[i] === null || cash[i] === null) return null;
+  if (n < 120) return null;
+
+  /* full-sample variance is the fallback for the first three years, because zero
+     would switch the daily-reset decay off exactly where we know least */
+  var m = 0, k;
+  for (k = 0; k < n; k++) m += us[k];
+  m /= n;
+  var acc = 0;
+  for (k = 0; k < n; k++) acc += (us[k] - m) * (us[k] - m);
+  var fullVar = acc / (n - 1);
+
+  /* trailing 36-month variance, computed once and reused for every multiple */
+  var vars = new Array(n);
+  for (i = 0; i < n; i++) {
+    var lo = Math.max(0, i - 36), len = i - lo;
+    if (len < 2) { vars[i] = fullVar; continue; }
+    var mm = 0;
+    for (k = lo; k < i; k++) mm += us[k];
+    mm /= len;
+    var a = 0;
+    for (k = lo; k < i; k++) a += (us[k] - mm) * (us[k] - mm);
+    vars[i] = a / (len - 1);
+  }
+  return { us: us, cash: cash, months: months, n: n, vars: vars };
+}
+
+function startIndex() {
+  var want = ST.start * 100 + 1;
+  for (var i = 0; i < D.n; i++) if (Number(D.months[i]) >= want) return i;
+  return 0;
+}
+
+/* ---------- the run ----------
+   One pass through the months at a given multiple. Returns the compounded growth
+   per year, the worst peak-to-trough fall, and the month it went to zero if it did. */
+function run(L, spread, method, from) {
+  var v = 1, peak = 1, dd = 0, wiped = null;
+  for (var i = from; i < D.n; i++) {
+    var r = leveredMonth(D.us[i], D.cash[i], L, spread, method, D.vars[i]);
+    v *= 1 + r;
+    if (v <= 0) { wiped = D.months[i]; v = 0; break; }
+    if (v > peak) peak = v;
+    var drop = v / peak - 1;
+    if (drop < dd) dd = drop;
+  }
+  var years = (D.n - from) / 12;
+  return { g: v > 0 ? Math.pow(v, 1 / years) - 1 : -1, dd: dd, wiped: wiped, years: years };
+}
+
+/* ---------- segmented controls ---------- */
+function segMethod() {
+  var el = document.getElementById('methodSeg');
+  el.textContent = '';
+  METHOD_ORDER.forEach(function (k) {
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.textContent = METHODS[k].label;
+    if (k === ST.method) b.className = 'on';
+    b.addEventListener('click', function () {
+      ST.method = k;
+      /* each product borrows at a different price, so move the slider with it
+         unless the reader has already set a rate of their own */
+      if (!ST.touchedSpread) ST.spread = METHODS[k].spread;
+      render();
+    });
+    el.appendChild(b);
+  });
+}
+
+function segStart() {
+  var el = document.getElementById('startSeg');
+  el.textContent = '';
+  STARTS.forEach(function (y) {
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.textContent = String(y);
+    b.setAttribute('aria-label', 'Start the run in ' + y);
+    if (y === ST.start) b.className = 'on';
+    b.addEventListener('click', function () { ST.start = y; render(); });
+    el.appendChild(b);
+  });
+}
+
+/* ---------- bars ---------- */
+function barRow(parent, label, value, width, colour, text) {
+  var wrap = document.createElement('div'); wrap.className = 'bar-row';
+  var lab = document.createElement('div'); lab.className = 'bar-lab'; lab.textContent = label;
+  var track = document.createElement('div'); track.className = 'bar-track';
+  var fill = document.createElement('div'); fill.className = 'bar-fill';
+  fill.style.width = Math.max(0, Math.min(100, width)) + '%';
+  fill.style.background = colour;
+  track.appendChild(fill);
+  var val = document.createElement('div'); val.className = 'bar-val num'; val.textContent = text;
+  wrap.appendChild(lab); wrap.appendChild(track); wrap.appendChild(val);
+  parent.appendChild(wrap);
+  return wrap;
+}
+
+function addStat(parent, value, cls, text) {
+  var d = document.createElement('div'); d.className = 'stat';
+  var v = document.createElement('div'); v.className = 'v num ' + cls; v.textContent = value;
+  var t = document.createElement('div'); t.className = 't'; t.textContent = text;
+  d.appendChild(v); d.appendChild(t); parent.appendChild(d);
+}
+
+function ym(s) {
+  s = String(s);
+  var names = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  var m = parseInt(s.slice(4, 6), 10);
+  return (names[m - 1] || '') + ' ' + s.slice(0, 4);
+}
+
+/* a drop of 99.97% reads as 100.0% at one decimal, and 100% is a claim this
+   data does not support, so deep falls are described rather than rounded */
+function ddText(dd) {
+  var x = -dd * 100;
+  if (x >= 99.95) return 'over 99.9%';
+  return '-' + x.toFixed(1) + '%';
+}
+
+/* ---------- render ---------- */
+function render() {
+  segMethod();
+  segStart();
+  document.getElementById('lev').value = String(ST.lev);
+  document.getElementById('levOut').textContent = ST.lev.toFixed(1) + 'x';
+  document.getElementById('spread').value = String(ST.spread);
+  document.getElementById('spreadOut').textContent = ST.spread.toFixed(2) + '%';
+  document.getElementById('methodBlurb').textContent = METHODS[ST.method].label + '. ' + METHODS[ST.method].blurb;
+
+  syncUrl();
+
+  if (FAILED) {
+    document.getElementById('big').textContent = '—';
+    document.getElementById('say').textContent =
+      'This page runs on the same return data the backtest uses, and that file did not load. Reload the page, or open the leverage lab.';
+    ['assumeShort','assump','ddNote','curveNote'].forEach(function (id) { document.getElementById(id).textContent = ''; });
+    ['bars','ddStats','curve'].forEach(function (id) { document.getElementById(id).textContent = ''; });
+    document.getElementById('curveLead').textContent = '';
+    return;
+  }
+  if (!D) return;
+
+  var from = startIndex();
+  var base = run(1, 0, 'margin', from);
+  var here = run(ST.lev, ST.spread, ST.method, from);
+  var naive = ST.lev * base.g;
+  var drag = naive - here.g;
+  var span = ym(D.months[from]) + ' to ' + ym(D.months[D.n - 1]);
+
+  document.getElementById('big').textContent = pp(drag) + ' pts';
+
+  /* built with textContent and <b> nodes, never innerHTML with computed numbers */
+  var say = document.getElementById('say');
+  say.textContent = '';
+  function t(s) { say.appendChild(document.createTextNode(s)); }
+  function bd(s) { var b = document.createElement('b'); b.textContent = s; say.appendChild(b); }
+
+  if (ST.lev === 1) {
+    t('At 1.0x you are not borrowing, so there is nothing to take off. US stocks returned ');
+    bd(pct(base.g));
+    t(' a year over this stretch. Drag the multiple up.');
+  } else if (here.wiped) {
+    t('At ');
+    bd(ST.lev.toFixed(1) + 'x');
+    t(' this went to zero in ');
+    bd(ym(here.wiped));
+    t('. There is no recovering from zero, and being right afterwards does not help.');
+  } else {
+    t('At ');
+    bd(ST.lev.toFixed(1) + 'x');
+    t(' ' + METHODS[ST.method].via + ', US stocks returned ');
+    bd(pct(here.g));
+    t(' a year. ' + ST.lev.toFixed(1) + ' times the unlevered return would have been ');
+    bd(pct(naive));
+    t('. The ');
+    bd(pp(drag) + ' points');
+    t(' in between went to interest and to the path the market took.');
+  }
+
+  document.getElementById('assumeShort').textContent =
+    span + ', US stocks and one-month T-bills, monthly total returns. Borrowing at ' +
+    ST.spread.toFixed(2) + '% over T-bills. Drag any control if you disagree.';
+
+  /* ---------- what you earned a year ---------- */
+  var bars = document.getElementById('bars');
+  bars.textContent = '';
+  var top = Math.max(naive, here.g, base.g, 0.0001);
+  barRow(bars, 'No borrowing', base.g, base.g / top * 100, 'var(--accent)', pct(base.g));
+  barRow(bars, 'At ' + ST.lev.toFixed(1) + 'x, what you got', here.g, Math.max(0, here.g) / top * 100,
+    here.g >= base.g ? 'var(--green)' : 'var(--red)', pct(here.g));
+  barRow(bars, 'At ' + ST.lev.toFixed(1) + 'x, on paper', naive, naive / top * 100, '#C9DAFB', pct(naive));
+
+  document.getElementById('assump').textContent =
+    'Compounded annual growth, nominal, no taxes and no bid-ask spread. "On paper" is the multiple times ' +
+    'the unlevered return, which is the number people picture and is not what compounding pays. Margin is ' +
+    'rebalanced monthly. Leveraged ETFs are modelled with a daily reset against trailing volatility, plus a ' +
+    LETF_ER.toFixed(2) + '% expense ratio on the whole position. LEAPS give up ' + (DIV_YIELD * 100).toFixed(1) +
+    '% a year in dividends on the whole position.';
+
+  /* ---------- the drop ---------- */
+  var dds = document.getElementById('ddStats');
+  dds.textContent = '';
+  addStat(dds, ddText(here.dd), 'lose', 'worst peak-to-bottom fall at ' + ST.lev.toFixed(1) + 'x, which is the number that decides whether you would have stayed');
+  addStat(dds, ddText(base.dd), '', 'worst fall with no borrowing over the same months');
+  var wipeAt = ST.lev > 1 ? (1 / ST.lev * 100) : 100;
+  addStat(dds, '-' + wipeAt.toFixed(1) + '%', 'lose', 'one month this bad ends it at ' + ST.lev.toFixed(1) + 'x, with nothing left to recover');
+
+  document.getElementById('ddNote').textContent =
+    'Leverage multiplies the fall before it multiplies the return, and the fall arrives first. ' +
+    'These runs assume you kept paying interest the whole way down and were never forced out, which is ' +
+    'the assumption a real margin account breaks.';
+
+  renderCurve(from, base);
+}
+
+/* ---------- the curve ----------
+   Every multiple from 1.0 to 3.0 through the same months, so the hump is visible
+   rather than asserted. */
+function renderCurve(from, base) {
+  var el = document.getElementById('curve');
+  el.textContent = '';
+  var pts = [], i, best = null;
+  for (i = 0; i <= 20; i++) {
+    var L = 1 + i / 10;
+    var g = run(L, ST.spread, ST.method, from).g;
+    pts.push({ L: L, g: g });
+    if (!best || g > best.g) best = pts[pts.length - 1];
+  }
+  var top = Math.max.apply(null, pts.map(function (p) { return p.g; }));
+  var floor = Math.min.apply(null, pts.map(function (p) { return p.g; }));
+  var range = Math.max(top - floor, 0.0001);
+
+  pts.forEach(function (p) {
+    if (Math.round(p.L * 10) % 2 !== 0) return;  /* every 0.2x keeps it readable */
+    var isBest = Math.abs(p.L - best.L) < 0.001;
+    var isHere = Math.abs(p.L - ST.lev) < 0.001;
+    var colour = isBest ? 'var(--green)' : (isHere ? 'var(--accent)' : '#C9DAFB');
+    var row = barRow(el, p.L.toFixed(1) + 'x' + (isHere ? '  (yours)' : ''), p.g,
+      (p.g - floor) / range * 92 + 8, colour, pct(p.g));
+    if (isBest) row.setAttribute('aria-label', 'Best multiple in this window, ' + p.L.toFixed(1) + 'x');
+  });
+
+  document.getElementById('curveLead').textContent =
+    'Each row is the same months at a different amount of borrowing, ' +
+    'from none at the top to 3x at the bottom. Bars are scaled against each other, not against zero.';
+
+  var note = document.getElementById('curveNote');
+  var atEdge = best.L >= 2.999;
+  if (atEdge) {
+    note.textContent = 'The curve never turns down inside 3x at ' + ST.spread.toFixed(2) +
+      '% over T-bills. More borrowing kept paying across the whole range, which usually means this ' +
+      'window was kind rather than that the limit is gone. Push the interest slider up and it turns over. ' +
+      'The worst drop above is still the reason to be careful.';
+  } else if (best.g <= base.g) {
+    note.textContent = 'Nothing in this range beat simply owning the shares. The best of them was ' +
+      best.L.toFixed(1) + 'x at ' + pct(best.g) + ' a year, against ' + pct(base.g) +
+      ' unlevered, and that is before the extra fall you sat through to get it. At this borrowing cost ' +
+      'the product is the problem rather than the amount.';
+  } else {
+    note.textContent = 'The best multiple over these months was ' + best.L.toFixed(1) + 'x at ' +
+      pct(best.g) + ' a year, against ' + pct(base.g) + ' unlevered. Past that point more risk bought ' +
+      'less money, which is the part people do not expect. Where the hump sits depends on the window, ' +
+      'the interest rate and how you borrow, so it moves every time you touch a control. It is not a target.';
+  }
+}
+
+/* the URL is the product here, every state is a link someone can send */
+function syncUrl() {
+  var q = new URLSearchParams();
+  q.set('m', ST.method);
+  q.set('l', ST.lev.toFixed(1));
+  q.set('s', ST.spread.toFixed(1));
+  q.set('from', String(ST.start));
+  history.replaceState(null, '', location.pathname + '?' + q.toString());
+}
+
+/* ---------- wiring ---------- */
+document.getElementById('lev').addEventListener('input', function () {
+  ST.lev = Math.round(clamp(this.value, 1, 3, 2) * 10) / 10;
+  render();
+});
+document.getElementById('spread').addEventListener('input', function () {
+  ST.spread = Math.round(clamp(this.value, 0, 5, 1.5) * 10) / 10;
+  ST.touchedSpread = true;
+  render();
+});
+
+document.getElementById('copyBtn').addEventListener('click', function () {
+  var ok = document.getElementById('copyOk');
+  var url = location.href;
+  function flash() { ok.classList.add('on'); setTimeout(function () { ok.classList.remove('on'); }, 1600); }
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(url).then(flash, flash);
+  } else {
+    /* older Safari: a temporary field is the only reliable path */
+    var tmp = document.createElement('input');
+    tmp.value = url; document.body.appendChild(tmp); tmp.select();
+    try { document.execCommand('copy'); } catch (e) {}
+    document.body.removeChild(tmp); flash();
+  }
+});
+
+readUrl();
+render();
+
+fetch('returns.json').then(function (r) {
+  if (!r.ok) throw new Error('no data');
+  return r.json();
+}).then(function (j) {
+  D = prep(j);
+  if (!D) FAILED = true;
+  render();
+}).catch(function () {
+  FAILED = true; render();
+});
+})();
+</script>
+</body>
+</html>
