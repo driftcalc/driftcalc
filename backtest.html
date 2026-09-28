@@ -51,6 +51,7 @@ header{background:var(--navy);position:sticky;top:0;z-index:50;box-shadow:0 1px 
 .btn.tiny{font-size:12px;padding:5px 10px}
 .btn.ghost{border-color:rgba(255,255,255,.18);background:transparent;color:#B9C6DB}
 .btn.ghost:hover{color:#fff;background:rgba(255,255,255,.09)}
+.btn.ghost[aria-current=page]{background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.34);color:#fff}
 
 .hero{padding:34px 0 8px}
 .hero h1{font-family:var(--disp);font-size:30px;font-weight:800;letter-spacing:-.03em;line-height:1.15}
@@ -113,9 +114,10 @@ footer{margin-top:44px;padding:26px 0 60px;border-top:1px solid var(--border);fo
 <header><div class="wrap hbar">
   <a class="logo" href="/"><span class="logo-mark"><svg width="12" height="12" viewBox="0 0 12 12"><rect x="1" y="6" width="2.4" height="5" rx="1" fill="#fff"/><rect x="4.8" y="3" width="2.4" height="8" rx="1" fill="#fff" opacity=".75"/><rect x="8.6" y="1" width="2.4" height="10" rx="1" fill="#fff" opacity=".5"/></svg></span>Drift Calculator</a>
   <div class="hbtns">
-    <a class="btn ghost tiny" href="/">← Calculator</a>
+    <a class="btn ghost tiny" href="/">Calculator</a>
+    <a class="btn ghost tiny" href="/tools.html">Tools</a>
+    <a class="btn ghost tiny" href="/backtest.html" aria-current="page">Backtest</a>
     <a class="btn tiny" href="https://ko-fi.com/driftcalc" target="_blank" rel="noopener"><span style="color:var(--accent)">&hearts;</span> Support</a>
-    <a class="btn tiny bt-nav" href="/compounding.html" style="text-decoration:none">Compounding</a>
   </div>
 </div></header>
 
