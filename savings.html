@@ -407,18 +407,35 @@ function syncUrl() {
    assert. This works out what a plain 80/20 actually returned after inflation
    across the whole monthly series the backtest uses, and offers it as a button
    rather than quietly using it. */
+var HIST_SPAN = null;
 function realCagr(j, wStock) {
-  var us = j.series.US, bd = j.series.BOND, cpi = j.series.CPI;
-  if (!us || !bd || !cpi) return null;
-  var n = Math.min(us.length, bd.length, cpi.length);
-  if (n < 120) return null;
+  var us = j.series.US, bd = j.series.BOND, cpi = j.series.CPI, mo = j.months;
+  if (!us || !bd || !cpi || !mo) return null;
+  var n = Math.min(us.length, bd.length, cpi.length, mo.length);
+
+  /* The three series do not cover the same months. Bonds only start in 1953,
+     the newest months are not published yet, and there is a hole where a source
+     revised. A null left in the loop reads as a flat month, because 1 + null is
+     1 in JavaScript, so this takes the longest run where all three are real and
+     records which run that was. */
+  var bestLo = 0, bestLen = 0, lo = -1, i;
+  for (i = 0; i <= n; i++) {
+    if (i < n && us[i] !== null && bd[i] !== null && cpi[i] !== null) {
+      if (lo < 0) lo = i;
+    } else if (lo >= 0) {
+      if (i - lo > bestLen) { bestLen = i - lo; bestLo = lo; }
+      lo = -1;
+    }
+  }
+  if (bestLen < 120) return null;
+
   var nom = 1, inf = 1;
-  for (var i = 0; i < n; i++) {
+  for (i = bestLo; i < bestLo + bestLen; i++) {
     nom *= 1 + (wStock * us[i] + (1 - wStock) * bd[i]);
     inf *= 1 + cpi[i];
   }
-  var years = n / 12;
-  return (Math.pow(nom / inf, 1 / years) - 1) * 100;
+  HIST_SPAN = { from: String(mo[bestLo]), to: String(mo[bestLo + bestLen - 1]) };
+  return (Math.pow(nom / inf, 12 / bestLen) - 1) * 100;
 }
 
 fetch('returns.json').then(function (r) {
@@ -429,8 +446,8 @@ fetch('returns.json').then(function (r) {
   if (c == null || !isFinite(c)) return;
   var rounded = Math.round(c * 2) / 2;
   var line = document.getElementById('histLine');
-  line.textContent = 'A plain 80/20 returned about ' + c.toFixed(1) + '% a year after inflation across the whole series, ' +
-    String(j.start).slice(0, 4) + ' to ' + String(j.end).slice(0, 4) + '. ';
+  line.textContent = 'A plain 80/20 returned about ' + c.toFixed(1) + '% a year after inflation, ' +
+    HIST_SPAN.from.slice(0, 4) + ' to ' + HIST_SPAN.to.slice(0, 4) + '. The bond data only goes back that far. ';
   var b = document.createElement('button');
   b.type = 'button'; b.className = 'btn tiny';
   b.textContent = 'Use ' + rounded.toFixed(1) + '%';

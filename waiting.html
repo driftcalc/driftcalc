@@ -397,6 +397,15 @@ function renderHistory() {
 
   var H = ST.yrs * 12, W = ST.wait;
   var n = Math.min(us.length, cash.length, months.length);
+
+  /* The file ends with the months a source has not published yet, held as null.
+     1 + null is 1 in JavaScript, so leaving them in would quietly count them as
+     flat months rather than as missing ones. Cut back to the last real month. */
+  while (n > 0 && (us[n - 1] === null || cash[n - 1] === null)) n--;
+  for (var g = 0; g < n; g++) {
+    if (us[g] === null || cash[g] === null) { RET_FAILED = true; return renderHistory(); }
+  }
+  if (n < 120) { RET_FAILED = true; return renderHistory(); }
   if (H >= n) { lead.textContent = 'That horizon is longer than the data.'; stats.textContent=''; note.textContent=''; return; }
 
   var wins = 0, total = 0, worstGap = 0, worstStart = null;
