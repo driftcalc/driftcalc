@@ -20,13 +20,14 @@ if (bar) {
   a.innerHTML = '<span style="opacity:.85;margin-right:5px">&#9650;</span>Backtest';
   bar.insertBefore(a, bar.firstChild);
 
-  /* fees.html is the shareable one — the number people actually send each other.
-     It earns a slot next to Backtest rather than being buried in Extras. */
+  /* Every other page's header reads Calculator / Tools / Backtest, so the home
+     page points at the same hub. Fee cost used to sit here on the grounds that it
+     is the most-shared page; it is now one click away on tools.html instead. */
   var fa = document.createElement('a');
   fa.className = 'btn tiny bt-nav';
-  fa.href = '/fees.html';
+  fa.href = '/tools.html';
   fa.style.textDecoration = 'none';
-  fa.textContent = 'Fee cost';
+  fa.textContent = 'Tools';
   bar.insertBefore(fa, bar.firstChild);
 }
 
