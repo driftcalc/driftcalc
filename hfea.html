@@ -312,7 +312,11 @@ function run(w, ws, lev) {
     if (v > peak) peak = v;
     if (v / peak - 1 < dd) dd = v / peak - 1;
     a /= tot; b /= tot;
-    if ((i - lo + 1) % 3 === 0) { a = ws / 100; b = 1 - ws / 100; }
+    /* Calendar quarters, which is what HFEA means and what the backtest uses.
+       Counting three months from whatever month the data happens to start on
+       rebalances in July and October here, and was worth 1.4 points a year. */
+    var mm = D.months[i].slice(4);
+    if (mm === '03' || mm === '06' || mm === '09' || mm === '12') { a = ws / 100; b = 1 - ws / 100; }
   }
   var n = hi - lo;
   return { cagr: Math.pow(v, 12 / n) - 1, dd: dd, wiped: null, lo: lo, hi: hi, months: n };
