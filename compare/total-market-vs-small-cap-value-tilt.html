@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https://driftcalc.goatcounter.com; connect-src 'self' https://driftcalc.goatcounter.com; frame-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<title>Did a small-cap value tilt pay? &middot; Drift Calculator</title>
+<meta name="description" content="A small-value tilt returned 11.41% a year against 10.32% for US total market, 1926 to 2025, on monthly total returns. Worst falls 84.5% and 83.7%.">
+<link rel="canonical" href="https://driftcalc.com/compare/total-market-vs-small-cap-value-tilt.html">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://driftcalc.com/compare/total-market-vs-small-cap-value-tilt.html">
+<meta property="og:site_name" content="Drift Calculator">
+<meta property="og:title" content="Did a small-cap value tilt pay?">
+<meta property="og:description" content="A small-value tilt returned 11.41% a year against 10.32% for US total market, 1926 to 2025, on monthly total returns. Worst falls 84.5% and 83.7%.">
+<meta property="og:image" content="https://driftcalc.com/og-compare.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Did a small-cap value tilt pay?">
+<meta name="twitter:description" content="A small-value tilt returned 11.41% a year against 10.32% for US total market, 1926 to 2025, on monthly total returns. Worst falls 84.5% and 83.7%.">
+<meta name="twitter:image" content="https://driftcalc.com/og-compare.png">
+<link rel="icon" href="/favicon.ico" sizes="32x32">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="theme-color" content="#0B1F3B">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/site.css">
+<style>
+/* Only what these pages do differently. Everything else is site.css. */
+.sub{color:var(--muted);margin-top:14px;font-size:16.5px;max-width:640px}
+.vs{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:4px}
+.vs .card{display:flex;flex-direction:column;gap:3px}
+.vs .nm{font-family:var(--disp);font-size:17px;font-weight:800;letter-spacing:-.02em}
+.vs .bl{font-size:13px;color:var(--muted);line-height:1.5;margin-bottom:10px}
+.vs .big{font-family:var(--disp);font-size:36px;font-weight:800;letter-spacing:-.03em;line-height:1.1}
+.vs .lbl2{font-size:11.5px;text-transform:uppercase;letter-spacing:.07em;color:var(--faint);font-weight:600;margin-top:10px}
+.vs .row{display:flex;justify-content:space-between;font-size:13.5px;padding:5px 0;border-top:1px solid var(--hairline)}
+.vs .row b{font-family:var(--disp)}
+.swatch{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:7px;vertical-align:middle}
+.chart{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px 14px 6px;margin-top:4px;overflow:hidden}
+.key{display:flex;gap:18px;flex-wrap:wrap;font-size:13px;color:var(--muted);margin:10px 2px 0}
+.idx{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:16px;margin-top:4px}
+a.card{text-decoration:none;color:inherit;display:flex;flex-direction:column;gap:6px;transition:border-color .15s,box-shadow .15s}
+a.card:hover{border-color:#C9DAFB;box-shadow:0 2px 10px rgba(16,24,40,.07)}
+.idx .q{font-family:var(--disp);font-size:16.5px;font-weight:800;letter-spacing:-.02em;line-height:1.3}
+.idx .ans{font-size:13.5px;color:var(--muted);line-height:1.55}
+.idx .win{font-size:13px;color:var(--accent);font-weight:600;margin-top:auto;padding-top:8px}
+@media(max-width:599.98px){ .vs{grid-template-columns:1fr} h1{font-size:29px} }
+</style>
+</head>
+<body>
+
+<header><div class="wrap">
+  <a class="logo" href="/">
+    <span class="mk"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M4 20V10M10 20V4M16 20v-7M22 20V7" stroke="#fff" stroke-width="3" stroke-linecap="round"/></svg></span>
+    Drift Calculator
+  </a>
+  <div class="hbtns">
+    <a class="btn nav" href="/">Calculator</a>
+    <a class="btn nav" href="/tools.html">Tools</a>
+    <a class="btn nav" href="/backtest.html">Backtest</a>
+  </div>
+</div></header>
+
+<div class="wrap">
+
+  <div class="hero">
+    <h1>Did a small-cap value tilt pay?</h1>
+    <p class="sub">July 1926 to September 2025, 99 years of monthly total returns.
+      Both mixes rebalanced once a year, both measured over the same months.</p>
+  </div>
+
+  <div class="answer">
+    <div class="k">The answer</div>
+    <div class="big num">1.1 pts a year</div>
+    <div class="say">Over 99 years, a small-value tilt returned 11.41% a year against 10.32% for US total market. That is 1.1 percentage points a year, and on $10,000 left alone it is the difference between $456,046,140 and $170,640,920. It also fell further on the way: 84.5% against 83.7%.</div>
+    <div class="assume">Nominal returns unless the row says otherwise. No fund fees, spreads or taxes.</div>
+  </div>
+
+  <section class="blk">
+    <h2>Side by side</h2>
+    <div class="vs">
+    <div class="card">
+      <div class="nm"><span class="swatch" style="background:#2E6BE6"></span>US total market</div>
+      <div class="bl">One fund, every US listed company, weighted by size.</div>
+      <div class="big num">10.32%</div>
+      <div class="lbl2">A year, before inflation</div>
+      <div class="row"><span>After inflation</span><b class="num">7.13%</b></div>
+      <div class="row"><span>Worst fall</span><b class="num">83.7%</b></div>
+      <div class="row"><span>$10,000 became</span><b class="num">$170,640,920</b></div>
+    </div>
+    <div class="card">
+      <div class="nm"><span class="swatch" style="background:#93A1B5"></span>A small-value tilt</div>
+      <div class="bl">78% US total market, 22% US small-cap value, rebalanced once a year.</div>
+      <div class="big num">11.41%</div>
+      <div class="lbl2">A year, before inflation</div>
+      <div class="row"><span>After inflation</span><b class="num">8.20%</b></div>
+      <div class="row"><span>Worst fall</span><b class="num">84.5%</b></div>
+      <div class="row"><span>$10,000 became</span><b class="num">$456,046,140</b></div>
+    </div>
+    </div>
+    <div class="note">Inflation over these months ran 2.98% a year, which is what turns the
+      first number into the second. The worst fall is peak to bottom on month-end values, so the
+      real one was worse than the figure shown.</div>
+  </section>
+
+  <section class="blk">
+    <h2>Growth of $10,000</h2>
+    <div class="chart"><svg viewBox="0 0 720 220" width="100%" height="220" preserveAspectRatio="none" role="img" aria-label="Growth of the two mixes on a log scale, 1926 to 2025"><line x1="25.4" y1="0" x2="25.4" y2="220" stroke="#E3E8F0" stroke-width="1"/><text x="25.4" y="214" font-size="10" fill="#93A1B5" font-family="Inter,sans-serif">1930</text><line x1="98.0" y1="0" x2="98.0" y2="220" stroke="#E3E8F0" stroke-width="1"/><text x="98.0" y="214" font-size="10" fill="#93A1B5" font-family="Inter,sans-serif">1940</text><line x1="170.6" y1="0" x2="170.6" y2="220" stroke="#E3E8F0" stroke-width="1"/><text x="170.6" y="214" font-size="10" fill="#93A1B5" font-family="Inter,sans-serif">1950</text><line x1="243.2" y1="0" x2="243.2" y2="220" stroke="#E3E8F0" stroke-width="1"/><text x="243.2" y="214" font-size="10" fill="#93A1B5" font-family="Inter,sans-serif">1960</text><line x1="315.8" y1="0" x2="315.8" y2="220" stroke="#E3E8F0" stroke-width="1"/><text x="315.8" y="214" font-size="10" fill="#93A1B5" font-family="Inter,sans-serif">1970</text><line x1="388.4" y1="0" x2="388.4" y2="220" stroke="#E3E8F0" stroke-width="1"/><text x="388.4" y="214" font-size="10" fill="#93A1B5" font-family="Inter,sans-serif">1980</text><line x1="461.0" y1="0" x2="461.0" y2="220" stroke="#E3E8F0" stroke-width="1"/><text x="461.0" y="214" font-size="10" fill="#93A1B5" font-family="Inter,sans-serif">1990</text><line x1="533.6" y1="0" x2="533.6" y2="220" stroke="#E3E8F0" stroke-width="1"/><text x="533.6" y="214" font-size="10" fill="#93A1B5" font-family="Inter,sans-serif">2000</text><line x1="606.3" y1="0" x2="606.3" y2="220" stroke="#E3E8F0" stroke-width="1"/><text x="606.3" y="214" font-size="10" fill="#93A1B5" font-family="Inter,sans-serif">2010</text><line x1="678.9" y1="0" x2="678.9" y2="220" stroke="#E3E8F0" stroke-width="1"/><text x="678.9" y="214" font-size="10" fill="#93A1B5" font-family="Inter,sans-serif">2020</text><polyline fill="none" stroke="#93A1B5" stroke-width="2.5" stroke-linejoin="round" points="0.0,197.7 2.4,197.0 4.8,195.5 7.3,193.3 9.7,191.7 12.1,190.0 14.5,189.5 16.9,185.3 19.4,184.7 21.8,183.4 24.2,189.5 26.6,186.2 29.0,189.5 31.5,194.5 33.9,194.1 36.3,197.5 38.7,204.4 41.1,208.5 43.6,209.9 46.0,208.5 48.4,210.1 50.8,197.4 53.2,198.2 55.7,195.2 58.1,199.5 60.5,197.3 62.9,199.2 65.3,194.6 67.8,190.6 70.2,187.2 72.6,186.6 75.0,183.8 77.4,182.0 79.9,183.5 82.3,191.1 84.7,196.2 87.1,188.8 89.5,188.4 92.0,191.1 94.4,189.1 96.8,188.1 99.2,187.4 101.6,190.5 104.1,189.1 106.5,189.8 108.9,187.9 111.3,189.6 113.7,191.7 116.2,190.5 118.6,188.2 121.0,182.5 123.4,181.3 125.8,182.0 128.3,179.5 130.7,178.0 133.1,177.3 135.5,175.4 137.9,173.7 140.4,169.8 142.8,168.3 145.2,168.1 147.6,171.7 150.1,170.9 152.5,170.5 154.9,170.6 157.3,169.9 159.7,168.8 162.2,170.3 164.6,169.5 167.0,169.5 169.4,167.5 171.8,165.7 174.3,164.7 176.7,162.4 179.1,160.2 181.5,159.2 183.9,158.5 186.4,157.4 188.8,156.9 191.2,156.4 193.6,156.0 196.0,156.3 198.5,156.0 200.9,154.1 203.3,151.6 205.7,149.5 208.1,147.5 210.6,145.4 213.0,144.6 215.4,142.9 217.8,142.4 220.2,143.4 222.7,143.2 225.1,141.8 227.5,144.3 229.9,143.5 232.3,141.0 234.8,138.6 237.2,136.9 239.6,135.3 242.0,135.8 244.4,136.5 246.9,136.2 249.3,136.1 251.7,132.7 254.1,132.1 256.5,130.9 259.0,131.1 261.4,134.3 263.8,132.9 266.2,131.5 268.6,130.5 271.1,129.4 273.5,127.7 275.9,126.7 278.3,126.2 280.7,125.2 283.2,125.3 285.6,123.2 288.0,122.7 290.4,123.7 292.8,124.5 295.3,121.5 297.7,119.6 300.1,119.5 302.5,119.7 304.9,117.3 307.4,114.7 309.8,115.9 312.2,118.2 314.6,117.5 317.0,118.3 319.5,121.3 321.9,119.0 324.3,115.4 326.7,116.5 329.1,116.8 331.6,113.7 334.0,114.1 336.4,112.7 338.8,114.2 341.2,114.9 343.7,117.0 346.1,116.5 348.5,119.7 350.9,121.6 353.3,117.6 355.8,115.8 358.2,115.7 360.6,112.3 363.0,112.0 365.4,111.8 367.9,111.3 370.3,110.4 372.7,110.3 375.1,110.2 377.5,107.4 380.0,108.5 382.4,106.4 384.8,105.1 387.2,104.4 389.6,105.3 392.1,101.4 394.5,98.5 396.9,98.2 399.3,98.1 401.7,98.4 404.2,100.0 406.6,100.4 409.0,94.9 411.4,92.5 413.8,90.6 416.3,90.1 418.7,90.7 421.1,91.7 423.5,89.8 425.9,87.6 428.4,86.3 430.8,85.1 433.2,81.8 435.6,81.8 438.1,81.1 440.5,78.3 442.9,77.0 445.3,82.8 447.7,79.9 450.2,78.8 452.6,78.7 455.0,76.9 457.4,74.2 459.8,74.3 462.3,74.7 464.7,74.2 467.1,76.5 469.5,72.8 471.9,72.1 474.4,72.2 476.8,69.9 479.2,69.3 481.6,68.3 484.0,66.8 486.5,66.6 488.9,65.8 491.3,66.0 493.7,65.6 496.1,65.6 498.6,63.9 501.0,61.4 503.4,60.1 505.8,58.8 508.2,58.9 510.7,56.1 513.1,56.0 515.5,52.0 517.9,51.4 520.3,48.8 522.8,49.1 525.2,49.1 527.6,47.8 530.0,46.6 532.4,45.9 534.9,43.5 537.3,44.5 539.7,45.9 542.1,46.8 544.5,45.4 547.0,46.4 549.4,45.2 551.8,48.9 554.2,48.4 556.6,50.0 559.1,46.3 561.5,44.2 563.9,42.8 566.3,43.5 568.7,41.9 571.2,41.6 573.6,40.3 576.0,40.0 578.4,38.8 580.8,39.4 583.3,37.5 585.7,37.0 588.1,36.9 590.5,36.9 592.9,38.7 595.4,39.1 597.8,45.5 600.2,47.5 602.6,43.0 605.0,41.2 607.5,39.0 609.9,40.1 612.3,38.5 614.7,36.1 617.1,36.8 619.6,37.6 622.0,35.3 624.4,35.8 626.8,34.9 629.2,32.6 631.7,30.9 634.1,29.3 636.5,28.5 638.9,28.4 641.3,27.3 643.8,26.9 646.2,26.8 648.6,26.9 651.0,27.4 653.4,26.0 655.9,24.9 658.3,23.7 660.7,23.0 663.1,21.4 665.5,21.3 668.0,20.0 670.4,20.6 672.8,20.3 675.2,19.5 677.6,18.8 680.1,23.2 682.5,18.6 684.9,15.8 687.3,12.8 689.7,11.5 692.2,10.9 694.6,11.0 697.0,12.5 699.4,12.5 701.8,12.8 704.3,10.7 706.7,11.1 709.1,8.4 711.5,7.3 713.9,5.6 716.4,7.4 718.8,5.2 720,4.0"/><polyline fill="none" stroke="#2E6BE6" stroke-width="2.5" stroke-linejoin="round" points="0.0,197.6 2.4,197.0 4.8,195.6 7.3,193.5 9.7,191.8 12.1,190.1 14.5,189.6 16.9,185.5 19.4,184.6 21.8,182.8 24.2,188.6 26.6,185.5 29.0,188.4 31.5,193.0 33.9,192.6 36.3,195.9 38.7,202.2 41.1,206.2 43.6,208.8 46.0,207.3 48.4,208.7 50.8,198.8 53.2,198.7 55.7,196.6 58.1,199.9 60.5,197.8 62.9,199.4 65.3,194.9 67.8,191.8 70.2,189.2 72.6,188.2 75.0,186.0 77.4,185.2 79.9,186.0 82.3,192.9 84.7,197.5 87.1,190.6 89.5,189.9 92.0,192.0 94.4,190.1 96.8,189.3 99.2,188.6 101.6,191.3 104.1,190.2 106.5,191.0 108.9,189.7 111.3,191.2 113.7,193.7 116.2,192.3 118.6,190.3 121.0,186.0 123.4,185.4 125.8,186.0 128.3,184.0 130.7,182.7 133.1,182.1 135.5,180.6 137.9,179.3 140.4,175.7 142.8,174.4 145.2,174.1 147.6,177.5 150.1,176.9 152.5,176.3 154.9,176.6 157.3,176.1 159.7,175.1 162.2,176.3 164.6,175.4 167.0,175.2 169.4,173.3 171.8,171.5 174.3,170.8 176.7,168.6 179.1,166.7 181.5,165.4 183.9,164.8 186.4,163.6 188.8,163.0 191.2,162.5 193.6,162.2 196.0,162.4 198.5,161.8 200.9,159.9 203.3,157.5 205.7,155.4 208.1,153.7 210.6,151.5 213.0,150.6 215.4,148.9 217.8,148.2 220.2,149.5 222.7,149.4 225.1,147.8 227.5,150.1 229.9,149.6 232.3,147.2 234.8,145.0 237.2,143.6 239.6,141.9 242.0,142.4 244.4,143.1 246.9,142.8 249.3,142.5 251.7,139.3 254.1,138.8 256.5,137.4 259.0,137.7 261.4,141.0 263.8,139.5 266.2,138.2 268.6,137.3 271.1,136.2 273.5,134.8 275.9,133.7 278.3,133.2 280.7,132.5 283.2,132.6 285.6,131.0 288.0,131.1 290.4,132.0 292.8,132.5 295.3,129.9 297.7,128.6 300.1,128.4 302.5,129.0 304.9,127.1 307.4,124.8 309.8,126.0 312.2,128.0 314.6,127.2 317.0,128.0 319.5,130.9 321.9,128.6 324.3,125.5 326.7,126.3 329.1,126.4 331.6,123.6 334.0,123.7 336.4,122.1 338.8,123.5 341.2,124.1 343.7,126.1 346.1,126.2 348.5,129.5 350.9,131.2 353.3,127.7 355.8,126.1 358.2,125.7 360.6,123.1 363.0,122.8 365.4,122.6 367.9,122.7 370.3,122.1 372.7,122.3 375.1,122.7 377.5,120.1 380.0,121.0 382.4,119.2 384.8,118.2 387.2,117.4 389.6,118.1 392.1,114.2 394.5,111.1 396.9,111.3 399.3,111.5 401.7,111.8 404.2,113.8 406.6,114.3 409.0,109.0 411.4,106.8 413.8,105.3 416.3,104.9 418.7,105.8 421.1,106.6 423.5,104.8 425.9,102.6 428.4,101.3 430.8,100.1 433.2,96.8 435.6,96.8 438.1,96.0 440.5,93.1 442.9,91.8 445.3,97.5 447.7,94.9 450.2,93.8 452.6,93.6 455.0,92.0 457.4,89.1 459.8,89.0 462.3,89.3 464.7,88.5 467.1,90.3 469.5,87.0 471.9,86.2 474.4,86.3 476.8,84.6 479.2,83.9 481.6,83.0 484.0,82.0 486.5,81.8 488.9,81.1 491.3,81.5 493.7,81.1 496.1,81.0 498.6,79.2 501.0,76.9 503.4,75.4 505.8,74.1 508.2,74.4 510.7,71.4 513.1,71.6 515.5,67.4 517.9,67.1 520.3,64.4 522.8,64.4 525.2,63.9 527.6,62.1 530.0,61.3 532.4,60.1 534.9,58.0 537.3,59.3 539.7,61.3 542.1,63.4 544.5,62.4 547.0,63.4 549.4,63.0 551.8,67.0 554.2,66.4 556.6,68.0 559.1,64.8 561.5,63.2 563.9,62.0 566.3,62.5 568.7,61.0 571.2,60.8 573.6,59.7 576.0,59.3 578.4,58.4 580.8,58.8 583.3,56.9 585.7,56.5 588.1,56.0 590.5,55.6 592.9,57.5 595.4,58.0 597.8,64.3 600.2,65.9 602.6,61.8 605.0,59.9 607.5,58.3 609.9,59.3 612.3,57.7 614.7,55.5 617.1,55.9 619.6,56.6 622.0,54.2 624.4,54.7 626.8,53.9 629.2,51.8 631.7,50.2 634.1,48.7 636.5,47.9 638.9,47.5 641.3,46.2 643.8,45.9 646.2,45.6 648.6,45.8 651.0,46.0 653.4,44.9 655.9,44.2 658.3,42.9 660.7,41.9 663.1,40.4 665.5,40.3 668.0,39.0 670.4,39.4 672.8,38.8 675.2,37.8 677.6,36.9 680.1,40.4 682.5,35.7 684.9,33.3 687.3,31.4 689.7,29.7 692.2,29.1 694.6,29.6 697.0,31.3 699.4,31.5 701.8,31.3 704.3,29.1 706.7,29.2 709.1,26.5 711.5,25.6 713.9,23.8 716.4,25.2 718.8,22.8 720,21.8"/></svg></div>
+    <div class="key">
+      <span><span class="swatch" style="background:#2E6BE6"></span>US total market</span>
+      <span><span class="swatch" style="background:#93A1B5"></span>A small-value tilt</span>
+    </div>
+    <div class="note">Log scale. On a straight axis a lifetime of compounding is a flat line and
+      then a cliff, which hides everything that happened in between. Here a constant slope means
+      a constant percentage gain, so the two lines can be compared at any point.</div>
+  </section>
+
+  <section class="blk">
+    <h2>What this leaves out</h2>
+    <div class="note">
+      <b>The window is doing a lot of the work.</b> These are the months where every series
+      involved exists, which is July 1926 onward. Pick a different start and the answer
+      can change sides. That is a fact about backtests, not about these two mixes.
+      <br><br>
+      <b>Nobody earned these numbers.</b> They are index returns. A real holder paid a fund fee,
+      paid a spread on every trade, paid tax on dividends in a taxable account, and rebalanced
+      late or not at all.
+      <br><br>
+      <b>The worst fall is the part that decides it.</b> A number you can read in a second took
+      years to sit through, and the mix someone can hold through a fall beats the one
+      they sell.
+      <br><br>
+      Run your own mix on the <a href="/backtest.html">backtest</a>, or put your real accounts into
+      the <a href="/">drift calculator</a> and see where the next contribution should go.
+    </div>
+  </section>
+
+  <section class="blk">
+    <h2>Other comparisons</h2>
+    <div class="note" style="background:none;padding:0">
+      <a href="/compare.html">Every comparison on the site &rarr;</a>
+    </div>
+  </section>
+
+</div>
+
+<footer><div class="wrap">
+  <b>Drift Calc</b> is an educational calculator for portfolio arithmetic. It is not investment advice,
+  tax advice, or a recommendation of any security or strategy, and it knows nothing about your situation.
+  Past returns are a record, not a forecast. The figures here come from the same monthly total-return data
+  the <a href="/backtest.html">backtest</a> uses, with no fund fees, spreads or taxes subtracted. Talk to a
+  qualified professional before making decisions. Nothing on this page is stored or sent anywhere.
+</div></footer>
+
+<script src="/count.js"></script>
+</body>
+</html>

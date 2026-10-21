@@ -9,4 +9,15 @@
   <url><loc>https://driftcalc.com/compounding.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
   <url><loc>https://driftcalc.com/leverage.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
   <url><loc>https://driftcalc.com/hfea.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <!-- generated:compare -->
+  <url><loc>https://driftcalc.com/compare.html</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://driftcalc.com/compare/60-40-vs-100-percent-stocks.html</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://driftcalc.com/compare/us-only-vs-global-stocks.html</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://driftcalc.com/compare/total-market-vs-small-cap-value-tilt.html</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://driftcalc.com/compare/90-10-vs-60-40.html</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://driftcalc.com/compare/stocks-vs-cash.html</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://driftcalc.com/compare/stocks-vs-long-treasuries.html</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://driftcalc.com/compare/three-fund-vs-us-only.html</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://driftcalc.com/compare/60-40-vs-long-treasuries.html</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <!-- /generated:compare -->
 </urlset>

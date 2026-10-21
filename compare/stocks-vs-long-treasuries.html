@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https://driftcalc.goatcounter.com; connect-src 'self' https://driftcalc.goatcounter.com; frame-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<title>Stocks or long Treasuries? &middot; Drift Calculator</title>
+<meta name="description" content="US total market returned 11.35% a year against 5.42% for long Treasuries, 1953 to 2025, on monthly total returns. Worst falls 50.3% and 40.6%.">
+<link rel="canonical" href="https://driftcalc.com/compare/stocks-vs-long-treasuries.html">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://driftcalc.com/compare/stocks-vs-long-treasuries.html">
+<meta property="og:site_name" content="Drift Calculator">
+<meta property="og:title" content="Stocks or long Treasuries?">
+<meta property="og:description" content="US total market returned 11.35% a year against 5.42% for long Treasuries, 1953 to 2025, on monthly total returns. Worst falls 50.3% and 40.6%.">
+<meta property="og:image" content="https://driftcalc.com/og-compare.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Stocks or long Treasuries?">
+<meta name="twitter:description" content="US total market returned 11.35% a year against 5.42% for long Treasuries, 1953 to 2025, on monthly total returns. Worst falls 50.3% and 40.6%.">
+<meta name="twitter:image" content="https://driftcalc.com/og-compare.png">
+<link rel="icon" href="/favicon.ico" sizes="32x32">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="theme-color" content="#0B1F3B">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/site.css">
+<style>
+/* Only what these pages do differently. Everything else is site.css. */
+.sub{color:var(--muted);margin-top:14px;font-size:16.5px;max-width:640px}
+.vs{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:4px}
+.vs .card{display:flex;flex-direction:column;gap:3px}
+.vs .nm{font-family:var(--disp);font-size:17px;font-weight:800;letter-spacing:-.02em}
+.vs .bl{font-size:13px;color:var(--muted);line-height:1.5;margin-bottom:10px}
+.vs .big{font-family:var(--disp);font-size:36px;font-weight:800;letter-spacing:-.03em;line-height:1.1}
+.vs .lbl2{font-size:11.5px;text-transform:uppercase;letter-spacing:.07em;color:var(--faint);font-weight:600;margin-top:10px}
+.vs .row{display:flex;justify-content:space-between;font-size:13.5px;padding:5px 0;border-top:1px solid var(--hairline)}
+.vs .row b{font-family:var(--disp)}
+.swatch{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:7px;vertical-align:middle}
+.chart{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px 14px 6px;margin-top:4px;overflow:hidden}
+.key{display:flex;gap:18px;flex-wrap:wrap;font-size:13px;color:var(--muted);margin:10px 2px 0}
+.idx{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:16px;margin-top:4px}
+a.card{text-decoration:none;color:inherit;display:flex;flex-direction:column;gap:6px;transition:border-color .15s,box-shadow .15s}
+a.card:hover{border-color:#C9DAFB;box-shadow:0 2px 10px rgba(16,24,40,.07)}
+.idx .q{font-family:var(--disp);font-size:16.5px;font-weight:800;letter-spacing:-.02em;line-height:1.3}
+.idx .ans{font-size:13.5px;color:var(--muted);line-height:1.55}
+.idx .win{font-size:13px;color:var(--accent);font-weight:600;margin-top:auto;padding-top:8px}
+@media(max-width:599.98px){ .vs{grid-template-columns:1fr} h1{font-size:29px} }
+</style>
+</head>
+<body>
+
+<header><div class="wrap">
+  <a class="logo" href="/">
+    <span class="mk"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M4 20V10M10 20V4M16 20v-7M22 20V7" stroke="#fff" stroke-width="3" stroke-linecap="round"/></svg></span>
+    Drift Calculator
+  </a>
+  <div class="hbtns">
+    <a class="btn nav" href="/">Calculator</a>
+    <a class="btn nav" href="/tools.html">Tools</a>
+    <a class="btn nav" href="/backtest.html">Backtest</a>
+  </div>
+</div></header>
+
+<div class="wrap">
+
+  <div class="hero">
+    <h1>Stocks or long Treasuries?</h1>
+    <p class="sub">May 1953 to September 2025, 72 years of monthly total returns.
+      Both mixes rebalanced once a year, both measured over the same months.</p>
+  </div>
+
+  <div class="answer">
+    <div class="k">The answer</div>
+    <div class="big num">5.9 pts a year</div>
+    <div class="say">Over 72 years, US total market returned 11.35% a year against 5.42% for long Treasuries. That is 5.9 percentage points a year, and on $10,000 left alone it is the difference between $24,084,319 and $456,313. It also fell further on the way: 50.3% against 40.6%.</div>
+    <div class="assume">Nominal returns unless the row says otherwise. No fund fees, spreads or taxes.</div>
+  </div>
+
+  <section class="blk">
+    <h2>Side by side</h2>
+    <div class="vs">
+    <div class="card">
+      <div class="nm"><span class="swatch" style="background:#2E6BE6"></span>US total market</div>
+      <div class="bl">One fund, every US listed company, weighted by size.</div>
+      <div class="big num">11.35%</div>
+      <div class="lbl2">A year, before inflation</div>
+      <div class="row"><span>After inflation</span><b class="num">7.57%</b></div>
+      <div class="row"><span>Worst fall</span><b class="num">50.3%</b></div>
+      <div class="row"><span>$10,000 became</span><b class="num">$24,084,319</b></div>
+    </div>
+    <div class="card">
+      <div class="nm"><span class="swatch" style="background:#93A1B5"></span>Long Treasuries</div>
+      <div class="bl">A rolling par 20-year Treasury, the duration the 20+ year funds track.</div>
+      <div class="big num">5.42%</div>
+      <div class="lbl2">A year, before inflation</div>
+      <div class="row"><span>After inflation</span><b class="num">1.84%</b></div>
+      <div class="row"><span>Worst fall</span><b class="num">40.6%</b></div>
+      <div class="row"><span>$10,000 became</span><b class="num">$456,313</b></div>
+    </div>
+    </div>
+    <div class="note">Inflation over these months ran 3.52% a year, which is what turns the
+      first number into the second. The worst fall is peak to bottom on month-end values, so the
+      real one was worse than the figure shown.</div>
+  </section>
+
+  <section class="blk">
+    <h2>Growth of $10,000</h2>
+    <div class="chart"><svg viewBox="0 0 720 220" width="100%" height="220" preserveAspectRatio="none" role="img" aria-label="Growth of the two mixes on a log scale, 1953 to 2025"><line x1="66.4" y1="0" x2="66.4" y2="220" stroke="#E3E8F0" stroke-width="1"/><text x="66.4" y="214" font-size="10" fill="#93A1B5" font-family="Inter,sans-serif">1960</text><line x1="165.9" y1="0" x2="165.9" y2="220" stroke="#E3E8F0" stroke-width="1"/><text x="165.9" y="214" font-size="10" fill="#93A1B5" font-family="Inter,sans-serif">1970</text><line x1="265.4" y1="0" x2="265.4" y2="220" stroke="#E3E8F0" stroke-width="1"/><text x="265.4" y="214" font-size="10" fill="#93A1B5" font-family="Inter,sans-serif">1980</text><line x1="365.0" y1="0" x2="365.0" y2="220" stroke="#E3E8F0" stroke-width="1"/><text x="365.0" y="214" font-size="10" fill="#93A1B5" font-family="Inter,sans-serif">1990</text><line x1="464.5" y1="0" x2="464.5" y2="220" stroke="#E3E8F0" stroke-width="1"/><text x="464.5" y="214" font-size="10" fill="#93A1B5" font-family="Inter,sans-serif">2000</text><line x1="564.1" y1="0" x2="564.1" y2="220" stroke="#E3E8F0" stroke-width="1"/><text x="564.1" y="214" font-size="10" fill="#93A1B5" font-family="Inter,sans-serif">2010</text><line x1="663.6" y1="0" x2="663.6" y2="220" stroke="#E3E8F0" stroke-width="1"/><text x="663.6" y="214" font-size="10" fill="#93A1B5" font-family="Inter,sans-serif">2020</text><polyline fill="none" stroke="#93A1B5" stroke-width="2.5" stroke-linejoin="round" points="0.0,215.5 2.5,215.0 5.0,214.2 7.5,213.0 10.0,212.6 12.4,212.1 14.9,212.2 17.4,212.8 19.9,212.8 22.4,213.1 24.9,212.6 27.4,212.3 29.9,212.7 32.4,213.2 34.8,213.5 37.3,213.0 39.8,213.6 42.3,214.3 44.8,213.5 47.3,212.2 49.8,211.4 52.3,213.0 54.7,213.2 57.2,213.7 59.7,214.0 62.2,213.8 64.7,213.7 67.2,213.7 69.7,213.2 72.2,211.6 74.7,211.8 77.1,211.1 79.6,210.4 82.1,211.3 84.6,210.9 87.1,211.0 89.6,210.0 92.1,210.1 94.6,209.5 97.1,209.4 99.5,209.3 102.0,209.1 104.5,209.3 107.0,209.1 109.5,208.9 112.0,208.5 114.5,208.2 117.0,208.1 119.4,207.8 121.9,207.7 124.4,207.9 126.9,208.7 129.4,208.3 131.9,208.9 134.4,208.3 136.9,207.1 139.4,207.8 141.8,208.2 144.3,209.6 146.8,208.4 149.3,208.6 151.8,207.1 154.3,207.9 156.8,209.2 159.3,208.8 161.8,208.7 164.2,209.9 166.7,209.2 169.2,210.4 171.7,209.5 174.2,207.6 176.7,205.8 179.2,206.0 181.7,205.4 184.1,203.7 186.6,204.0 189.1,203.6 191.6,202.8 194.1,201.9 196.6,204.9 199.1,204.7 201.6,206.0 204.1,204.6 206.5,204.6 209.0,205.9 211.5,206.6 214.0,204.4 216.5,203.2 219.0,204.0 221.5,204.2 224.0,203.0 226.5,201.8 228.9,201.6 231.4,200.5 233.9,199.2 236.4,198.7 238.9,198.5 241.4,197.7 243.9,197.5 246.4,198.2 248.8,198.3 251.3,197.7 253.8,197.9 256.3,198.0 258.8,197.9 261.3,196.7 263.8,199.4 266.3,202.6 268.8,198.1 271.2,198.8 273.7,200.9 276.2,201.1 278.7,201.8 281.2,202.2 283.7,199.5 286.2,200.3 288.7,197.5 291.2,195.6 293.6,190.0 296.1,190.3 298.6,188.8 301.1,190.8 303.6,190.0 306.1,189.4 308.6,191.3 311.1,189.1 313.5,186.2 316.0,185.5 318.5,183.6 321.0,181.9 323.5,180.1 326.0,176.8 328.5,173.0 331.0,171.0 333.5,170.9 335.9,170.8 338.4,173.5 340.9,173.4 343.4,172.8 345.9,170.9 348.4,172.3 350.9,171.9 353.4,170.6 355.9,170.0 358.3,168.9 360.8,166.6 363.3,165.4 365.8,166.5 368.3,166.5 370.8,166.3 373.3,164.9 375.8,163.0 378.2,163.1 380.7,162.2 383.2,161.1 385.7,160.4 388.2,160.0 390.7,158.1 393.2,158.2 395.7,156.2 398.2,155.3 400.6,153.1 403.1,152.9 405.6,153.0 408.1,155.3 410.6,155.0 413.1,156.1 415.6,154.3 418.1,151.8 420.6,151.1 423.0,148.9 425.5,148.4 428.0,150.4 430.5,149.5 433.0,147.9 435.5,148.0 438.0,148.3 440.5,146.7 442.9,144.9 445.4,143.8 447.9,143.6 450.4,142.1 452.9,141.1 455.4,141.4 457.9,142.3 460.4,142.9 462.9,142.7 465.3,142.4 467.8,142.0 470.3,140.0 472.8,139.5 475.3,137.9 477.8,138.5 480.3,137.1 482.8,135.9 485.3,136.4 487.7,136.7 490.2,134.3 492.7,133.5 495.2,132.6 497.7,131.0 500.2,133.7 502.7,132.7 505.2,131.5 507.6,133.0 510.1,131.3 512.6,130.4 515.1,129.1 517.6,128.6 520.1,128.2 522.6,128.9 525.1,128.3 527.6,130.1 530.0,128.8 532.5,127.5 535.0,127.6 537.5,127.5 540.0,127.2 542.5,125.4 545.0,124.8 547.5,124.9 550.0,124.4 552.4,123.2 554.9,121.4 557.4,122.6 559.9,122.7 562.4,122.1 564.9,122.7 567.4,121.1 569.9,118.6 572.4,119.5 574.8,121.5 577.3,119.7 579.8,116.6 582.3,114.3 584.8,114.2 587.3,113.1 589.8,112.4 592.3,112.2 594.7,113.7 597.2,113.3 599.7,116.2 602.2,116.0 604.7,115.3 607.2,114.0 609.7,113.1 612.2,112.2 614.7,110.3 617.1,111.6 619.6,110.8 622.1,111.3 624.6,109.0 627.1,109.0 629.6,107.4 632.1,110.1 634.6,110.8 637.1,110.4 639.5,109.6 642.0,109.7 644.5,111.2 647.0,111.1 649.5,110.6 652.0,111.6 654.5,109.8 657.0,108.6 659.4,105.4 661.9,106.2 664.4,104.7 666.9,101.4 669.4,101.5 671.9,102.6 674.4,104.7 676.9,106.1 679.4,104.3 681.8,104.8 684.3,106.1 686.8,109.9 689.3,110.0 691.8,113.1 694.3,111.9 696.8,111.6 699.3,113.2 701.8,114.2 704.2,112.7 706.7,113.2 709.2,111.3 711.7,112.3 714.2,112.4 716.7,112.7 719.2,112.2 720,111.6"/><polyline fill="none" stroke="#2E6BE6" stroke-width="2.5" stroke-linejoin="round" points="0.0,215.0 2.5,216.0 5.0,213.9 7.5,212.0 10.0,209.0 12.4,208.0 14.9,204.2 17.4,201.8 19.9,200.6 22.4,198.2 24.9,197.1 27.4,196.4 29.9,195.8 32.4,194.4 34.8,195.4 37.3,195.9 39.8,193.1 42.3,194.3 44.8,196.3 47.3,196.4 49.8,194.0 52.3,191.5 54.7,188.7 57.2,186.7 59.7,185.0 62.2,184.4 64.7,184.7 67.2,185.5 69.7,185.3 72.2,184.5 74.7,185.0 77.1,181.0 79.6,179.4 82.1,178.6 84.6,177.2 87.1,177.7 89.6,182.0 92.1,182.0 94.6,180.5 97.1,179.3 99.5,176.7 102.0,175.8 104.5,175.5 107.0,173.8 109.5,172.8 112.0,172.1 114.5,171.0 117.0,169.7 119.4,169.2 121.9,169.3 124.4,167.6 126.9,167.2 129.4,168.6 131.9,171.3 134.4,169.9 136.9,167.2 139.4,166.0 141.8,164.2 144.3,163.8 146.8,164.8 149.3,161.5 151.8,161.3 154.3,158.4 156.8,161.0 159.3,159.6 161.8,161.9 164.2,161.9 166.7,163.1 169.2,168.0 171.7,166.2 174.2,164.1 176.7,160.6 179.2,159.5 181.7,159.5 184.1,160.8 186.6,156.8 189.1,156.0 191.6,155.8 194.1,154.4 196.6,156.2 199.1,158.5 201.6,158.2 204.1,160.3 206.5,159.8 209.0,162.8 211.5,168.0 214.0,168.1 216.5,163.6 219.0,160.1 221.5,161.0 224.0,159.7 226.5,156.6 228.9,156.4 231.4,155.4 233.9,155.1 236.4,155.0 238.9,155.4 241.4,154.8 243.9,154.6 246.4,156.2 248.8,152.5 251.3,150.1 253.8,152.7 256.3,151.7 258.8,150.2 261.3,146.9 263.8,147.3 266.3,145.0 268.8,145.4 271.2,141.9 273.7,137.9 276.2,139.4 278.7,138.1 281.2,140.0 283.7,138.9 286.2,141.7 288.7,141.5 291.2,139.6 293.6,134.7 296.1,132.4 298.6,129.2 301.1,129.1 303.6,128.6 306.1,130.3 308.6,131.3 311.1,128.3 313.5,128.5 316.0,125.1 318.5,123.7 321.0,123.4 323.5,121.4 326.0,117.8 328.5,115.2 331.0,114.8 333.5,115.3 335.9,111.5 338.4,111.2 340.9,107.9 343.4,117.5 345.9,113.0 348.4,113.2 350.9,112.7 353.4,111.7 355.9,109.8 358.3,106.8 360.8,104.3 363.3,104.7 365.8,105.8 368.3,103.5 370.8,106.7 373.3,106.7 375.8,102.5 378.2,100.6 380.7,99.8 383.2,100.7 385.7,97.5 388.2,97.6 390.7,97.7 393.2,95.8 395.7,94.9 398.2,94.1 400.6,93.0 403.1,92.9 405.6,92.2 408.1,93.0 410.6,91.7 413.1,92.8 415.6,90.8 418.1,88.5 420.6,86.3 423.0,84.4 425.5,82.8 428.0,81.0 430.5,81.9 433.0,78.4 435.5,77.3 438.0,75.5 440.5,73.3 442.9,71.9 445.4,69.3 447.9,68.3 450.4,72.5 452.9,67.2 455.4,65.5 457.9,63.8 460.4,63.5 462.9,61.5 465.3,59.8 467.8,61.0 470.3,58.3 472.8,63.2 475.3,64.5 477.8,63.9 480.3,66.6 482.8,66.4 485.3,66.9 487.7,67.5 490.2,71.6 492.7,70.8 495.2,73.5 497.7,69.4 500.2,67.8 502.7,66.1 505.2,63.9 507.6,64.4 510.1,64.9 512.6,62.8 515.1,62.0 517.6,62.1 520.1,61.0 522.6,60.3 525.1,59.3 527.6,59.4 530.0,58.8 532.5,56.7 535.0,56.3 537.5,54.0 540.0,55.0 542.5,54.7 545.0,57.4 547.5,55.8 550.0,57.8 552.4,67.7 554.9,72.4 557.4,66.1 559.9,63.0 562.4,61.2 564.9,60.4 567.4,60.5 569.9,61.5 572.4,57.8 574.8,54.6 577.3,54.0 579.8,56.8 582.3,56.1 584.8,53.4 587.3,54.5 589.8,52.6 592.3,52.1 594.7,50.0 597.2,47.7 599.7,47.3 602.2,44.4 604.7,43.3 607.2,42.7 609.7,41.4 612.2,40.6 614.7,39.9 617.1,39.6 619.6,41.3 622.1,40.0 624.6,42.2 627.1,39.6 629.6,38.4 632.1,37.6 634.6,35.6 637.1,35.0 639.5,34.1 642.0,32.0 644.5,31.1 647.0,30.9 649.5,28.8 652.0,30.4 654.5,29.9 657.0,30.3 659.4,28.7 661.9,26.6 664.4,28.1 666.9,27.0 669.4,22.8 671.9,21.2 674.4,19.2 676.9,17.0 679.4,15.1 681.8,15.0 684.3,16.5 686.8,18.5 689.3,19.3 691.8,18.5 694.3,19.0 696.8,17.8 699.3,15.5 701.8,15.2 704.2,12.0 706.7,11.0 709.2,9.2 711.7,6.9 714.2,7.4 716.7,7.6 719.2,5.0 720,4.0"/></svg></div>
+    <div class="key">
+      <span><span class="swatch" style="background:#2E6BE6"></span>US total market</span>
+      <span><span class="swatch" style="background:#93A1B5"></span>Long Treasuries</span>
+    </div>
+    <div class="note">Log scale. On a straight axis a lifetime of compounding is a flat line and
+      then a cliff, which hides everything that happened in between. Here a constant slope means
+      a constant percentage gain, so the two lines can be compared at any point.</div>
+  </section>
+
+  <section class="blk">
+    <h2>What this leaves out</h2>
+    <div class="note">
+      <b>The window is doing a lot of the work.</b> These are the months where every series
+      involved exists, which is May 1953 onward. Pick a different start and the answer
+      can change sides. That is a fact about backtests, not about these two mixes.
+      <br><br>
+      <b>Nobody earned these numbers.</b> They are index returns. A real holder paid a fund fee,
+      paid a spread on every trade, paid tax on dividends in a taxable account, and rebalanced
+      late or not at all.
+      <br><br>
+      <b>The worst fall is the part that decides it.</b> A number you can read in a second took
+      years to sit through, and the mix someone can hold through a fall beats the one
+      they sell.
+      <br><br>
+      Run your own mix on the <a href="/backtest.html">backtest</a>, or put your real accounts into
+      the <a href="/">drift calculator</a> and see where the next contribution should go.
+    </div>
+  </section>
+
+  <section class="blk">
+    <h2>Other comparisons</h2>
+    <div class="note" style="background:none;padding:0">
+      <a href="/compare.html">Every comparison on the site &rarr;</a>
+    </div>
+  </section>
+
+</div>
+
+<footer><div class="wrap">
+  <b>Drift Calc</b> is an educational calculator for portfolio arithmetic. It is not investment advice,
+  tax advice, or a recommendation of any security or strategy, and it knows nothing about your situation.
+  Past returns are a record, not a forecast. The figures here come from the same monthly total-return data
+  the <a href="/backtest.html">backtest</a> uses, with no fund fees, spreads or taxes subtracted. Talk to a
+  qualified professional before making decisions. Nothing on this page is stored or sent anywhere.
+</div></footer>
+
+<script src="/count.js"></script>
+</body>
+</html>
