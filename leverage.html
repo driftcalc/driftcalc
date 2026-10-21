@@ -199,7 +199,11 @@ function clamp(v, lo, hi, dflt) {
 
 function readUrl() {
   var q = new URLSearchParams(location.search);
-  if (q.has('m') && METHODS[q.get('m')]) ST.method = q.get('m');
+  /* METHODS['constructor'] walks up the prototype chain and comes back truthy,
+     which used to set a method that does not exist and kill the page on the
+     next read. Only an own key counts. */
+  var m = q.get('m');
+  if (m && Object.prototype.hasOwnProperty.call(METHODS, m)) ST.method = m;
   ST.spread = METHODS[ST.method].spread;
   if (q.has('l')) ST.lev = Math.round(clamp(q.get('l'), 1, 3, 2) * 10) / 10;
   if (q.has('s')) { ST.spread = Math.round(clamp(q.get('s'), 0, 5, 1.5) * 10) / 10; ST.touchedSpread = true; }

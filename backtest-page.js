@@ -338,6 +338,9 @@ window.showTab = function (which) {
   });
 };
 window.setUI = function (k, v) {
+  /* an inherited key such as "constructor" would pass a plain truthiness test
+     and then blow up on the next read, so only an own key is a method */
+  if (k === 'method' && !Object.prototype.hasOwnProperty.call(METHODS, v)) return;
   UI[k] = (k === 'lev' || k === 'spread' || k === 'er' || k === 'divTax') ? parseFloat(v) : v;
   /* each product borrows at a different price, so move the slider with it */
   if (k === 'method') UI.spread = METHODS[v].spread;
