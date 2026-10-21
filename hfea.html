@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https://driftcalc.goatcounter.com; connect-src 'self' https://driftcalc.goatcounter.com; frame-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<title>What HFEA really did &middot; Drift Calculator</title>
+<meta name="description" content="55% UPRO, 45% TMF, rebalanced quarterly, run through every stretch of history since 1953 instead of the one people post. Stocks and long bonds moved opposite ways in only a third of it.">
+<link rel="canonical" href="https://driftcalc.com/hfea.html">
+
+<!-- Social preview. A link to this page should say what the page says. -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://driftcalc.com/hfea.html">
+<meta property="og:site_name" content="Drift Calculator">
+<meta property="og:title" content="What HFEA really did">
+<meta property="og:description" content="The 2009 to 2021 backtest everyone posts is the one window where the hedge worked. Across everything since 1953, stocks and long bonds moved opposite ways only a third of the time.">
+<meta property="og:image" content="https://driftcalc.com/og-hfea.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="HFEA returned 33% a year from 2009 to 2021 and minus 1% a year through the 1970s.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="What HFEA really did">
+<meta name="twitter:description" content="The 2009 to 2021 backtest everyone posts is the one window where the hedge worked. Across everything since 1953, stocks and long bonds moved opposite ways only a third of the time.">
+<meta name="twitter:image" content="https://driftcalc.com/og-hfea.png">
+
+<link rel="icon" href="/favicon.ico" sizes="32x32">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="theme-color" content="#0B1F3B">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="site.css">
+<style>
+/* Only what this page does differently. Everything else is site.css. */
+.sub{color:var(--muted);margin-top:14px;font-size:16.5px;max-width:640px}
+input[type=text]{font-family:inherit;font-size:16px;border:1px solid var(--border);border-radius:9px;padding:10px 12px 10px 24px;width:170px;color:var(--ink);background:#fff}
+input[type=range]{-webkit-appearance:none;appearance:none;height:28px;background:transparent;width:190px;cursor:pointer;margin:0}
+.readout{font-family:var(--disp);font-size:16px;font-weight:800;min-width:74px;display:inline-block}
+.answer .say{font-size:16.5px;line-height:1.6;max-width:640px}
+.bars{display:flex;flex-direction:column;gap:12px;margin-top:24px}
+.bar-lab{width:190px;font-size:13.5px;color:var(--muted);flex:none}
+.bar-track{flex:1;min-width:130px;height:26px;background:var(--hairline);border-radius:7px;overflow:hidden}
+.bar-val{width:130px;text-align:right;font-family:var(--disp);font-weight:800;font-size:15px;flex:none}
+/* the window table carries three numbers a row, which bars alone cannot hold */
+.wintab{width:100%;border-collapse:collapse;margin-top:4px;font-size:14px}
+.wintab th{text-align:right;font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--faint);font-weight:600;padding:0 0 8px}
+.wintab th:first-child{text-align:left}
+.wintab td{padding:10px 0;border-top:1px solid var(--hairline);text-align:right;font-variant-numeric:tabular-nums}
+.wintab td:first-child{text-align:left;color:var(--muted)}
+.wintab tr.on td{background:var(--accent-soft)}
+.wintab .big-n{font-family:var(--disp);font-weight:800;font-size:15.5px}
+.wintab .win{color:var(--green)} .wintab .lose{color:var(--red)}
+.wintab caption{caption-side:bottom;text-align:left;font-size:12.5px;color:var(--faint);padding-top:10px;line-height:1.5}
+@media(max-width:559.98px){ .wintab{font-size:12.5px} .wintab td{padding:8px 0} .bar-lab{width:120px} .bar-val{width:92px} }
+</style>
+</head>
+<body>
+
+<header><div class="wrap">
+  <a class="logo" href="/">
+    <span class="mk"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M4 20V10M10 20V4M16 20v-7M22 20V7" stroke="#fff" stroke-width="3" stroke-linecap="round"/></svg></span>
+    Drift Calculator
+  </a>
+  <div class="hbtns">
+    <a class="btn nav" href="/">Calculator</a>
+    <a class="btn nav" href="/tools.html">Tools</a>
+    <a class="btn nav" href="/backtest.html">Backtest</a>
+  </div>
+</div></header>
+
+<div class="wrap">
+
+  <div class="hero">
+    <h1>What <em>HFEA</em> really did</h1>
+    <p class="sub">55% UPRO, 45% TMF, rebalanced every quarter. The number you have seen for it comes from one stretch of history. This runs the same mix through all of them, on monthly data back to 1953.</p>
+  </div>
+
+  <div class="card">
+    <div class="controls">
+      <div class="field">
+        <span class="lbl">Which stretch</span>
+        <div class="seg" id="winSeg"></div>
+      </div>
+      <div class="field">
+        <span class="lbl">Share in stocks</span>
+        <div style="display:flex;align-items:center;gap:12px">
+          <input type="range" id="ws" min="0" max="100" step="5" value="55" aria-label="Share of the portfolio in the stock leg, percent">
+          <span class="readout num" id="wsOut">55 / 45</span>
+        </div>
+      </div>
+      <div class="field">
+        <span class="lbl">Leverage on both legs</span>
+        <div style="display:flex;align-items:center;gap:12px">
+          <input type="range" id="lev" min="1" max="3" step="0.5" value="3" aria-label="Leverage multiple applied to both legs">
+          <span class="readout num" id="levOut">3.0x</span>
+        </div>
+      </div>
+    </div>
+    <div class="assume" id="mixNote"></div>
+  </div>
+
+  <div class="answer">
+    <div class="k">What it returned over this stretch</div>
+    <div class="big num" id="big">&mdash;</div>
+    <div class="say" id="say"></div>
+    <div class="assume" id="assumeShort"></div>
+    <div class="share">
+      <button class="btn primary" id="copyBtn" type="button">Copy link to this result</button>
+      <a class="btn" href="/leverage.html">What leverage costs &rarr;</a>
+      <span class="ok" id="copyOk">Copied</span>
+    </div>
+  </div>
+
+  <section class="blk">
+    <h2>Every stretch, side by side</h2>
+    <p class="sub" style="margin-top:0;margin-bottom:16px;font-size:15px">The same mix, the same rules, different decades. Click a row to load it above.</p>
+    <table class="wintab" id="wintab">
+      <caption id="wincap"></caption>
+    </table>
+  </section>
+
+  <section class="blk">
+    <h2>The thing the whole strategy rests on</h2>
+    <p class="sub" style="margin-top:0;margin-bottom:16px;font-size:15px">HFEA needs the bond leg to rise when the stock leg falls. That is a correlation, and a correlation is a fact about a period, not a property of the assets.</p>
+    <div class="split" id="corrStats"></div>
+    <div class="bars" id="corrBars"></div>
+    <div class="note" id="corrNote"></div>
+  </section>
+
+  <section class="blk">
+    <h2>The honest version</h2>
+    <div class="note">
+      <b>The window everyone posts is the one where it worked.</b> Stocks and long Treasuries
+      moved opposite ways in about a third of the rolling three-year windows since 1953. The
+      2010s are the most negative decade in the data. Build a case on that decade and you have
+      built it on the exception.
+      <br><br>
+      <b>This model cannot see the thing that would actually kill you.</b> UPRO and TMF reset
+      daily, so what ends a 3x fund is one <i>day</i> down more than a third, not one month.
+      Everything here is monthly, which means it quietly assumes that day never arrives.
+      <br><br>
+      <b>The legs are stand-ins.</b> UPRO tracks the S&amp;P 500 and this uses the US total
+      market. TMF tracks the ICE 20+ Year index and this uses a modelled rolling par 20-year
+      Treasury, which for the years Treasury issued no 20-year is really the 30-year. Fund
+      fees here are the 0.90% the rest of the site uses; UPRO and TMF both charge more.
+      <br><br>
+      <b>Quarterly rebalancing is the easy part to write down.</b> Every number above assumes
+      you sold the leg that went up and bought the leg that was collapsing, on schedule, for
+      decades, including in the quarters where both legs fell. That is the part people do not
+      do.
+      <br><br>
+      None of this says the strategy is wrong. It says the evidence for it is one favourable
+      stretch, and the page you are reading is the rest of the record. The
+      <a href="/backtest.html">leverage lab</a> will run a mix you choose with the financing
+      costs broken out, and <a href="/leverage.html">what leverage costs</a> covers why the
+      multiple that wins is lower than it looks.
+    </div>
+  </section>
+
+</div>
+
+<footer><div class="wrap">
+  <b>Drift Calc</b> is an educational calculator for portfolio arithmetic. It is not investment advice,
+  tax advice, or a recommendation of any security or strategy, and it knows nothing about your situation.
+  Leveraged funds can lose almost everything and have. The figures above are modelled from the same monthly
+  total-return data the <a href="/backtest.html">backtest</a> uses, with no taxes, spreads or tracking error
+  subtracted. Talk to a qualified professional before making decisions. Nothing on this page is stored or
+  sent anywhere.
+</div></footer>
+
+<script src="count.js"></script>
+<script>
+(function () {
+'use strict';
+
+/* ---------- the leveraged-fund model ----------
+   Copied from backtest-page.js on purpose, same as leverage.html. If one of
+   these changes, change it in all three or the pages will quietly disagree. */
+var LETF_ER = 0.90;      /* fund fee, charged on the whole position */
+var SPREAD  = 0.6;       /* what a leveraged fund pays over T-bills to borrow */
+
+function leveredMonth(r, cash, L, varM) {
+  var c = cash + SPREAD / 100 / 12;
+  var decay = Math.exp(-(L * L - L) / 2 * varM);
+  return Math.pow(1 + r, L) * decay - 1 - (L - 1) * c - LETF_ER / 100 / 12;
+}
+
+/* ---------- the stretches ----------
+   Named so the page cannot be accused of picking one. The last entry is the
+   backtest that circulates, kept in deliberately. */
+var WINDOWS = [
+  { id: 'all',  from: '195305', to: '202612', label: 'Everything there is' },
+  { id: 'pitch', from: '198207', to: '202112', label: 'The era the case is built on' },
+  { id: 'posted', from: '200901', to: '202112', label: 'The backtest people post' },
+  { id: 'seventies', from: '197001', to: '197912', label: 'The 1970s' },
+  { id: 'y2022', from: '202201', to: '202212', label: '2022 on its own' }
+];
+
+var ST = { win: 'all', ws: 55, lev: 3 };
+
+function clamp(v, lo, hi, dflt) {
+  v = parseFloat(v);
+  if (!isFinite(v)) return dflt;
+  return Math.min(hi, Math.max(lo, v));
+}
+
+function readUrl() {
+  var q = new URLSearchParams(location.search);
+  if (q.has('w')) {
+    var w = q.get('w');
+    if (WINDOWS.some(function (x) { return x.id === w; })) ST.win = w;
+  }
+  if (q.has('s')) ST.ws = Math.round(clamp(q.get('s'), 0, 100, 55) / 5) * 5;
+  if (q.has('l')) ST.lev = Math.round(clamp(q.get('l'), 1, 3, 3) * 2) / 2;
+}
+
+function syncUrl() {
+  var q = new URLSearchParams();
+  q.set('w', ST.win);
+  q.set('s', String(ST.ws));
+  q.set('l', ST.lev.toFixed(1));
+  history.replaceState(null, '', location.pathname + '?' + q.toString());
+}
+
+function pct(x) { return (x * 100).toFixed(1) + '%'; }
+function signed(x) { return (x >= 0 ? '+' : '') + x.toFixed(2); }
+
+/* ---------- data ---------- */
+var D = null, FAILED = false;
+
+function prep(j) {
+  var us = j.series && j.series.US,
+      lb = j.series && j.series.LONGBOND,
+      cash = j.series && j.series.CASH,
+      mo = j.months;
+  /* LONGBOND arrived with the October 2026 rebuild. An older returns.json will
+     not have it, and this page is meaningless without a long-bond leg. */
+  if (!us || !lb || !cash || !mo) return null;
+
+  var n = Math.min(us.length, lb.length, cash.length, mo.length);
+  var ok = [];
+  for (var i = 0; i < n; i++) {
+    if (us[i] !== null && lb[i] !== null && cash[i] !== null) ok.push(i);
+  }
+  if (ok.length < 240) return null;
+
+  /* longest contiguous run, so no month-to-month step ever jumps a hole */
+  var bestLo = 0, bestLen = 0, lo = ok[0], len = 1, k;
+  for (k = 1; k <= ok.length; k++) {
+    if (k < ok.length && ok[k] === ok[k - 1] + 1) { len++; continue; }
+    if (len > bestLen) { bestLen = len; bestLo = lo; }
+    if (k < ok.length) { lo = ok[k]; len = 1; }
+  }
+  var a = bestLo, b = bestLo + bestLen;
+
+  function variance(arr, from, to) {
+    var m = 0, c = 0, i;
+    for (i = from; i < to; i++) { m += arr[i]; c++; }
+    m /= c;
+    var acc = 0;
+    for (i = from; i < to; i++) acc += (arr[i] - m) * (arr[i] - m);
+    return acc / (c - 1);
+  }
+  var fvUS = variance(us, a, b), fvLB = variance(lb, a, b);
+
+  /* trailing 36-month variance for the daily-reset decay, one pass, reused */
+  function rolling(arr, full) {
+    var out = new Array(b);
+    for (var i = a; i < b; i++) {
+      var s = Math.max(a, i - 36), c = i - s;
+      if (c < 2) { out[i] = full; continue; }
+      var m = 0, q;
+      for (q = s; q < i; q++) m += arr[q];
+      m /= c;
+      var acc = 0;
+      for (q = s; q < i; q++) acc += (arr[q] - m) * (arr[q] - m);
+      out[i] = acc / (c - 1);
+    }
+    return out;
+  }
+  return { us: us, lb: lb, cash: cash, months: mo, a: a, b: b,
+           vUS: rolling(us, fvUS), vLB: rolling(lb, fvLB) };
+}
+
+function bounds(w) {
+  var lo = -1, hi = -1;
+  for (var i = D.a; i < D.b; i++) {
+    var m = D.months[i];
+    if (m >= w.from && lo < 0) lo = i;
+    if (m <= w.to) hi = i;
+  }
+  if (lo < 0 || hi < lo) return null;
+  return [lo, hi + 1];
+}
+
+/* ---------- the run ----------
+   Both legs drift inside the quarter and snap back to the target every third
+   month, which is what quarterly rebalancing means and is also the part that
+   does the work. */
+function run(w, ws, lev) {
+  var r = bounds(w);
+  if (!r) return null;
+  var lo = r[0], hi = r[1];
+  var a = ws / 100, b = 1 - ws / 100, v = 1, peak = 1, dd = 0, i;
+  for (i = lo; i < hi; i++) {
+    var ru = lev === 1 ? D.us[i] : leveredMonth(D.us[i], D.cash[i], lev, D.vUS[i]);
+    var rb = lev === 1 ? D.lb[i] : leveredMonth(D.lb[i], D.cash[i], lev, D.vLB[i]);
+    a *= 1 + ru; b *= 1 + rb;
+    var tot = a + b;
+    if (tot <= 0) return { cagr: -1, dd: -1, wiped: D.months[i], lo: lo, hi: hi };
+    v *= tot;
+    if (v > peak) peak = v;
+    if (v / peak - 1 < dd) dd = v / peak - 1;
+    a /= tot; b /= tot;
+    if ((i - lo + 1) % 3 === 0) { a = ws / 100; b = 1 - ws / 100; }
+  }
+  var n = hi - lo;
+  return { cagr: Math.pow(v, 12 / n) - 1, dd: dd, wiped: null, lo: lo, hi: hi, months: n };
+}
+
+function correlation(lo, hi) {
+  var n = hi - lo, i, mx = 0, my = 0;
+  for (i = lo; i < hi; i++) { mx += D.us[i]; my += D.lb[i]; }
+  mx /= n; my /= n;
+  var cov = 0, sx = 0, sy = 0;
+  for (i = lo; i < hi; i++) {
+    cov += (D.us[i] - mx) * (D.lb[i] - my);
+    sx += (D.us[i] - mx) * (D.us[i] - mx);
+    sy += (D.lb[i] - my) * (D.lb[i] - my);
+  }
+  if (sx <= 0 || sy <= 0) return 0;
+  return cov / Math.sqrt(sx * sy);
+}
+
+function ym(s) {
+  s = String(s);
+  var names = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  return (names[parseInt(s.slice(4, 6), 10) - 1] || '') + ' ' + s.slice(0, 4);
+}
+
+/* ---------- controls ---------- */
+function segWindows() {
+  var el = document.getElementById('winSeg');
+  el.textContent = '';
+  WINDOWS.forEach(function (w) {
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.textContent = w.id === 'all' ? 'All of it'
+      : w.id === 'pitch' ? '1982–21'
+      : w.id === 'posted' ? '2009–21'
+      : w.id === 'seventies' ? '1970s' : '2022';
+    b.setAttribute('aria-label', w.label);
+    if (w.id === ST.win) b.className = 'on';
+    b.addEventListener('click', function () { ST.win = w.id; render(); });
+    el.appendChild(b);
+  });
+}
+
+function addStat(parent, value, cls, text) {
+  var d = document.createElement('div'); d.className = 'stat';
+  var v = document.createElement('div'); v.className = 'v num ' + cls; v.textContent = value;
+  var t = document.createElement('div'); t.className = 't'; t.textContent = text;
+  d.appendChild(v); d.appendChild(t); parent.appendChild(d);
+}
+
+/* ---------- render ---------- */
+function render() {
+  segWindows();
+  document.getElementById('ws').value = String(ST.ws);
+  document.getElementById('wsOut').textContent = ST.ws + ' / ' + (100 - ST.ws);
+  document.getElementById('lev').value = String(ST.lev);
+  document.getElementById('levOut').textContent = ST.lev.toFixed(1) + 'x';
+  syncUrl();
+
+  if (FAILED) {
+    document.getElementById('big').textContent = '—';
+    document.getElementById('say').textContent =
+      'This page needs the long-Treasury series from the backtest data, and it did not load. ' +
+      'If the file is older than October 2026 it has no long-bond leg, which is the whole point here.';
+    ['assumeShort','mixNote','corrNote','wincap'].forEach(function (id) {
+      var e = document.getElementById(id); if (e) e.textContent = '';
+    });
+    ['corrStats','corrBars'].forEach(function (id) { document.getElementById(id).textContent = ''; });
+    document.getElementById('wintab').textContent = '';
+    return;
+  }
+  if (!D) return;
+
+  var w = WINDOWS.filter(function (x) { return x.id === ST.win; })[0];
+  var res = run(w, ST.ws, ST.lev);
+  var plain = run(w, ST.ws, 1);
+  if (!res || !plain) return;
+  var c = correlation(res.lo, res.hi);
+  var span = ym(D.months[res.lo]) + ' to ' + ym(D.months[res.hi - 1]);
+
+  document.getElementById('mixNote').textContent =
+    ST.ws + '% in a ' + ST.lev.toFixed(1) + 'x stock fund, ' + (100 - ST.ws) +
+    '% in a ' + ST.lev.toFixed(1) + 'x long-Treasury fund, snapped back to those weights every third month. ' +
+    'At 1.0x there is no leverage and no fund fee, which is the comparison line.';
+
+  document.getElementById('big').textContent =
+    (res.cagr >= 0 ? '' : '−') + Math.abs(res.cagr * 100).toFixed(1) + '% a year';
+
+  var say = document.getElementById('say');
+  say.textContent = '';
+  function t(s) { say.appendChild(document.createTextNode(s)); }
+  function bd(s) { var b = document.createElement('b'); b.textContent = s; say.appendChild(b); }
+
+  t('From ' + span + ', ' + ST.ws + '/' + (100 - ST.ws) + ' at ' + ST.lev.toFixed(1) + 'x returned ');
+  bd(pct(res.cagr));
+  t(' a year and fell ');
+  bd(pct(Math.abs(res.dd)));
+  t(' at its worst. The same mix with no leverage returned ');
+  bd(pct(plain.cagr));
+  t(' and fell ');
+  bd(pct(Math.abs(plain.dd)));
+  t('. Stocks and long bonds moved together over this stretch at a correlation of ');
+  bd(signed(c));
+  t(c < -0.15 ? ', so the hedge was doing its job.'
+    : c > 0.15 ? ', so the two legs were falling together more often than not.'
+    : ', which is close to no relationship in either direction. The hedge was not really there.');
+
+  document.getElementById('assumeShort').textContent =
+    'Monthly total returns, no taxes, spreads or tracking error. Fund fee ' + LETF_ER.toFixed(2) +
+    '% and borrowing at ' + SPREAD.toFixed(1) + '% over T-bills on the leveraged legs.';
+
+  renderTable();
+  renderCorrelation();
+}
+
+/* ---------- every stretch at once ---------- */
+function renderTable() {
+  var tab = document.getElementById('wintab');
+  var cap = document.getElementById('wincap');
+  tab.textContent = '';
+  tab.appendChild(cap);
+
+  var head = document.createElement('tr');
+  ['', 'A year', 'Worst fall', 'Stock/bond'].forEach(function (h) {
+    var th = document.createElement('th'); th.textContent = h; head.appendChild(th);
+  });
+  tab.appendChild(head);
+
+  WINDOWS.forEach(function (w) {
+    var r = run(w, ST.ws, ST.lev);
+    if (!r) return;
+    var c = correlation(r.lo, r.hi);
+    var tr = document.createElement('tr');
+    if (w.id === ST.win) tr.className = 'on';
+
+    var name = document.createElement('td');
+    name.textContent = w.label + '  (' + D.months[r.lo].slice(0, 4) + '–' + D.months[r.hi - 1].slice(0, 4) + ')';
+    tr.appendChild(name);
+
+    var g = document.createElement('td');
+    g.className = 'big-n num ' + (r.cagr >= 0 ? 'win' : 'lose');
+    g.textContent = pct(r.cagr);
+    tr.appendChild(g);
+
+    var d = document.createElement('td');
+    d.className = 'num lose'; d.textContent = pct(r.dd);
+    tr.appendChild(d);
+
+    var cc = document.createElement('td');
+    cc.className = 'num ' + (c < 0 ? 'win' : 'lose'); cc.textContent = signed(c);
+    tr.appendChild(cc);
+
+    tr.style.cursor = 'pointer';
+    tr.addEventListener('click', function () { ST.win = w.id; render(); });
+    tab.appendChild(tr);
+  });
+
+  cap.textContent = 'Same mix, same rules, different decades. "The backtest people post" is the ' +
+    'stretch that circulates, and it is the only row here where the two legs reliably moved ' +
+    'opposite ways. Drawdown is peak to bottom on monthly data, so the real one was worse.';
+}
+
+/* ---------- the correlation, decade by decade ---------- */
+function renderCorrelation() {
+  var bars = document.getElementById('corrBars');
+  var stats = document.getElementById('corrStats');
+  bars.textContent = ''; stats.textContent = '';
+
+  var firstYear = Math.ceil(Number(D.months[D.a].slice(0, 4)) / 10) * 10 - 10;
+  var lastYear = Number(D.months[D.b - 1].slice(0, 4));
+  var rows = [];
+  for (var y = firstYear; y <= lastYear; y += 10) {
+    var lo = -1, hi = -1;
+    for (var i = D.a; i < D.b; i++) {
+      var yr = Number(D.months[i].slice(0, 4));
+      if (yr >= y && lo < 0) lo = i;
+      if (yr <= y + 9) hi = i;
+    }
+    if (lo < 0 || hi - lo < 24) continue;
+    rows.push({ label: y + 's', c: correlation(lo, hi + 1) });
+  }
+
+  rows.forEach(function (r) {
+    var wrap = document.createElement('div'); wrap.className = 'bar-row';
+    var lab = document.createElement('div'); lab.className = 'bar-lab';
+    lab.textContent = r.label + (r.c < -0.15 ? '  hedge worked'
+      : r.c > 0.15 ? '  fell together' : '  no real link');
+    var track = document.createElement('div'); track.className = 'bar-track';
+    track.style.position = 'relative';
+    var fill = document.createElement('div'); fill.className = 'bar-fill';
+    /* zero sits in the middle, so a negative bar grows left and a positive one right */
+    var half = Math.min(50, Math.abs(r.c) * 50);
+    fill.style.position = 'absolute';
+    fill.style.width = half + '%';
+    fill.style.left = (r.c < 0 ? 50 - half : 50) + '%';
+    fill.style.background = r.c < 0 ? 'var(--green)' : 'var(--red)';
+    track.appendChild(fill);
+    var val = document.createElement('div'); val.className = 'bar-val num';
+    val.textContent = signed(r.c);
+    wrap.appendChild(lab); wrap.appendChild(track); wrap.appendChild(val);
+    bars.appendChild(wrap);
+  });
+
+  /* how often was the hedge actually there, on a rolling three-year view */
+  var neg = 0, tot = 0, worst = null;
+  for (var k = D.a + 36; k < D.b; k++) {
+    var cc = correlation(k - 36, k);
+    tot++;
+    if (cc < 0) neg++;
+    if (!worst || cc > worst.c) worst = { c: cc, m: D.months[k - 1] };
+  }
+  addStat(stats, Math.round(neg / tot * 100) + '%', 'lose',
+    'of the rolling three-year windows since ' + D.months[D.a].slice(0, 4) +
+    ' had stocks and long bonds moving opposite ways. The strategy needs that to be the normal case.');
+  if (worst) {
+    addStat(stats, signed(worst.c), 'lose',
+      'the most tightly they ever moved together, in the three years to ' + ym(worst.m) +
+      '. Both legs fall at once in a stretch like that, and leverage multiplies both.');
+  }
+
+  document.getElementById('corrNote').textContent =
+    'A bar to the left of centre is a decade where long bonds rose when stocks fell, which is ' +
+    'what the strategy is buying. A bar to the right is a decade where they fell together. ' +
+    'The 2010s are the furthest left in the whole record, and that is the decade the strategy ' +
+    'was designed in.';
+}
+
+/* ---------- wiring ---------- */
+document.getElementById('ws').addEventListener('input', function () {
+  ST.ws = Math.round(clamp(this.value, 0, 100, 55) / 5) * 5;
+  render();
+});
+document.getElementById('lev').addEventListener('input', function () {
+  ST.lev = Math.round(clamp(this.value, 1, 3, 3) * 2) / 2;
+  render();
+});
+
+document.getElementById('copyBtn').addEventListener('click', function () {
+  var ok = document.getElementById('copyOk');
+  var url = location.href;
+  function flash() { ok.classList.add('on'); setTimeout(function () { ok.classList.remove('on'); }, 1600); }
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(url).then(flash, flash);
+  } else {
+    /* older Safari: a temporary field is the only reliable path */
+    var tmp = document.createElement('input');
+    tmp.value = url; document.body.appendChild(tmp); tmp.select();
+    try { document.execCommand('copy'); } catch (e) {}
+    document.body.removeChild(tmp); flash();
+  }
+});
+
+readUrl();
+render();
+
+fetch('returns.json').then(function (r) {
+  if (!r.ok) throw new Error('no data');
+  return r.json();
+}).then(function (j) {
+  D = prep(j);
+  if (!D) FAILED = true;
+  render();
+}).catch(function () {
+  FAILED = true; render();
+});
+})();
+</script>
+</body>
+</html>
