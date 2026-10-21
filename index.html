@@ -672,10 +672,80 @@ function targetsRaw(){ return S.preset==='Custom' ? (S.targets || computeTargets
 
 /* ---------- persistence ---------- */
 function save(){ try{ localStorage.setItem('driftcalc-v1', JSON.stringify(S)); }catch(e){} }
+function sanitizeState(raw){
+  /* Anything out of storage or an imported file is untrusted. It may be a file
+     from another app, a half-written backup, or a state from a much older
+     build. A bad one used to be written straight to localStorage and then throw
+     on every later load, which left the page broken with no way back that a
+     normal person would find.
+
+     This repairs in place rather than whitelisting, so fields this version does
+     not know about survive a round trip instead of being quietly dropped. */
+  if(!raw || typeof raw !== 'object' || Array.isArray(raw)) return null;
+
+  /* Repairing anything object-shaped into a valid empty state would accept a
+     file from some other app and report "Data imported" after quietly wiping
+     the portfolio. A backup has to look like one of ours first. */
+  const KNOWN = ['accounts','equityPct','intlPct','tiltPct','preset','targets','customClasses','plan','ytd'];
+  if(!KNOWN.some(k => Object.prototype.hasOwnProperty.call(raw, k))) return null;
+  /* present but the wrong type is a corrupt backup, not an empty one, and
+     emptying somebody's accounts is not a repair */
+  if(raw.accounts !== undefined && !Array.isArray(raw.accounts)) return null;
+
+  const num = (v, lo, hi, dflt) => { const n = +v; return isFinite(n) ? Math.min(hi, Math.max(lo, n)) : dflt; };
+  const s = raw;
+
+  if(!Array.isArray(s.accounts)) s.accounts = [];
+  s.accounts = s.accounts.filter(a => a && typeof a === 'object' && !Array.isArray(a));
+  s.accounts.forEach(a => {
+    if(typeof a.id !== 'string' || !a.id) a.id = uid();
+    if(typeof a.name !== 'string') a.name = 'Account';
+    if(typeof a.type !== 'string') a.type = 'Taxable';
+    if(!Array.isArray(a.holdings)) a.holdings = [];
+    a.holdings = a.holdings.filter(h => h && typeof h === 'object' && !Array.isArray(h));
+    a.holdings.forEach(h => {
+      if(typeof h.id !== 'string' || !h.id) h.id = uid();
+      if(typeof h.ticker !== 'string') h.ticker = '';
+      if(typeof h.cls !== 'string') h.cls = 'US';
+      h.bal = num(h.bal, 0, 1e12, 0);
+    });
+  });
+
+  s.equityPct = num(s.equityPct, 0, 100, 90);
+  if(s.intlPct != null) s.intlPct = num(s.intlPct, 0, 100, MARKET_INTL);
+  if(s.tiltPct != null) s.tiltPct = num(s.tiltPct, 0, 100, 0);
+  if(typeof s.preset !== 'string') s.preset = 'Market portfolio';
+
+  if(s.targets && typeof s.targets === 'object' && !Array.isArray(s.targets)){
+    const t = {};
+    for(const k in s.targets){
+      /* assigning a key named __proto__ would run the setter rather than store
+         a target, so it never gets copied across */
+      if(k === '__proto__' || !Object.prototype.hasOwnProperty.call(s.targets, k)) continue;
+      const v = num(s.targets[k], 0, 100, 0);
+      if(v > 0) t[k] = v;
+    }
+    s.targets = Object.keys(t).length ? t : null;
+  } else s.targets = null;
+
+  if(!Array.isArray(s.customClasses)) s.customClasses = [];
+  s.customClasses = s.customClasses.filter(c => c && typeof c === 'object' && !Array.isArray(c) && typeof c.id === 'string');
+
+  if(!s.plan || typeof s.plan !== 'object' || Array.isArray(s.plan)) s.plan = {};
+  s.plan.income  = num(s.plan.income, 0, 1e12, 0);
+  s.plan.savePct = num(s.plan.savePct, 0, 100, 20);
+  s.plan.monthly = num(s.plan.monthly, 0, 1e12, 0);
+  s.plan.target  = num(s.plan.target, 0, 1e15, 1000000);
+
+  if(!s.ytd || typeof s.ytd !== 'object' || Array.isArray(s.ytd)) s.ytd = {};
+  return s;
+}
 function load(){
   try{
     const raw = localStorage.getItem('driftcalc-v1') || localStorage.getItem('nextdollar-v1') || localStorage.getItem('allocate-v1');
-    if(raw){ S = JSON.parse(raw); migrate(); return; }
+    /* repair on the way in too, so anyone already carrying a broken state
+       recovers on their next visit instead of staying stuck */
+    if(raw){ const s = sanitizeState(JSON.parse(raw)); if(s){ S = s; migrate(); return; } }
   }catch(e){}
   FIRST_VISIT = true;
   S = DEFAULT(); loadSample(true);
@@ -723,7 +793,24 @@ function dismissBackup(){ S.backupDismissed = true; save(); renderBackupNote(); 
 function importJSON(inp){
   const f = inp.files[0]; if(!f) return;
   const r = new FileReader();
-  r.onload = e => { try{ S = JSON.parse(e.target.result); save(); renderAll(); toast('Data imported'); }catch(err){ toast('Could not read that file'); } };
+  r.onload = e => {
+    const before = S;
+    try{
+      const incoming = sanitizeState(JSON.parse(e.target.result));
+      if(!incoming) throw new Error('not a backup');
+      /* render BEFORE saving. The old order wrote the file to localStorage and
+         then threw, so a wrong file broke the page on every load after it. */
+      const had = before && before.accounts ? before.accounts.length : 0;
+      S = incoming; migrate(); renderAll(); save();
+      toast(S.accounts.length ? 'Data imported'
+        : had ? 'Imported, but that file had no accounts in it'
+              : 'Imported. That file had no accounts in it');
+    }catch(err){
+      S = before;
+      try{ renderAll(); }catch(e2){}
+      toast('That does not look like a Drift Calc backup');
+    }
+  };
   r.readAsText(f); inp.value='';
 }
 function loadSample(silent){
