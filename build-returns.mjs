@@ -328,8 +328,15 @@ async function main() {
     series.LONGBOND.push(longBonds.has(m) ? round(longBonds.get(m)) : null);
     series.CASH.push(us && us.RF != null ? round(us.RF) : null);
 
+    /* A month-over-month change is only that if the month before it is really
+       the month before. BLS published no October 2025 CPI, and taking the next
+       available key would have labelled two months of inflation as one. When
+       the previous reading is not the previous month, there is no honest
+       one-month figure, so emit null and let the consumers skip it. */
     const i = cpiIdx.has(m) ? cpiIdx.get(m) : -1;
-    series.CPI.push(i > 0 ? round(cpi.get(m) / cpi.get(cpiKeys[i - 1]) - 1) : null);
+    const prevKey = i > 0 ? cpiKeys[i - 1] : null;
+    const adjacent = prevKey != null && monthGap(prevKey, m) === 1;
+    series.CPI.push(adjacent ? round(cpi.get(m) / cpi.get(prevKey) - 1) : null);
   }
 
   console.log('\nShape checks:');
@@ -364,6 +371,7 @@ async function main() {
       'Emerging markets has no free long-history series, so EM is backtested as international.',
       'International starts July 1990. Backtests that include it cannot begin earlier.',
       'These are index returns with no fund fees, bid-ask spreads, or taxes subtracted.',
+      'CPI is a month-over-month change and is null for any month whose previous month was not published. October 2025 was not published, so October and November 2025 both read null.',
       'LONGBOND is a modelled rolling par 20-year Treasury, not a tradeable index. Treasury issued no 20-year between 1987 and late 1993, so the 30-year yield stands in for those years and the duration is longer across that stretch.',
       'LONGBOND exists for the 20+ year leveraged strategies. Modelling those on the 10-year understates both their volatility and their drawdowns.',
     ],
