@@ -109,7 +109,11 @@ function run(w, lo, hi) {
     if (v > peak) peak = v;
     if (v / peak - 1 < dd) dd = v / peak - 1;
     for (const k of keys) bal[k] /= tot;
-    if ((i - lo + 1) % 12 === 0) bal = { ...w };
+    /* Calendar year end, the same convention the backtest uses. Counting twelve
+       months from the first month of the window rebalances in April or June
+       depending on the mix, and the two pages then disagree about the same
+       portfolio by up to 0.14 points a year. */
+    if (MONTHS[i].slice(4) === '12') bal = { ...w };
     path.push(v);
   }
   const n = hi - lo;
