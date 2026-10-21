@@ -32,6 +32,11 @@ jobs:
           set -o pipefail
           node build-returns.mjs 2>&1 | tee build.log
 
+      - name: Rebuild the comparison pages from the new data
+        run: |
+          set -o pipefail
+          node build-pages.mjs 2>&1 | tee -a build.log
+
       - name: Refuse to ship data that failed its own checks
         run: |
           if grep -q "CHECK THIS" build.log; then
@@ -40,6 +45,10 @@ jobs:
           fi
           if [ ! -s returns.json ]; then
             echo "::error::returns.json is missing or empty."
+            exit 1
+          fi
+          if [ ! -s compare.html ] || [ -z "$(ls -A compare 2>/dev/null)" ]; then
+            echo "::error::the comparison pages are missing or empty."
             exit 1
           fi
           echo "Checks passed."
@@ -61,11 +70,11 @@ jobs:
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           rm -f build.log
-          git add returns.json
+          git add returns.json compare.html compare sitemap.xml
           if git diff --cached --quiet; then
-            echo "returns.json is unchanged, nothing to commit."
+            echo "Nothing changed, nothing to commit."
           else
-            git commit -m "Update returns.json ($(date -u +%Y-%m-%d))"
+            git commit -m "Update returns.json and the comparison pages ($(date -u +%Y-%m-%d))"
             git push
             echo "Committed."
           fi
