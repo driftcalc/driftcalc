@@ -115,7 +115,39 @@ function rollingVar(series, window) {
 var RET = null, W = {}, UNKNOWN = 0, PROXIED = 0, PROXIED_NAMES = [];
 /* the classes that get modelled as something else, named for the note under the donut */
 var SRC_NAMES = { EM:'Emerging markets', INTLSCV:'International small-cap value' };
-var UI = { start:null, rebal:'annual', lev:2, spread:1.5, asset:'mix', method:'margin', years:50 };
+/* ---------- what it costs to actually hold a mix ----------
+ * returns.json carries total returns only, with no split between income and
+ * price, so the dividend and coupon a real holder pays tax on cannot be read
+ * out of the data. These two are stated assumptions, printed on the page, and
+ * STOCK_YIELD is the same 1.8% the LEAPS model already uses. Change both here
+ * or the two will disagree.
+ *
+ * What this models: the fund fee, and the tax on income in a taxable account.
+ * What it does not: capital gains tax when you rebalance, capital gains tax
+ * when you finally sell, bid-ask spreads, and state tax. Every one of those
+ * makes a taxable account worse, so the net figure here is still the kind end
+ * of the range. */
+var STOCK_YIELD = 1.8;   /* % a year, the dividend a broad stock fund throws off */
+var BOND_YIELD  = 4.0;   /* % a year, the coupon a broad bond fund throws off */
+var BOND_CLASSES = { BOND:1, LONGBOND:1 };
+
+var UI = { start:null, rebal:'annual', lev:2, spread:1.5, asset:'mix', method:'margin', years:50,
+           er:0.05, account:'deferred', divTax:15 };
+
+/* Monthly drag from fees and income tax, as a decimal. */
+function costPerMonth(w) {
+  var ks = keysOf(w), stock = 0, bond = 0, i;
+  for (i = 0; i < ks.length; i++) {
+    if (BOND_CLASSES[ks[i]]) bond += w[ks[i]]; else stock += w[ks[i]];
+  }
+  var tot = stock + bond;
+  if (tot > 0) { stock /= tot; bond /= tot; }
+  var fee = UI.er / 100;
+  var taxed = UI.account === 'taxable'
+    ? (stock * STOCK_YIELD / 100 + bond * BOND_YIELD / 100) * (UI.divTax / 100)
+    : 0;
+  return { monthly: (fee + taxed) / 12, fee: fee, tax: taxed, stock: stock, bond: bond };
+}
 
 /* ---------- read the saved allocation ---------- */
 
@@ -212,7 +244,8 @@ function run(w, from, to, _rebal, lev, spreadAnnual, method, VARS) {
 }
 
 /* Unlevered path with honest rebalancing behaviour (drift between rebalances). */
-function runPlain(w, from, to, rebal) {
+function runPlain(w, from, to, rebal, cost) {
+  cost = cost || 0;
   var M = RET.months, S = RET.series, ks = keysOf(w);
   var val = 1, hold = {}, i, j;
   for (j = 0; j < ks.length; j++) hold[ks[j]] = w[ks[j]];
@@ -223,6 +256,9 @@ function runPlain(w, from, to, rebal) {
     if (skip) continue;
     var nv = 0;
     for (j = 0; j < ks.length; j++) { hold[ks[j]] *= (1 + S[ks[j]][i]); nv += hold[ks[j]]; }
+    /* fees and tax come off the whole position, so the sleeves shrink together
+       and the mix is unchanged by paying them */
+    if (cost) { nv *= 1 - cost; for (j = 0; j < ks.length; j++) hold[ks[j]] *= 1 - cost; }
     var prev = val; val = nv;
     var yr = M[i].slice(0, 4);
     byYear[yr] = (byYear[yr] == null ? 1 : byYear[yr]) * (val / prev);
@@ -302,13 +338,79 @@ window.showTab = function (which) {
   });
 };
 window.setUI = function (k, v) {
-  UI[k] = (k === 'lev' || k === 'spread') ? parseFloat(v) : v;
+  UI[k] = (k === 'lev' || k === 'spread' || k === 'er' || k === 'divTax') ? parseFloat(v) : v;
   /* each product borrows at a different price, so move the slider with it */
   if (k === 'method') UI.spread = METHODS[v].spread;
   if (k === 'years') UI.years = parseInt(v, 10);
   if (k === 'lev' || k === 'spread' || k === 'asset' || k === 'method' || k === 'years') renderLev();
   else renderHist();
 };
+
+
+/* ---------- the cost controls ----------
+ * Each option says what the number means, because "0.60%" on its own tells a
+ * reader nothing about whether that is normal or outrageous. */
+function feeOpts() {
+  var opts = [
+    [0.00, 'None, for comparison'],
+    [0.03, '0.03%, a big index fund'],
+    [0.05, '0.05%, a typical index fund'],
+    [0.20, '0.20%, a cheap active fund'],
+    [0.60, '0.60%, a typical active fund'],
+    [1.00, '1.00%, an expensive one']
+  ];
+  return opts.map(function (o) {
+    return '<option value="' + o[0].toFixed(2) + '"' +
+      (Math.abs(UI.er - o[0]) < 0.001 ? ' selected' : '') + '>' + o[1] + '</option>';
+  }).join('');
+}
+
+function taxOpts() {
+  var opts = [
+    [0,    '0%, qualified and under the threshold'],
+    [15,   '15%, where most people land'],
+    [18.8, '18.8%, with the 3.8% surtax'],
+    [23.8, '23.8%, top bracket with the surtax'],
+    [37,   '37%, all of it taxed as ordinary income']
+  ];
+  return opts.map(function (o) {
+    return '<option value="' + o[0] + '"' +
+      (Math.abs(UI.divTax - o[0]) < 0.001 ? ' selected' : '') + '>' + o[1] + '</option>';
+  }).join('');
+}
+
+/* What the costs took, and the larger list of what is still not in here. */
+function costNote(C, gross, net, lastMonth) {
+  var annual = (C.fee + C.tax) * 100;
+  if (annual <= 0) {
+    return '<div class="note"><b>No costs are in these numbers.</b> That is the setting above: ' +
+      'no fund fee and a tax-sheltered account. Switch either control and every figure on this ' +
+      'tab moves to what you would have kept.</div>';
+  }
+  var gone = 1e4 * (gross.val - net.val);
+  var pp = (cagr(gross.val, gross.n) - cagr(net.val, net.n)) * 100;
+  return '<div class="note">' +
+    '<b>Costs took ' + money(gone) + ' of that.</b> ' +
+    'Paying ' + annual.toFixed(2) + '% a year' +
+    (C.tax > 0
+      ? ' (a ' + (C.fee * 100).toFixed(2) + '% fund fee, plus ' + (C.tax * 100).toFixed(2) +
+        '% in tax on income) '
+      : ' in fund fees ') +
+    'cost ' + pp.toFixed(2) + ' points of annual return over this stretch, which compounds into ' +
+    money(gone) + ' by ' + lastMonth.slice(0, 4) + '. The fee is charged whether the mix went up or down.' +
+    '<br><br>' +
+    '<b>What the tax figure assumes.</b> That a stock fund pays ' + STOCK_YIELD.toFixed(1) +
+    '% a year in dividends and a bond fund pays ' + BOND_YIELD.toFixed(1) + '% in interest, and ' +
+    'that you are taxed on that income every year at the rate above. Your mix is ' +
+    Math.round(C.stock * 100) + '% stocks, ' + Math.round(C.bond * 100) + '% bonds. The return data ' +
+    'here is total return with no split between income and price, so those two yields are ' +
+    'assumptions rather than history.' +
+    '<br><br>' +
+    '<b>Still not in here, and all of it makes a taxable account worse.</b> Capital gains tax when ' +
+    'rebalancing sells something, capital gains tax when you finally sell, the bid-ask spread on ' +
+    'every trade, and state tax. The net figure above is the kind end of the range, not the floor.' +
+    '</div>';
+}
 
 /* ---------- history tab ---------- */
 
@@ -324,10 +426,16 @@ function renderHist() {
   var from = UI.start ? Math.max(earliest, M.indexOf(UI.start)) : earliest;
   var to = M.length - 1;
 
-  var mine = runPlain(W, from, to, UI.rebal);
-  var allUS = runPlain({ US:1 }, from, to, UI.rebal);
-  var sixty = runPlain({ US:0.6, BOND:0.4 }, from, to, UI.rebal);
-  var drift = runPlain(W, from, to, 'none');
+  var C = costPerMonth(W);
+  var gross = runPlain(W, from, to, UI.rebal);
+  var mine  = runPlain(W, from, to, UI.rebal, C.monthly);
+  /* each comparison pays its own costs: a bond-heavy mix throws off more
+     taxable income than a stock-heavy one, so reusing your mix's drag here
+     would flatter 60/40 against you */
+  var usW = { US:1 }, sixtyW = { US:0.6, BOND:0.4 };
+  var allUS = runPlain(usW, from, to, UI.rebal, costPerMonth(usW).monthly);
+  var sixty = runPlain(sixtyW, from, to, UI.rebal, costPerMonth(sixtyW).monthly);
+  var drift = runPlain(W, from, to, 'none', C.monthly);
 
   var infl = 1, im = 0;
   for (var i = from; i <= to; i++) if (RET.series.CPI[i] != null) { infl *= 1 + RET.series.CPI[i]; im++; }
@@ -366,6 +474,18 @@ function renderHist() {
       '</select></label>' +
       '<span style="color:var(--faint);font-size:13px">' + M[from].slice(0, 4) + '&ndash;' + M[to].slice(0, 4) + ', ' + Math.round(mine.n / 12) + ' years</span>' +
     '</div>' +
+    '<div class="ctlbar">' +
+      '<label class="ctl">Fund fee <select onchange="setUI(&#39;er&#39;,this.value)">' +
+        feeOpts() +
+      '</select></label>' +
+      '<label class="ctl">Held in <select onchange="setUI(&#39;account&#39;,this.value)">' +
+        '<option value="deferred"' + (UI.account === 'deferred' ? ' selected' : '') + '>A 401(k) or IRA</option>' +
+        '<option value="taxable"' + (UI.account === 'taxable' ? ' selected' : '') + '>A taxable account</option>' +
+      '</select></label>' +
+      (UI.account === 'taxable'
+        ? '<label class="ctl">Tax on income <select onchange="setUI(&#39;divTax&#39;,this.value)">' + taxOpts() + '</select></label>'
+        : '') +
+    '</div>' +
     '<div class="strip">' +
       '<div class="stat"><div class="k">$10,000 became</div><div class="v num">' + money(1e4 * mine.val) + '</div><div class="s">by ' + M[to].slice(0, 4) + '</div></div>' +
       '<div class="stat"><div class="k">A year</div><div class="v num">' + pct(g) + '</div><div class="s">compounded</div></div>' +
@@ -377,9 +497,14 @@ function renderHist() {
     '<div class="card"><table>' +
       '<tr><th>&nbsp;</th><th>Ended with</th><th>A year</th><th>Worst drop</th></tr>' +
       '<tr class="me"><td>Your mix</td><td class="num">' + money(1e4 * mine.val) + '</td><td class="num">' + pct(g) + '</td><td class="num">' + pct(mine.maxDD) + '</td></tr>' +
+      (C.monthly > 0
+        ? '<tr><td class="dim">Your mix, before costs</td><td class="dim num">' + money(1e4 * gross.val) +
+          '</td><td class="dim num">' + pct(cagr(gross.val, gross.n)) + '</td><td class="dim num">' + pct(gross.maxDD) + '</td></tr>'
+        : '') +
       rows + '</table>' +
       '<div class="note" style="margin-top:12px"><b>Reading this.</b> &ldquo;Never rebalanced&rdquo; is the same mix left alone, so you can see what rebalancing did. &ldquo;Worst drop&rdquo; is peak to bottom, the number that decides whether you would have stuck with it.</div>' +
     '</div>' +
+    costNote(C, gross, mine, M[to]) +
     (worst ? '<div class="note">Worst year <b>' + worst.y + '</b>, ' + pct(worst.r) + '. Best <b>' + best.y + '</b>, +' + pct(best.r) +
       '. ' + yrs.length + ' full years, ' + down + ' negative.</div>' : '');
 }
