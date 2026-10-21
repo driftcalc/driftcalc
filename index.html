@@ -1119,7 +1119,7 @@ function overlapNote(a){
 function renderAccounts(){
   const el = document.getElementById('accounts');
   el.innerHTML = '';
-  if(!S.accounts.length){ el.innerHTML = '<div class="empty">No accounts yet. Add one, or load the sample data from the top bar.</div>'; }
+  if(!S.accounts.length){ el.innerHTML = '<div class="empty">No accounts yet. Use the buttons at the top of the page to add one or load sample numbers.</div>'; }
   S.accounts.forEach((a, ai)=>{
     const total = a.holdings.reduce((s,h)=>s+(+h.bal||0),0);
     const card = document.createElement('div'); card.className='card';

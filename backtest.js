@@ -639,3 +639,110 @@ if (hp && /A drift calculator|Put in your accounts/.test(hp.textContent)) {
     });
   });
 })();
+
+
+/* ---------- what an empty page should say ----------
+   renderOverview() hides the whole strip when there is nothing to total, which
+   is right, but it leaves a page carrying six separate "add something" notes
+   and no obvious first move. The growth card sits outside #overview, so it
+   stays on screen as an empty frame quoting a balance that is gone.
+
+   The sample-data button is also in the overflow menu now, because tidyHeader()
+   put it there, so the stock note telling people to find it "in the top bar"
+   points at something they cannot see. This puts both moves on the page. */
+(function firstRun() {
+  var HOST = 'firstRun';
+
+  function balance() {
+    if (typeof S === 'undefined' || !S || !S.accounts) return null;   /* not ready yet */
+    var t = 0;
+    S.accounts.forEach(function (a) {
+      (a.holdings || []).forEach(function (h) { t += (+h.bal || 0); });
+    });
+    return t;
+  }
+
+  function button(label, cls, fn) {
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.className = cls;
+    b.textContent = label;
+    b.addEventListener('click', fn);
+    return b;
+  }
+
+  function build() {
+    var box = document.createElement('div');
+    box.id = HOST;
+    box.className = 'card';
+    box.style.cssText = 'margin-bottom:18px';
+    box.appendChild(Object.assign(document.createElement('div'), { className: 'big-title' }));
+    box.appendChild(Object.assign(document.createElement('p'), {
+      style: 'color:var(--muted);font-size:14.5px;line-height:1.6;max-width:560px;margin-top:2px'
+    }));
+    box.appendChild(Object.assign(document.createElement('div'), {
+      style: 'display:flex;gap:10px;flex-wrap:wrap;margin-top:16px'
+    }));
+    return box;
+  }
+
+  /* Two different empty pages. With no accounts at all the move is to make one.
+     With an account already there and nothing in it, offering to add a second
+     empty account is the wrong button, so it points at the balance field. */
+  function fill(box, hasAccounts) {
+    box.children[0].textContent = hasAccounts ? 'No balances yet' : 'Nothing in here yet';
+    box.children[1].textContent = hasAccounts
+      ? 'Your account is below. Put a balance against a fund in it and this page fills in: ' +
+        'how far you have drifted from your target, and where the next contribution should go.'
+      : 'Put in one account and what it holds. This page then shows how far you have drifted ' +
+        'from your target and where the next contribution should go. Nothing you type leaves ' +
+        'this browser.';
+    var row = box.children[2];
+    row.textContent = '';
+    if (!hasAccounts) {
+      row.appendChild(button('Add your first account', 'btn primary', function () {
+        if (typeof addAccount === 'function') addAccount();
+      }));
+    }
+    row.appendChild(button('Show me with sample numbers', hasAccounts ? 'btn' : 'btn', function () {
+      if (typeof loadSample === 'function') loadSample();
+    }));
+  }
+
+  function paint() {
+    var ov = document.getElementById('overview');
+    if (!ov || !ov.parentNode) return;
+    var t = balance();
+    if (t === null) return;
+    var empty = t <= 0;
+
+    var box = document.getElementById(HOST);
+    if (empty && !box) {
+      ov.parentNode.insertBefore(build(), ov);
+      box = document.getElementById(HOST);
+    }
+    if (box) {
+      if (empty) fill(box, S.accounts.length > 0);
+      box.style.display = empty ? 'block' : 'none';
+    }
+
+    /* the growth chart draws the balance, so with no balance it is a blank frame */
+    var g = document.getElementById('growth');
+    var card = g && g.closest ? g.closest('.card') : null;
+    if (card) card.style.display = empty ? 'none' : '';
+  }
+
+  /* repaint whenever the page redraws. Both are plain function declarations, so
+     reassigning the global property also catches the page's own internal calls. */
+  ['renderAll', 'renderOverview'].forEach(function (name) {
+    var orig = window[name];
+    if (typeof orig !== 'function') return;
+    window[name] = function () {
+      var out = orig.apply(this, arguments);
+      try { paint(); } catch (e) {}
+      return out;
+    };
+  });
+
+  paint();
+})();
