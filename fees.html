@@ -68,12 +68,12 @@ input[type=range]{-webkit-appearance:none;appearance:none;height:28px;background
     <div class="controls">
       <div class="field">
         <span class="lbl">Portfolio balance</span>
-        <div class="money-wrap"><span>$</span><input type="text" id="bal" inputmode="numeric" value="250,000"></div>
+        <div class="money-wrap"><span>$</span><input type="text" id="bal" inputmode="numeric" value="250,000" aria-label="Amount invested, in dollars"></div>
       </div>
       <div class="field">
         <span class="lbl">Annual fee</span>
         <div style="display:flex;align-items:center;gap:12px">
-          <input type="range" id="fee" min="0" max="2" step="0.05" value="1">
+          <input type="range" id="fee" min="0" max="2" step="0.05" value="1" aria-label="Yearly fee, percent of the balance">
           <span class="readout num" id="feeOut">1.00%</span>
         </div>
       </div>
