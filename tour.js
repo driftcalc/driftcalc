@@ -101,38 +101,81 @@ function injectStyle() {
   if (document.getElementById('tqStyle')) return;
   var css =
     'html.tq-lock,html.tq-lock body{overflow:hidden}' +
-    '.tq-back{position:fixed;inset:0;z-index:1000;background:rgba(11,31,59,.5);display:flex;' +
-      'padding:16px;overflow-y:auto;-webkit-overflow-scrolling:touch}' +
-    '.tq{margin:auto;width:100%;max-width:540px;background:var(--card);color:var(--ink);' +
-      'border-radius:14px;padding:22px 22px 18px;box-shadow:0 12px 40px rgba(11,31,59,.25)}' +
-    '.tq-top{display:flex;align-items:center;justify-content:space-between;gap:12px;' +
-      'font-size:12.5px;color:var(--muted);font-weight:600}' +
-    '.tq-x{font:inherit;font-size:22px;line-height:1;border:0;background:none;color:var(--muted);' +
-      'cursor:pointer;min-width:44px;min-height:44px;margin:-12px -12px -12px 0;border-radius:8px}' +
+    '.tq-back{position:fixed;inset:0;z-index:1000;display:flex;align-items:center;justify-content:center;padding:24px;' +
+      'background:rgba(11,31,59,.62);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);animation:tqFade .18s ease-out}' +
+    '.tq{display:flex;flex-direction:column;width:100%;max-width:560px;max-height:calc(100vh - 48px);max-height:calc(100dvh - 48px);' +
+      'background:var(--card);color:var(--ink);border-radius:18px;box-shadow:0 24px 60px rgba(11,31,59,.32);overflow:hidden;' +
+      'animation:tqUp .22s cubic-bezier(.2,.8,.2,1)}' +
+
+    /* header: label, close, progress */
+    '.tq-head{flex:none;padding:18px 22px 14px;border-bottom:1px solid transparent;transition:border-color .15s}' +
+    '.tq-head.sh{border-bottom-color:var(--hairline)}' +
+    '.tq-top{display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:11.5px;font-weight:700;' +
+      'letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}' +
+    '.tq-x{font:inherit;font-size:24px;font-weight:400;line-height:1;border:0;background:none;color:var(--muted);cursor:pointer;' +
+      'min-width:44px;min-height:44px;margin:-12px -14px -12px 0;border-radius:10px}' +
     '.tq-x:hover{color:var(--ink);background:var(--hairline)}' +
-    '.tq-bar{height:4px;background:var(--hairline);border-radius:4px;margin:6px 0 18px;overflow:hidden}' +
-    '.tq-bar i{display:block;height:100%;background:var(--accent);border-radius:4px;transition:width .2s}' +
-    '.tq h2{font-family:var(--disp);font-size:21px;line-height:1.25;margin:0 0 6px;outline:none}' +
-    '.tq-intro{color:var(--muted);font-size:14px;line-height:1.55;margin:0 0 14px}' +
-    '.tq-opts{display:flex;flex-direction:column;gap:8px}' +
-    '.tq-opt{display:flex;gap:12px;align-items:flex-start;border:1px solid var(--border);border-radius:10px;' +
-      'padding:12px 14px;cursor:pointer;transition:border-color .15s,background .15s}' +
-    '.tq-opt:hover{border-color:#CBD5E4}' +
-    '.tq-opt.on{border-color:var(--accent);background:var(--accent-soft)}' +
-    '.tq-opt input{flex:none;width:18px;height:18px;margin:2px 0 0;accent-color:var(--accent)}' +
-    '.tq-opt b{display:block;font-size:14.5px;font-weight:600}' +
-    '.tq-opt small{display:block;color:var(--muted);font-size:13px;line-height:1.5;margin-top:2px}' +
-    '.tq-opt small+small{margin-top:0}' +
-    '.tq-nav{display:flex;justify-content:space-between;gap:10px;margin-top:18px}' +
-    '.tq-nav .btn{min-height:44px;padding:10px 18px;font-size:14px}' +
-    '.tq-nav .btn[disabled]{opacity:.45;cursor:not-allowed}' +
-    '.tq-note{font-size:13px;color:var(--muted);margin-top:12px}' +
-    '@media (max-width:420px){.tq{padding:18px 16px 14px}.tq h2{font-size:19px}}';
+    '.tq-steps{display:flex;gap:6px;margin-top:8px}' +
+    '.tq-steps i{flex:1;height:5px;border-radius:5px;background:var(--hairline);transition:background .25s}' +
+    '.tq-steps i.done{background:var(--accent)}' +
+
+    /* the question, which scrolls on its own so the buttons never leave the screen */
+    '.tq-main{flex:1 1 auto;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding:8px 22px 22px}' +
+    '.tq-main.in{animation:tqIn .2s ease-out}' +
+    '.tq h2{font-family:var(--disp);font-size:23px;font-weight:800;letter-spacing:-.01em;line-height:1.22;margin:0 0 8px;outline:none}' +
+    /* the heading takes focus so a screen reader reads the question; it is not a control */
+    '.tq h2:focus,.tq h2:focus-visible{outline:none;box-shadow:none}' +
+    '.tq-intro{color:var(--muted);font-size:14.5px;line-height:1.55;margin:0 0 18px}' +
+    '.tq-opts{display:flex;flex-direction:column;gap:10px}' +
+    '.tq-opt{display:flex;gap:13px;align-items:flex-start;border:1.5px solid var(--border);border-radius:12px;padding:14px 16px;' +
+      'cursor:pointer;background:var(--card);transition:border-color .15s,background .15s,box-shadow .15s;-webkit-tap-highlight-color:transparent}' +
+    '.tq-opt:hover{border-color:#B9C7DD}' +
+    '.tq-opt.on{border-color:var(--accent);background:var(--accent-soft);box-shadow:0 0 0 3px rgba(46,107,230,.12)}' +
+    '.tq-opt input{flex:none;width:20px;height:20px;margin:1px 0 0;accent-color:var(--accent);cursor:pointer}' +
+    '.tq-txt{flex:1;min-width:0}' +
+    '.tq-opt b{display:block;font-size:15px;font-weight:600;line-height:1.35}' +
+    '.tq-opt small{display:block;color:var(--muted);font-size:13px;line-height:1.5;margin-top:3px}' +
+    '.tq-opt small+small{margin-top:1px}' +
+
+    /* the fall, drawn: title on the left, the drop in red on the right, a bar under it */
+    '.tq-row{display:flex;align-items:baseline;justify-content:space-between;gap:10px}' +
+    '.tq-drop{flex:none;font-weight:800;font-size:16px;color:var(--red);font-variant-numeric:tabular-nums}' +
+    '.tq-bar{height:7px;border-radius:7px;background:var(--hairline);overflow:hidden;margin:8px 0 6px}' +
+    '.tq-bar i{display:block;height:100%;border-radius:7px;background:var(--red);opacity:.8}' +
+    '.tq-opt.on .tq-bar{background:#fff}' +
+
+    '.tq-note{font-size:13px;color:var(--muted);margin:14px 0 0;line-height:1.5}' +
+    '.tq-sum{margin-top:16px;padding:12px 14px;border-radius:12px;background:var(--bg);font-size:13.5px;line-height:1.55}' +
+    '.tq-sum span{display:block;font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin-bottom:2px}' +
+
+    /* footer, pinned */
+    '.tq-foot{flex:none;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;' +
+      'padding:14px 22px;padding-bottom:calc(14px + env(safe-area-inset-bottom));border-top:1px solid var(--hairline);background:var(--card)}' +
+    '.tq-foot .btn{min-height:46px;padding:10px 20px;font-size:14.5px;font-weight:600;border-radius:10px}' +
+    '.tq-foot .btn.primary{min-width:130px;margin-left:auto}' +
+    '.tq-foot .btn.primary[disabled]{background:var(--hairline);border-color:var(--hairline);color:var(--faint);cursor:not-allowed}' +
+
+    '@keyframes tqFade{from{opacity:0}}' +
+    '@keyframes tqUp{from{opacity:0;transform:translateY(12px) scale(.98)}}' +
+    '@keyframes tqSheet{from{opacity:0;transform:translateY(48px)}}' +
+    '@keyframes tqIn{from{opacity:0;transform:translateX(10px)}}' +
+
+    /* phones: a sheet that rises from the bottom, thumb-height buttons */
+    '@media (max-width:560px){' +
+      '.tq-back{align-items:flex-end;padding:0}' +
+      '.tq{max-width:none;max-height:calc(100vh - 20px);max-height:calc(100dvh - 20px);border-radius:20px 20px 0 0;animation-name:tqSheet}' +
+      '.tq-head{padding:14px 18px 12px}' +
+      '.tq-main{padding:6px 18px 18px}' +
+      '.tq-foot{padding:12px 18px;padding-bottom:calc(12px + env(safe-area-inset-bottom))}' +
+      '.tq h2{font-size:21px}' +
+      '.tq-foot .btn.primary{flex:1}' +
+    '}' +
+    '@media (prefers-reduced-motion:reduce){.tq-back,.tq,.tq-main.in{animation:none}}';
   document.head.appendChild(el('style', { id: 'tqStyle', text: css }));
 }
 
 /* ---------- the overlay ---------- */
-var box = null, back = null, opener = null, step = 0, ans = null, gated = false;
+var box = null, back = null, pane = null, opener = null, step = 0, ans = null, gated = false;
 
 function hasRealData() {
   if (typeof S === 'undefined' || !S || S.isSample || !Array.isArray(S.accounts)) return false;
@@ -152,7 +195,8 @@ function open() {
   back = el('div', { cls: 'tq-back' });
   box = el('div', { cls: 'tq', role: 'dialog', 'aria-modal': 'true', 'aria-labelledby': 'tqTitle' });
   back.appendChild(box);
-  back.addEventListener('mousedown', function (e) { if (e.target === back) close(); });
+  /* a stray tap outside only closes before any answers are given */
+  back.addEventListener('mousedown', function (e) { if (e.target === back && step <= 1 && !ans.route) close(); });
   back.addEventListener('keydown', onKey);
   document.body.appendChild(back);
   document.documentElement.classList.add('tq-lock');
@@ -163,7 +207,7 @@ function open() {
 function close(landed) {
   if (!back) return;
   back.parentNode.removeChild(back);
-  back = box = null;
+  back = box = pane = null;
   document.documentElement.classList.remove('tq-lock');
   if (landed) return;
   if (opener && opener.focus && document.body.contains(opener) && opener.offsetParent !== null) opener.focus();
@@ -171,6 +215,12 @@ function close(landed) {
 
 function onKey(e) {
   if (e.key === 'Escape' || e.key === 'Esc') { e.preventDefault(); close(); return; }
+  /* Enter on an answer moves on, the way it would in a form */
+  if (e.key === 'Enter' && e.target && e.target.tagName === 'INPUT') {
+    var go1 = box.querySelector('.tq-foot .btn.primary');
+    if (go1 && !go1.disabled) { e.preventDefault(); go1.click(); }
+    return;
+  }
   if (e.key !== 'Tab') return;
   var f = Array.prototype.filter.call(
     box.querySelectorAll('button,input,[tabindex="0"]'),
@@ -186,34 +236,47 @@ function shell(title, intro) {
   var x = el('button', { type: 'button', cls: 'tq-x', 'aria-label': 'Close' });
   x.textContent = '×';
   x.addEventListener('click', function () { close(); });
-  var label = step > 0 ? 'Question ' + step + ' of ' + TOTAL : 'Before you start';
-  box.appendChild(el('div', { cls: 'tq-top' }, [el('span', { text: label }), x]));
-  var bar = el('div', { cls: 'tq-bar' }, [el('i')]);
-  bar.firstChild.style.width = (step / TOTAL * 100) + '%';
-  box.appendChild(bar);
-  box.appendChild(el('h2', { id: 'tqTitle', tabindex: '-1', text: title }));
-  if (intro) box.appendChild(el('p', { cls: 'tq-intro', text: intro }));
+  var head = el('div', { cls: 'tq-head' }, [
+    el('div', { cls: 'tq-top' }, [el('span', { text: step > 0 ? 'Question ' + step + ' of ' + TOTAL : 'Before you start' }), x])
+  ]);
+  if (step > 0) {
+    var steps = el('div', { cls: 'tq-steps', 'aria-hidden': 'true' });
+    for (var i = 1; i <= TOTAL; i++) steps.appendChild(el('i', { cls: i <= step ? 'done' : '' }));
+    head.appendChild(steps);
+  }
+  box.appendChild(head);
+  pane = el('div', { cls: 'tq-main in' });
+  pane.appendChild(el('h2', { id: 'tqTitle', tabindex: '-1', text: title }));
+  if (intro) pane.appendChild(el('p', { cls: 'tq-intro', text: intro }));
+  box.appendChild(pane);
+  /* a line under the header only once the question has scrolled under it */
+  pane.addEventListener('scroll', function () { head.classList.toggle('sh', pane.scrollTop > 2); });
 }
 
 function nav(backFn, nextLabel, nextFn, ready) {
-  var row = el('div', { cls: 'tq-nav' });
-  var b = el('button', { type: 'button', cls: 'btn', text: 'Back' });
-  if (backFn) b.addEventListener('click', backFn); else b.style.visibility = 'hidden';
+  var row = el('div', { cls: 'tq-foot' });
+  if (backFn) {
+    var b = el('button', { type: 'button', cls: 'btn', text: 'Back' });
+    b.addEventListener('click', backFn);
+    row.appendChild(b);
+  }
   var n = el('button', { type: 'button', cls: 'btn primary', text: nextLabel });
   n.disabled = !ready;
   n.addEventListener('click', nextFn);
-  row.appendChild(b); row.appendChild(n);
+  row.appendChild(n);
   box.appendChild(row);
   return n;
 }
 
-/* one radio or checkbox per option, each a real labelled input */
+/* one radio or checkbox per option, each a real labelled input.
+   An option can bring its own body (o.body) in place of title and lines. */
 function options(type, name, list, isOn, onPick) {
   var wrap = el('div', { cls: 'tq-opts', role: type === 'radio' ? 'radiogroup' : 'group', 'aria-labelledby': 'tqTitle' });
   list.forEach(function (o) {
     var inp = el('input', { type: type, name: name, value: String(o.value) });
     inp.checked = !!isOn(o.value);
-    var txt = el('span', null, [el('b', { text: o.title })]);
+    var txt = o.body || el('span', null, [el('b', { text: o.title })]);
+    txt.classList.add('tq-txt');
     (o.lines || []).forEach(function (l) { txt.appendChild(el('small', { text: l })); });
     var lab = el('label', { cls: 'tq-opt' + (inp.checked ? ' on' : '') }, [inp, txt]);
     inp.addEventListener('change', function () {
@@ -224,7 +287,7 @@ function options(type, name, list, isOn, onPick) {
     });
     wrap.appendChild(lab);
   });
-  box.appendChild(wrap);
+  pane.appendChild(wrap);
   return wrap;
 }
 
@@ -234,7 +297,7 @@ function render() {
   if (!box) return;
   [gate, q1, q2, q3, q4, q5][step]();
   var t = document.getElementById('tqTitle');
-  if (t) t.focus();
+  if (t) { try { t.focus({ preventScroll: true }); } catch (e) { t.focus(); } }
 }
 
 /* ---------- step 0: only when there is real data to lose ---------- */
@@ -242,23 +305,20 @@ function gate() {
   shell('Start over?',
     'You already have accounts in here. Finishing these questions replaces them, balances and all. ' +
     'Save a backup first if you might want them back.');
-  var row = el('div', { cls: 'tq-nav' });
-  var left = el('div', { style: 'display:flex;gap:10px;flex-wrap:wrap' });
+  var row = el('div', { cls: 'tq-foot' });
   var c = el('button', { type: 'button', cls: 'btn', text: 'Cancel' });
   c.addEventListener('click', function () { close(); });
   var bk = el('button', { type: 'button', cls: 'btn', text: 'Save a backup' });
   bk.addEventListener('click', function () { if (typeof exportJSON === 'function') exportJSON(); });
-  left.appendChild(c); left.appendChild(bk);
   var go1 = el('button', { type: 'button', cls: 'btn primary', text: 'Start over' });
   go1.addEventListener('click', function () { go(1); });
-  row.appendChild(left); row.appendChild(go1);
-  row.style.flexWrap = 'wrap';
+  row.appendChild(c); row.appendChild(bk); row.appendChild(go1);
   box.appendChild(row);
 }
 
 /* ---------- step 1: why are you here ---------- */
 function q1() {
-  shell('What brought you here?');
+  shell('What brought you here?', 'Five quick questions, then this page fills in for you.');
   var next;
   options('radio', 'tq1', [
     { value: 'target', title: 'Pick a mix to aim for', lines: ['How much in stocks, bonds and overseas.'] },
@@ -282,40 +342,41 @@ function q1() {
 /* ---------- step 2: the fall ---------- */
 function q2() {
   shell('How big a fall could you sit through?',
-    'Stocks grow more and fall harder. Bonds grow less and soften the fall. ' +
-    'These are real falls from the market record, top to bottom. ' +
+    'Stocks grow more but fall harder. Bonds soften the fall. These are real drops, top to bottom. ' +
     'Pick the biggest one you could watch without selling.');
   var holder = el('div');
-  box.appendChild(holder);
+  pane.appendChild(holder);
   var next = nav(function () { go(1); }, 'Next', function () { go(3); }, ans.eq != null);
-  var note = el('p', { cls: 'tq-note', text: 'Loading the market record…' });
-  holder.appendChild(note);
+  holder.appendChild(el('p', { cls: 'tq-note', text: 'Loading the market record…' }));
 
   var asked = step;
   loadReturns().then(function (d) {
     if (!box || step !== asked) return;
     holder.textContent = '';
     var list = EQ.map(function (e) {
-      var lines = [];
-      if (d) {
-        var f = falls(d, e[0]);
-        var r = f.recent, a = f.all;
-        var left = Math.round(10000 * (1 - r.dd) / 100) * 100;
-        lines.push(years(r) + ': fell ' + Math.round(r.dd * 100) + '%. $10,000 became $' + left.toLocaleString('en-US') + '.');
-        /* bond data starts in 1953, so a mix with bonds has a shorter record than
-           all stocks does. Say which year each one goes back to. */
-        var since = a.start.slice(0, 4);
-        lines.push(a.peak !== r.peak
-          ? 'Worst since ' + since + ': ' + years(a).replace('In ', '') + ', fell ' + Math.round(a.dd * 100) + '%.'
-          : 'That was the worst since ' + since + '.');
-      }
-      return { value: e[0], title: e[1], lines: lines };
+      if (!d) return { value: e[0], title: e[1] };
+      var f = falls(d, e[0]), r = f.recent, a = f.all;
+      var pct = Math.round(r.dd * 100);
+      var left = Math.round(10000 * (1 - r.dd) / 100) * 100;
+      var bar = el('div', { cls: 'tq-bar', 'aria-hidden': 'true' }, [el('i')]);
+      bar.firstChild.style.width = pct + '%';
+      var body = el('span', null, [
+        el('span', { cls: 'tq-row' }, [el('b', { text: e[1] }), el('span', { cls: 'tq-drop', text: '−' + pct + '%' })]),
+        bar,
+        el('small', { text: years(r) + ': $10,000 fell to $' + left.toLocaleString('en-US') + '.' })
+      ]);
+      /* bond data starts in 1953, so a mix with bonds has a shorter record than
+         all stocks does. Say which year each one goes back to. */
+      var since = a.start.slice(0, 4);
+      body.appendChild(el('small', { text: a.peak !== r.peak
+        ? 'Worst since ' + since + ': fell ' + Math.round(a.dd * 100) + '%, ' + years(a).replace('In ', '') + '.'
+        : 'That was the worst since ' + since + '.' }));
+      return { value: e[0], body: body };
     });
-    /* options() appends to the box; move the list into its slot above the buttons */
-    var wrap = options('radio', 'tq2', list, function (v) { return ans.eq === v; }, function (v) {
+    /* options() appends to the pane; move the list into its slot */
+    holder.appendChild(options('radio', 'tq2', list, function (v) { return ans.eq === v; }, function (v) {
       ans.eq = v; next.disabled = false;
-    });
-    holder.appendChild(wrap);
+    }));
     holder.appendChild(el('p', { cls: 'tq-note', text: d
       ? 'You can change this any time with the stocks and bonds slider.'
       : 'Could not load the market record just now. Pick by the mix; you can change it any time.' }));
@@ -363,6 +424,15 @@ function q5() {
     if (on) ans.accts.push(v);
     next.disabled = !ans.accts.length;
   });
+  /* what they picked, in one place, before anything is written */
+  var bonds = 100 - ans.eq;
+  pane.appendChild(el('div', { cls: 'tq-sum' }, [
+    el('span', { text: 'Your mix' }),
+    document.createTextNode(
+      (bonds ? ans.eq + '% stocks, ' + bonds + '% bonds. ' : 'All stocks. ') +
+      (ans.intl ? ans.intl + '% of the stocks outside the US. ' : 'US stocks only. ') +
+      (ans.tilt ? ans.tilt + '% of the stocks in small value.' : 'No small-value tilt.'))
+  ]));
   next = nav(function () { go(4); }, 'Set it up', finish, ans.accts.length > 0);
 }
 
