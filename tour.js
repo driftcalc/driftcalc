@@ -1,4 +1,4 @@
-/* Drift Calc: the setup quiz.
+/* Drift Calc: the setup quiz, and a short tour of the page.
    Loaded after backtest.js, so S, DEFAULT(), sanitizeState(), migrate(), save()
    and renderAll() are all in scope and the page has its final shape.
 
@@ -101,7 +101,7 @@ function injectStyle() {
   if (document.getElementById('tqStyle')) return;
   var css =
     'html.tq-lock,html.tq-lock body{overflow:hidden}' +
-    '.tq-back{position:fixed;inset:0;z-index:1000;display:flex;align-items:center;justify-content:center;padding:24px;' +
+    '.tq-back{position:fixed;top:0;right:0;bottom:0;left:0;z-index:1000;display:flex;align-items:center;justify-content:center;padding:24px;' +
       'background:rgba(11,31,59,.62);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);animation:tqFade .18s ease-out}' +
     '.tq{display:flex;flex-direction:column;width:100%;max-width:560px;max-height:calc(100vh - 48px);max-height:calc(100dvh - 48px);' +
       'background:var(--card);color:var(--ink);border-radius:18px;box-shadow:0 24px 60px rgba(11,31,59,.32);overflow:hidden;' +
@@ -155,6 +155,21 @@ function injectStyle() {
     '.tq-foot .btn.primary{min-width:130px;margin-left:auto}' +
     '.tq-foot .btn.primary[disabled]{background:var(--hairline);border-color:var(--hairline);color:var(--faint);cursor:not-allowed}' +
 
+    /* the tour: a clear shade that catches clicks, a lit hole, a card */
+    '.tt-shade{position:fixed;top:0;right:0;bottom:0;left:0;z-index:990}' +
+    '.tt-hole{position:fixed;z-index:991;pointer-events:none;border-radius:14px;' +
+      'box-shadow:0 0 0 2px var(--accent),0 0 0 200vmax rgba(11,31,59,.55);' +
+      'transition:top .25s ease,left .25s ease,width .25s ease,height .25s ease,opacity .2s}' +
+    '.tt-card{position:fixed;z-index:992;left:50%;bottom:24px;transform:translateX(-50%);width:calc(100% - 48px);max-width:440px;' +
+      'background:var(--card);color:var(--ink);border-radius:16px;padding:16px 20px 16px;box-shadow:0 18px 50px rgba(11,31,59,.35);' +
+      'animation:tqFade .2s ease-out}' +
+    '.tt-card .tq-steps{margin-bottom:12px}' +
+    '.tt-card h2{font-family:var(--disp);font-size:19px;font-weight:800;margin:0 0 6px;outline:none}' +
+    '.tt-card h2:focus,.tt-card h2:focus-visible{outline:none;box-shadow:none}' +
+    '.tt-card p{margin:0;color:var(--muted);font-size:14.5px;line-height:1.55}' +
+    '.tt-nav{display:flex;gap:10px;margin-top:14px}' +
+    '.tt-nav .btn{min-height:44px;padding:10px 18px;font-size:14.5px;font-weight:600;border-radius:10px}' +
+    '.tt-nav .btn.primary{margin-left:auto;min-width:110px}' +
     '@keyframes tqFade{from{opacity:0}}' +
     '@keyframes tqUp{from{opacity:0;transform:translateY(12px) scale(.98)}}' +
     '@keyframes tqSheet{from{opacity:0;transform:translateY(48px)}}' +
@@ -169,8 +184,11 @@ function injectStyle() {
       '.tq-foot{padding:12px 18px;padding-bottom:calc(12px + env(safe-area-inset-bottom))}' +
       '.tq h2{font-size:21px}' +
       '.tq-foot .btn.primary{flex:1}' +
+      '.tt-card{left:0;right:0;bottom:0;transform:none;width:auto;max-width:none;border-radius:20px 20px 0 0;' +
+        'padding:14px 18px;padding-bottom:calc(14px + env(safe-area-inset-bottom))}' +
+      '.tt-nav .btn.primary{flex:1}' +
     '}' +
-    '@media (prefers-reduced-motion:reduce){.tq-back,.tq,.tq-main.in{animation:none}}';
+    '@media (prefers-reduced-motion:reduce){.tq-back,.tq,.tq-main.in,.tt-card{animation:none}.tt-hole{transition:none}}';
   document.head.appendChild(el('style', { id: 'tqStyle', text: css }));
 }
 
@@ -323,18 +341,14 @@ function q1() {
   options('radio', 'tq1', [
     { value: 'target', title: 'Pick a mix to aim for', lines: ['How much in stocks, bonds and overseas.'] },
     { value: 'drift', title: 'Check the accounts I have', lines: ['How far they have drifted and where new money should go.'] },
-    { value: 'look', title: 'Just looking', lines: ['Keep the sample numbers and poke around.'] }
+    { value: 'look', title: 'Just looking', lines: ['Keep the sample numbers and get a quick tour of the page.'] }
   ], function (v) { return ans.route === v; }, function (v) {
     ans.route = v;
     next.disabled = false;
-    next.textContent = v === 'look' ? 'Close' : 'Next';
+    next.textContent = v === 'look' ? 'Show me around' : 'Next';
   });
-  next = nav(gated ? function () { go(0); } : null, ans.route === 'look' ? 'Close' : 'Next', function () {
-    if (ans.route === 'look') {
-      close();
-      if (typeof toast === 'function') toast('The sample numbers stay. Set it up whenever you like.');
-      return;
-    }
+  next = nav(gated ? function () { go(0); } : null, ans.route === 'look' ? 'Show me around' : 'Next', function () {
+    if (ans.route === 'look') { close(true); startTour(); return; }
     go(2);
   }, !!ans.route);
 }
@@ -487,6 +501,206 @@ function land() {
   sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
+/* ======================= the tour =======================
+   Six stops on the page, each saying what that part is for. Hand-rolled: the
+   CSP rules out every tour library.
+
+   Nothing about the page is cached. backtest.js reorders and rebuilds the DOM,
+   so every stop finds its element by id when it is shown and measures it again
+   on every scroll and resize. A folded section is opened through its own header,
+   the same path a click takes, and folded back when the tour ends.
+
+   It only runs when there are numbers on the page. Over an empty page every
+   stop would point at a blank. */
+var STOPS = [
+  { id: 'statStrip', title: 'Where you stand', text: function () {
+      return 'Your whole portfolio in one row: how far off target you are, what it all adds up to, ' +
+        'and your mix of stocks and bonds.' +
+        (S && S.isSample ? ' These are sample numbers until you put in your own.' : '');
+    } },
+  { id: 's2', title: 'Your target', text: 'What you want to own, in percentages. Three dials set it: ' +
+      'stocks versus bonds, how much overseas, and an optional small-value tilt. ' +
+      'Everything else on the page measures against this.' },
+  { id: 's1', title: 'Your accounts', text: 'What you own today, one account at a time. Type a fund ' +
+      'like VTI and its balance. The page works out what kind of fund it is.' },
+  { id: 's3', title: 'This month', text: 'Type what you are adding this month. It shows which fund to ' +
+      'buy in which account to get closer to your target, without selling anything.' },
+  { id: 's5', title: 'Extras', text: 'Side math: what your fees cost over the years, what waiting ' +
+      'to invest costs, and how savings grow. None of it is required.' },
+  { sel: 'header .hmore > .btn', title: 'Back it up', text: 'Your numbers live in this browser and ' +
+      'nowhere else. Save a backup file from this menu now and then, so clearing your browser ' +
+      'does not erase them.' }
+];
+
+var tour = null;   /* { stops, i, shade, hole, card, opened, opener, raf } while running */
+
+function pageBalance() {
+  if (typeof S === 'undefined' || !S || !Array.isArray(S.accounts)) return 0;
+  var t = 0;
+  S.accounts.forEach(function (a) { (a.holdings || []).forEach(function (h) { t += (+h.bal || 0); }); });
+  return t;
+}
+
+function stopEl(st) { return st.id ? document.getElementById(st.id) : document.querySelector(st.sel); }
+function shown(n) { return !!(n && n.getClientRects().length && n.offsetParent !== null); }
+function inHeader(n) { return !!(n && n.closest && n.closest('header')); }
+function headerBottom() {
+  var h = document.querySelector('header');
+  return h ? Math.max(0, h.getBoundingClientRect().bottom) : 0;
+}
+function smooth() {
+  return !(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+}
+
+function startTour() {
+  if (tour) return;
+  if (back) close(true);
+  if (!(pageBalance() > 0)) {
+    if (typeof toast === 'function') toast('The tour needs numbers on the page. Set it up or load the sample first.');
+    return;
+  }
+  injectStyle();
+  /* the summary row hides itself when there is nothing to sum, so skip what is not there */
+  var stops = STOPS.filter(function (st) {
+    var n = stopEl(st);
+    if (!n) return false;
+    if (n.closest && n.closest('section')) return true;   /* a folded section still counts */
+    return shown(n);
+  });
+  if (!stops.length) return;
+
+  tour = { stops: stops, i: 0, opened: [], opener: document.activeElement, raf: 0 };
+  tour.shade = el('div', { cls: 'tt-shade' });
+  tour.hole = el('div', { cls: 'tt-hole', 'aria-hidden': 'true' });
+  tour.card = el('div', { cls: 'tt-card', role: 'dialog', 'aria-modal': 'true', 'aria-labelledby': 'ttTitle' });
+  document.body.appendChild(tour.shade);
+  document.body.appendChild(tour.hole);
+  document.body.appendChild(tour.card);
+  tour.card.addEventListener('keydown', tourKey);
+  tour.shade.addEventListener('click', function () { if (tour) tour.card.querySelector('#ttTitle').focus(); });
+  window.addEventListener('scroll', schedule, { passive: true });
+  window.addEventListener('resize', schedule);
+  showStop(0);
+}
+
+function endTour() {
+  if (!tour) return;
+  var t = tour;
+  tour = null;
+  window.removeEventListener('scroll', schedule);
+  window.removeEventListener('resize', schedule);
+  if (t.raf) cancelAnimationFrame(t.raf);
+  [t.shade, t.hole, t.card].forEach(function (n) { if (n.parentNode) n.parentNode.removeChild(n); });
+  /* fold back what the tour opened, through the header so the state is saved */
+  t.opened.forEach(function (id) {
+    var sec = document.getElementById(id);
+    var head = sec && sec.querySelector('.sec-head');
+    if (head && !sec.classList.contains('closed')) head.click();
+  });
+  if (t.opener && t.opener.focus && document.body.contains(t.opener) && t.opener.offsetParent !== null) {
+    try { t.opener.focus({ preventScroll: true }); } catch (e) { t.opener.focus(); }
+  }
+}
+
+function showStop(i) {
+  if (!tour) return;
+  tour.i = i;
+  var st = tour.stops[i];
+  var n = stopEl(st);
+  if (!n) { endTour(); return; }
+
+  var sec = n.tagName === 'SECTION' ? n : null;
+  if (sec && sec.classList.contains('closed')) {
+    var head = sec.querySelector('.sec-head');
+    if (head) { head.click(); tour.opened.push(sec.id); }
+  }
+
+  drawCard(st, i);
+  if (!inHeader(n)) {
+    var top = window.pageYOffset + n.getBoundingClientRect().top - headerBottom() - 14;
+    try { window.scrollTo({ top: Math.max(0, top), behavior: smooth() ? 'smooth' : 'auto' }); }
+    catch (e) { window.scrollTo(0, Math.max(0, top)); }
+  }
+  follow(1200);
+}
+
+/* Smooth scrolling runs for a while after the call, and Safari does not always
+   fire a last scroll event, so track the target every frame until it settles. */
+function follow(ms) {
+  var until = Date.now() + ms;
+  (function tick() {
+    if (!tour) return;
+    place();
+    if (Date.now() < until) requestAnimationFrame(tick);
+  })();
+}
+
+function drawCard(st, i) {
+  var c = tour.card, total = tour.stops.length;
+  c.textContent = '';
+  var x = el('button', { type: 'button', cls: 'tq-x', 'aria-label': 'End the tour' });
+  x.textContent = '×';
+  x.addEventListener('click', endTour);
+  c.appendChild(el('div', { cls: 'tq-top' }, [el('span', { text: (i + 1) + ' of ' + total }), x]));
+  var steps = el('div', { cls: 'tq-steps', 'aria-hidden': 'true' });
+  for (var k = 0; k < total; k++) steps.appendChild(el('i', { cls: k <= i ? 'done' : '' }));
+  c.appendChild(steps);
+  c.appendChild(el('h2', { id: 'ttTitle', tabindex: '-1', text: st.title }));
+  c.appendChild(el('p', { text: typeof st.text === 'function' ? st.text() : st.text }));
+  var row = el('div', { cls: 'tt-nav' });
+  if (i > 0) {
+    var b = el('button', { type: 'button', cls: 'btn', text: 'Back' });
+    b.addEventListener('click', function () { showStop(i - 1); });
+    row.appendChild(b);
+  }
+  var last = i === total - 1;
+  var nx = el('button', { type: 'button', cls: 'btn primary', text: last ? 'Done' : 'Next' });
+  nx.addEventListener('click', function () { if (last) endTour(); else showStop(i + 1); });
+  row.appendChild(nx);
+  c.appendChild(row);
+  var t = c.querySelector('#ttTitle');
+  try { t.focus({ preventScroll: true }); } catch (e) { t.focus(); }
+}
+
+function schedule() {
+  if (!tour || tour.raf) return;
+  tour.raf = requestAnimationFrame(function () { if (tour) { tour.raf = 0; place(); } });
+}
+
+/* measure the target fresh, and keep the hole between the header and the card */
+function place() {
+  if (!tour) return;
+  var n = stopEl(tour.stops[tour.i]);
+  if (!n) return;
+  var r = n.getBoundingClientRect(), pad = 8;
+  var vh = window.innerHeight, vw = document.documentElement.clientWidth;
+  var cardTop = tour.card.getBoundingClientRect().top;
+  var top = r.top - pad, bottom = r.bottom + pad;
+  if (!inHeader(n)) top = Math.max(top, headerBottom() + 4);
+  /* a tall section is lit down to the card and no further, so the card never sits on it */
+  bottom = Math.min(bottom, Math.min(cardTop, vh) - 12);
+  var h = tour.hole.style;
+  if (bottom - top < 24) { h.opacity = '0'; return; }
+  h.opacity = '1';
+  h.top = top + 'px';
+  h.left = Math.max(4, r.left - pad) + 'px';
+  h.width = (Math.min(vw - 4, r.right + pad) - Math.max(4, r.left - pad)) + 'px';
+  h.height = (bottom - top) + 'px';
+}
+
+function tourKey(e) {
+  if (!tour) return;
+  if (e.key === 'Escape' || e.key === 'Esc') { e.preventDefault(); endTour(); return; }
+  if (e.key === 'ArrowRight' && tour.i < tour.stops.length - 1) { e.preventDefault(); showStop(tour.i + 1); return; }
+  if (e.key === 'ArrowLeft' && tour.i > 0) { e.preventDefault(); showStop(tour.i - 1); return; }
+  if (e.key !== 'Tab') return;
+  var f = Array.prototype.filter.call(tour.card.querySelectorAll('button'), function (b) { return b.offsetParent !== null; });
+  if (!f.length) return;
+  var first = f[0], last = f[f.length - 1];
+  if (e.shiftKey && (document.activeElement === first || !tour.card.contains(document.activeElement))) { e.preventDefault(); last.focus(); }
+  else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+}
+
 /* ---------- the way in ----------
    A first visit loads sample data, so the sample banner is what a new visitor
    sees. The first-run block only appears once the page is empty. Both get the
@@ -504,6 +718,15 @@ function addEntries() {
   if (sb && !sb.querySelector('.tq-entry')) {
     var clear = sb.querySelector('button');
     sb.insertBefore(entryButton('btn tiny primary'), clear || null);
+    var tb = el('button', { type: 'button', cls: 'btn tiny tt-entry', text: 'Show me around' });
+    tb.addEventListener('click', startTour);
+    sb.insertBefore(tb, clear || null);
+  }
+  var menu = document.querySelector('header .hmenu');
+  if (menu && !menu.querySelector('.tt-entry')) {
+    var mb = el('button', { type: 'button', cls: 'btn ghost tiny tt-entry', text: 'Show me around' });
+    mb.addEventListener('click', startTour);
+    menu.insertBefore(mb, menu.firstChild);
   }
   var fr = document.getElementById('firstRun');
   var row = fr && fr.children[2];
@@ -534,4 +757,5 @@ if (/(^|[?&])setup=1(&|$)/.test(location.search.slice(1))) {
 }
 
 window.openSetupQuiz = open;
+window.startTour = startTour;
 })();
