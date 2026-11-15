@@ -510,8 +510,10 @@ function land() {
    on every scroll and resize. A folded section is opened through its own header,
    the same path a click takes, and folded back when the tour ends.
 
-   It only runs when there are numbers on the page. Over an empty page every
-   stop would point at a blank. */
+   It needs at least one account on the page. With accounts but no balances yet,
+   which is where the setup quiz leaves people, the summary row is hidden and
+   skipped, and the rest still has something to point at. With no accounts at
+   all every stop would point at a blank, so it does not run. */
 var STOPS = [
   { id: 'statStrip', title: 'Where you stand', text: function () {
       return 'Your whole portfolio in one row: how far off target you are, what it all adds up to, ' +
@@ -534,11 +536,8 @@ var STOPS = [
 
 var tour = null;   /* { stops, i, shade, hole, card, opened, opener, raf } while running */
 
-function pageBalance() {
-  if (typeof S === 'undefined' || !S || !Array.isArray(S.accounts)) return 0;
-  var t = 0;
-  S.accounts.forEach(function (a) { (a.holdings || []).forEach(function (h) { t += (+h.bal || 0); }); });
-  return t;
+function hasAccounts() {
+  return typeof S !== 'undefined' && !!S && Array.isArray(S.accounts) && S.accounts.length > 0;
 }
 
 function stopEl(st) { return st.id ? document.getElementById(st.id) : document.querySelector(st.sel); }
@@ -555,8 +554,8 @@ function smooth() {
 function startTour() {
   if (tour) return;
   if (back) close(true);
-  if (!(pageBalance() > 0)) {
-    if (typeof toast === 'function') toast('The tour needs numbers on the page. Set it up or load the sample first.');
+  if (!hasAccounts()) {
+    if (typeof toast === 'function') toast('The tour needs an account on the page. Set it up or load the sample first.');
     return;
   }
   injectStyle();
@@ -733,6 +732,13 @@ function addEntries() {
   if (row && !row.querySelector('.tq-entry')) {
     Array.prototype.forEach.call(row.querySelectorAll('button'), function (b) { b.className = 'btn'; });
     row.insertBefore(entryButton('btn primary'), row.firstChild);
+    /* accounts but no balances, which is where the quiz leaves people: the tour
+       is the next useful thing, so it goes right after the quiz button */
+    if (hasAccounts()) {
+      var ft = el('button', { type: 'button', cls: 'btn tt-entry', text: 'Show me around' });
+      ft.addEventListener('click', startTour);
+      row.insertBefore(ft, row.children[1] || null);
+    }
   }
 }
 

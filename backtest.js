@@ -708,7 +708,9 @@ if (hp && /A drift calculator|Put in your accounts/.test(hp.textContent)) {
   function fill(box, hasAccounts) {
     box.children[0].textContent = hasAccounts ? 'No balances yet' : 'Nothing in here yet';
     box.children[1].textContent = hasAccounts
-      ? 'Your account is below. Put a balance against a fund in it and this page fills in: ' +
+      ? (S.accounts.length > 1 ? 'Your accounts are below. Put a balance against a fund in each' :
+                                 'Your account is below. Put a balance against a fund in it') +
+        ' and this page fills in: ' +
         'how far you have drifted from your target, and where the next contribution should go.'
       : 'Put in one account and what it holds. This page then shows how far you have drifted ' +
         'from your target and where the next contribution should go. Nothing you type leaves ' +
