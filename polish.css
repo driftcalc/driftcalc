@@ -196,6 +196,23 @@ section.closed .sec-head.collapser{background:#FBFCFE}
   .hbtns::-webkit-scrollbar{display:none}
   .hbtns .btn{flex:none}
 }
+/* Support sits in the bar. On a phone the word goes and the heart stays. */
+header .hbtns .h-support{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.18);color:#fff}
+header .hbtns .h-support:hover{background:rgba(255,255,255,.18)}
+@media(max-width:479.98px){
+  header .hbtns{gap:6px}
+  header .hbtns .h-support{padding:4px 10px}
+  header .hbtns .h-support .h-support-txt{display:none}
+  /* the triangle is decoration; the word says where it goes */
+  header .hbtns .bt-nav span{display:none}
+  header .logo{white-space:nowrap;font-size:14px;gap:7px}
+  header .hbtns .hmore > .btn{padding:4px 7px}
+}
+/* smaller phones (iPhone SE and mini are 375) keep the logo mark and drop the
+   name, so every button fits without the bar scrolling sideways */
+@media(max-width:389.98px){
+  header .logo{font-size:0;gap:0}
+}
 
 /* ---------- respect people who don't want motion ---------- */
 @media (prefers-reduced-motion: reduce){
