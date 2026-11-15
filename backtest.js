@@ -308,9 +308,24 @@ if (hp && /A drift calculator|Put in your accounts/.test(hp.textContent)) {
 (function tidyHeader() {
   var bar = document.querySelector('header .hbtns');
   if (!bar) return;
+  /* Support stays in the bar where people can see it, the same as on the
+     backtest page. On a phone it shrinks to the heart so the bar still fits. */
+  var support = bar.querySelector('a[href*="ko-fi.com"]');
+  if (support) {
+    support.classList.add('h-support');
+    support.setAttribute('aria-label', 'Support Drift Calc on Ko-fi');
+    [].slice.call(support.childNodes).forEach(function (n) {
+      if (n.nodeType === 3 && n.textContent.trim()) {
+        var t = document.createElement('span');
+        t.className = 'h-support-txt';
+        t.textContent = n.textContent.trim();
+        support.replaceChild(t, n);
+      }
+    });
+  }
   var spill = [].slice.call(bar.children).filter(function (el) {
     if (el.tagName === 'INPUT') return false;          /* hidden file picker must stay where it is */
-    return !el.classList.contains('bt-nav') && !el.classList.contains('badge');
+    return el !== support && !el.classList.contains('bt-nav') && !el.classList.contains('badge');
   });
   if (spill.length < 2) return;
 
@@ -328,6 +343,7 @@ if (hp && /A drift calculator|Put in your accounts/.test(hp.textContent)) {
   spill.forEach(function (el) { menu.appendChild(el); });
   wrap.appendChild(btn);
   wrap.appendChild(menu);
+  if (support) bar.appendChild(support);   /* after Tools and Backtest, before the menu */
   bar.appendChild(wrap);
 
   function close() { wrap.classList.remove('open'); btn.setAttribute('aria-expanded', 'false'); }
