@@ -170,6 +170,22 @@ function injectStyle() {
     '.tt-nav{display:flex;gap:10px;margin-top:14px}' +
     '.tt-nav .btn{min-height:44px;padding:10px 18px;font-size:14.5px;font-weight:600;border-radius:10px}' +
     '.tt-nav .btn.primary{margin-left:auto;min-width:110px}' +
+    /* the nudge: a small card in the corner, no backdrop, never takes focus */
+    '.tn{position:fixed;z-index:95;right:20px;bottom:20px;width:320px;max-width:calc(100% - 24px);' +
+      'background:var(--card);color:var(--ink);border:1px solid var(--border);border-radius:14px;' +
+      'box-shadow:0 10px 30px rgba(11,31,59,.18);padding:14px 14px 14px 16px;display:flex;gap:12px;align-items:flex-start;' +
+      'animation:tnIn .35s cubic-bezier(.2,.8,.2,1)}' +
+    '.tn-ic{flex:none;width:34px;height:34px;border-radius:10px;background:var(--accent-soft);color:var(--accent);' +
+      'display:flex;align-items:center;justify-content:center;font-size:17px}' +
+    '.tn-txt{flex:1;min-width:0}' +
+    '.tn b{display:block;font-size:14.5px;font-weight:700;margin-top:1px}' +
+    '.tn p{margin:2px 0 10px;font-size:13px;line-height:1.45;color:var(--muted)}' +
+    '.tn .btn{min-height:38px;padding:8px 14px;font-size:13.5px;font-weight:600;border-radius:9px}' +
+    '.tn .tq-x{margin:-10px -8px 0 0;font-size:20px;min-width:40px;min-height:40px}' +
+    '.tn.out{opacity:0;transform:translateY(10px);transition:opacity .2s,transform .2s}' +
+    '@keyframes tnIn{from{opacity:0;transform:translateY(16px)}}' +
+    '@media (max-width:560px){.tn{left:12px;right:12px;width:auto;max-width:none;' +
+      'bottom:calc(12px + env(safe-area-inset-bottom))}}' +
     '@keyframes tqFade{from{opacity:0}}' +
     '@keyframes tqUp{from{opacity:0;transform:translateY(12px) scale(.98)}}' +
     '@keyframes tqSheet{from{opacity:0;transform:translateY(48px)}}' +
@@ -188,7 +204,7 @@ function injectStyle() {
         'padding:14px 18px;padding-bottom:calc(14px + env(safe-area-inset-bottom))}' +
       '.tt-nav .btn.primary{flex:1}' +
     '}' +
-    '@media (prefers-reduced-motion:reduce){.tq-back,.tq,.tq-main.in,.tt-card{animation:none}.tt-hole{transition:none}}';
+    '@media (prefers-reduced-motion:reduce){.tq-back,.tq,.tq-main.in,.tt-card,.tn{animation:none}.tt-hole,.tn.out{transition:none}}';
   document.head.appendChild(el('style', { id: 'tqStyle', text: css }));
 }
 
@@ -204,6 +220,7 @@ function hasRealData() {
 
 function open() {
   if (back) return;
+  dropNudge(true);
   injectStyle();
   opener = document.activeElement;
   ans = { route: null, eq: null, intl: null, tilt: null, accts: [] };
@@ -489,6 +506,8 @@ function finish() {
   close(true);
   land();
   if (typeof toast === 'function') toast('Done. Now put a balance in each account.');
+  /* after the toast has gone, so the two never stack */
+  setTimeout(showNudge, 3000);
 }
 
 /* open the accounts section through its own header, so the open state is saved */
@@ -553,6 +572,7 @@ function smooth() {
 
 function startTour() {
   if (tour) return;
+  dropNudge();
   if (back) close(true);
   if (!hasAccounts()) {
     if (typeof toast === 'function') toast('The tour needs an account on the page. Set it up or load the sample first.');
@@ -700,6 +720,51 @@ function tourKey(e) {
   else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
 }
 
+/* ---------- the nudge ----------
+   The tour buttons sit in the sample banner, the empty-page box and the header
+   menu, and people walked past all three. This is a small card in the corner,
+   once per browser. It shows a second after load, only when there is an account
+   on the page for the tour to point at, and goes for good the moment someone
+   takes the tour or closes the card. Opening the quiz only moves it aside: the
+   quiz ends on empty accounts, which is when the tour helps most, so it comes
+   back after. It never takes focus.
+   The "seen" flag is a convenience, so if storage is blocked the worst case is
+   seeing the card again. */
+var NUDGE_KEY = 'driftcalc-tour-nudge';
+var nudgeEl = null;
+
+function nudgeSeen() { try { return localStorage.getItem(NUDGE_KEY) === '1'; } catch (e) { return false; } }
+function markNudge() { try { localStorage.setItem(NUDGE_KEY, '1'); } catch (e) {} }
+
+function dropNudge(keep) {
+  if (!keep) markNudge();
+  if (!nudgeEl) return;
+  var n = nudgeEl;
+  nudgeEl = null;
+  n.classList.add('out');
+  setTimeout(function () { if (n.parentNode) n.parentNode.removeChild(n); }, 220);
+}
+
+function showNudge() {
+  if (nudgeEl || nudgeSeen() || back || tour || !hasAccounts()) return;
+  injectStyle();
+  var x = el('button', { type: 'button', cls: 'tq-x', 'aria-label': 'No thanks' });
+  x.textContent = '×';
+  x.addEventListener('click', function () { dropNudge(); });
+  var go1 = el('button', { type: 'button', cls: 'btn primary', text: 'Show me around' });
+  go1.addEventListener('click', function () { dropNudge(); startTour(); });
+  nudgeEl = el('div', { cls: 'tn', role: 'region', 'aria-label': 'Page tour' }, [
+    el('span', { cls: 'tn-ic', 'aria-hidden': 'true', text: '→' }),
+    el('div', { cls: 'tn-txt' }, [
+      el('b', { text: 'New here?' }),
+      el('p', { text: 'A 30-second tour shows what each part of the page does.' }),
+      go1
+    ]),
+    x
+  ]);
+  document.body.appendChild(nudgeEl);
+}
+
 /* ---------- the way in ----------
    A first visit loads sample data, so the sample banner is what a new visitor
    sees. The first-run block only appears once the page is empty. Both get the
@@ -761,6 +826,8 @@ if (/(^|[?&])setup=1(&|$)/.test(location.search.slice(1))) {
   } catch (e) {}
   open();
 }
+
+setTimeout(showNudge, 1200);
 
 window.openSetupQuiz = open;
 window.startTour = startTour;
