@@ -26,7 +26,7 @@
 <meta name="theme-color" content="#0B1F3B">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="polish.css?v=20261116">
+<link rel="stylesheet" href="polish.css?v=20261117">
 <style>
 :root{
   --bg:#F5F7FA; --card:#FFFFFF; --ink:#0B1F3B; --muted:#5B6B83; --faint:#93A1B5;
@@ -1181,7 +1181,7 @@ function renderRoom(){
     const left = Math.max(0, lim-done);
     return `<div class="c-inp">
       <label>${esc(a.name)} <span style="color:var(--faint)">· ${a.type} · limit ${fmt$(lim)}</span></label>
-      <div class="money-wrap"><span>$</span><input class="money num" inputmode="numeric" aria-label="Contributed so far this year to ${esc(a.name)}, in dollars" placeholder="0" value="${done||''}" onchange="S.ytd['${a.id}']=+this.value||0;save();renderRoom()"></div>
+      <div class="money-wrap"><span>$</span><input class="money num" inputmode="numeric" aria-label="Contributed so far this year to ${esc(a.name)}, in dollars" placeholder="0" value="${done||''}" onchange="S.ytd['${a.id}']=+this.value||0;save();renderRoom();renderContribs()"></div>
       <div class="stackbar" style="margin-top:7px"><div style="width:${pct}%;background:${pct>=100?'var(--green)':'var(--accent)'}"></div></div>
       <div style="font-size:12px;color:${left>0?'var(--muted)':'var(--green)'};margin-top:3px" class="num">${left>0?fmt$(left)+' of room left':'Maxed for '+LIMITS.year+' 🎉'}</div>
     </div>`;
@@ -1225,7 +1225,7 @@ function renderAccounts(){
         <tr><th style="width:26%">Fund</th><th>Asset class</th><th style="width:26%;text-align:right">Balance</th><th style="width:26px"></th></tr>
         ${a.holdings.map((h, hi)=>`<tr>
           <td><input class="inp" aria-label="${esc(a.name)}, fund ${hi+1} ticker" value="${esc(h.ticker)}" placeholder="VTI" onchange="upHold('${a.id}','${h.id}','ticker',this.value)"></td>
-          <td><select class="inp" aria-label="${esc(a.name)}, fund ${hi+1} asset class" onchange="upHold('${a.id}','${h.id}','cls',this.value)">
+          <td><select class="inp" aria-label="${esc(a.name)}, fund ${hi+1} asset class" onchange="upHold('${a.id}','${h.id}','cls',this.value)"${SPLITS[(h.ticker||'').toUpperCase().trim()]?' disabled title="Set by the fund itself. See the split underneath."':''}>
             ${Object.keys(BUILTIN_CLASSES).map(c=>`<option value="${c}" ${c===h.cls?'selected':''}>${CLASSES[c].name}</option>`).join('')}
             ${Object.keys(CUSTOM_CLASSES).length?`<optgroup label="Your categories">${Object.keys(CUSTOM_CLASSES).map(c=>`<option value="${c}" ${c===h.cls?'selected':''}>${esc(CLASSES[c].name)}</option>`).join('')}</optgroup>`:''}
           </select>${splitNote(h.ticker)}</td>
@@ -1581,7 +1581,10 @@ function delAcct(id){
   S.isSample=false; S.accounts.splice(i,1); save(); renderAll();
   toastUndo(`Removed ${gone.name}.`, ()=>{ S.accounts.splice(i,0,gone); save(); renderAll(); });
 }
-function upAcct(id,k,v){ const a=S.accounts.find(x=>x.id===id); if(a){S.isSample=false; a[k]=v; save(); renderDrift();} }
+function upAcct(id,k,v){ const a=S.accounts.find(x=>x.id===id); if(a){S.isSample=false; a[k]=v; save(); renderDrift();
+  /* the contribution boxes and the room card both quote the account's name and
+     its type's limit, and used to keep the old ones until the next reload */
+  if(k==='type'||k==='name'){ renderContribs(); renderRoom(); } } }
 function addHold(aid){ const a=S.accounts.find(x=>x.id===aid); if(a){a.holdings.push({id:uid(),ticker:'',cls:'US',bal:0}); save(); renderAccounts();} }
 function delHold(aid,hid){
   const a = S.accounts.find(x=>x.id===aid); if(!a) return;
@@ -1832,7 +1835,7 @@ stampAsOf();
   }catch(e){ /* fallbacks stay in effect */ }
 })();
 </script>
-<script src="backtest.js?v=20261116"></script>
-<script src="tour.js?v=20261116"></script>
+<script src="backtest.js?v=20261117"></script>
+<script src="tour.js?v=20261117"></script>
 </body>
 </html>
