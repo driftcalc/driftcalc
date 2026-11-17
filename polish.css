@@ -236,4 +236,6 @@ header .hbtns .h-support:hover{background:rgba(255,255,255,.18)}
   @keyframes underline{from{transform:scaleX(0);opacity:.5}to{transform:scaleX(1);opacity:.18}}
 }
 
-
+/* a fund the page splits by itself (VXUS, VT, target-date funds) ignores the
+   asset class picker, so the picker is greyed out rather than left looking live */
+table.hold select.inp:disabled{opacity:.55;cursor:not-allowed;background:transparent}

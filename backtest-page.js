@@ -659,11 +659,11 @@ function renderLev() {
     '<div class="ctlgrid">' +
       '<div class="field"><span class="lbl">How much leverage</span>' +
         '<div style="display:flex;align-items:center;gap:12px">' +
-          '<input type="range" min="1" max="3" step="0.1" value="' + UI.lev + '" oninput="setUI(&#39;lev&#39;,this.value)" style="width:190px">' +
+          '<input type="range" aria-label="How much leverage" min="1" max="3" step="0.1" value="' + UI.lev + '" oninput="setUI(&#39;lev&#39;,this.value)" style="width:190px">' +
           '<span class="readout num">' + UI.lev.toFixed(1) + 'x</span></div></div>' +
       '<div class="field"><span class="lbl">Interest above T-bills</span>' +
         '<div style="display:flex;align-items:center;gap:12px">' +
-          '<input type="range" min="0" max="5" step="0.05" value="' + UI.spread + '" oninput="setUI(&#39;spread&#39;,this.value)" style="width:150px">' +
+          '<input type="range" aria-label="Interest above T-bills, percent a year" min="0" max="5" step="0.05" value="' + UI.spread + '" oninput="setUI(&#39;spread&#39;,this.value)" style="width:150px">' +
           '<span class="readout num">' + UI.spread.toFixed(2) + '%</span></div>' +
         '<span style="font-size:12px;color:var(--faint);line-height:1.5;max-width:250px;display:block">' +
           'Typical for ' + METHODS[UI.method].noun +
