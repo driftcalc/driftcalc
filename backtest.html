@@ -46,7 +46,21 @@ header{background:var(--navy);position:sticky;top:0;z-index:50;box-shadow:0 1px 
 .hbar{display:flex;align-items:center;justify-content:space-between;height:60px;gap:12px}
 .logo{font-weight:700;font-size:16.5px;letter-spacing:-.02em;display:flex;align-items:center;gap:9px;color:#fff;font-family:var(--disp);text-decoration:none}
 .logo-mark{width:24px;height:24px;border-radius:7px;background:var(--accent);display:flex;align-items:center;justify-content:center}
-.hbtns{display:flex;align-items:center;gap:8px}
+.hbtns{display:flex;align-items:center;gap:8px;min-width:0}
+/* Four buttons did not fit a phone, so the whole page scrolled sideways. Same
+   answer as the home page: Support shrinks to the heart, the spacing tightens,
+   and on the narrowest phones the logo keeps its mark and drops the name. If
+   it still does not fit, the bar scrolls on its own rather than the page. */
+@media(max-width:599.98px){
+  header .wrap{padding:0 16px}
+  .hbtns{gap:6px;overflow-x:auto;scrollbar-width:none}
+  .hbtns::-webkit-scrollbar{display:none}
+  .hbtns .btn{flex:none}
+  .hbtns .btn.tiny{padding:4px 9px}
+  .h-sup-txt{display:none}
+  .logo{white-space:nowrap}
+}
+@media(max-width:429.98px){.logo{font-size:0;gap:0}}
 .btn{font-family:inherit;font-size:13px;font-weight:500;border:1px solid var(--border);background:var(--card);color:var(--ink);border-radius:8px;padding:7px 13px;cursor:pointer;transition:all .15s;text-decoration:none;display:inline-block}
 .btn.tiny{font-size:12px;padding:5px 10px}
 .btn.ghost{border-color:rgba(255,255,255,.18);background:transparent;color:#B9C6DB}
@@ -118,7 +132,7 @@ footer{margin-top:44px;padding:26px 0 60px;border-top:1px solid var(--border);fo
     <a class="btn ghost tiny" href="/">Calculator</a>
     <a class="btn ghost tiny" href="/tools.html">Tools</a>
     <a class="btn ghost tiny" href="/backtest.html" aria-current="page">Backtest</a>
-    <a class="btn tiny" href="https://ko-fi.com/driftcalc" target="_blank" rel="noopener"><span style="color:var(--accent)">&hearts;</span> Support</a>
+    <a class="btn tiny h-sup" href="https://ko-fi.com/driftcalc" target="_blank" rel="noopener" aria-label="Support Drift Calc on Ko-fi"><span style="color:var(--accent)">&hearts;</span><span class="h-sup-txt"> Support</span></a>
   </div>
 </div></header>
 
