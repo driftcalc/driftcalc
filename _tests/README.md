@@ -20,6 +20,7 @@ They need Playwright. Claude's cloud sessions already have it. There is no
 | `boot.test.js` | Every page loads with no script errors, no NaN or Infinity on screen, and no sideways scrolling, on a desktop and a phone. |
 | `urls.test.js` | Junk in the URL (`?eq=1e400`, `?fee=<script>`, `__proto__`, repeated keys) on every page that reads it. |
 | `state.test.js` | Junk in saved data, and bad backup files. The page must still draw, survive a reload, and leave the portfolio alone. |
+| `import.test.js` | A crafted backup cannot run script or break out of an attribute. Safe ids, and the links between accounts, holdings, and categories, still round-trip. |
 | `controls.test.js` | Dead controls: every slider, dropdown, number box and toggle is moved, and must change something on the page. |
 | `structure.test.js` | Duplicate ids, unlabelled inputs, nameless buttons, skipped headings, missing alt text. Includes the quiz and tour. |
 | `index.test.js` | Home page bugs the sweeps can only half see: stale room card and contribution hints, the split-fund picker. |

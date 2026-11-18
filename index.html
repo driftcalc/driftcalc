@@ -694,17 +694,23 @@ function sanitizeState(raw){
 
   const num = (v, lo, hi, dflt) => { const n = +v; return isFinite(n) ? Math.min(hi, Math.max(lo, n)) : dflt; };
   const s = raw;
+  /* Ids are pasted into inline handlers, onchange="upAcct('${a.id}',...)".
+     Names go through esc(). Ids do not, and script-src allows 'unsafe-inline',
+     so a quote or angle bracket in an id runs as script. Only the characters
+     this page generates are kept. Anything else is replaced, and whatever
+     pointed at it (a holding's class, a target, year-to-date, this month's
+     contribution) points at the replacement, so the portfolio still lines up. */
+  const idOk = id => typeof id === 'string' && /^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$/.test(id)
+    && id !== '__proto__' && id !== 'constructor' && id !== 'prototype';
 
   if(!Array.isArray(s.accounts)) s.accounts = [];
   s.accounts = s.accounts.filter(a => a && typeof a === 'object' && !Array.isArray(a));
   s.accounts.forEach(a => {
-    if(typeof a.id !== 'string' || !a.id) a.id = uid();
     if(typeof a.name !== 'string') a.name = 'Account';
     if(typeof a.type !== 'string') a.type = 'Taxable';
     if(!Array.isArray(a.holdings)) a.holdings = [];
     a.holdings = a.holdings.filter(h => h && typeof h === 'object' && !Array.isArray(h));
     a.holdings.forEach(h => {
-      if(typeof h.id !== 'string' || !h.id) h.id = uid();
       if(typeof h.ticker !== 'string') h.ticker = '';
       if(typeof h.cls !== 'string') h.cls = 'US';
       h.bal = num(h.bal, 0, 1e12, 0);
@@ -716,28 +722,87 @@ function sanitizeState(raw){
   if(s.tiltPct != null) s.tiltPct = num(s.tiltPct, 0, 100, 0);
   if(typeof s.preset !== 'string') s.preset = 'Market portfolio';
 
-  if(s.targets && typeof s.targets === 'object' && !Array.isArray(s.targets)){
-    const t = {};
-    for(const k in s.targets){
-      /* assigning a key named __proto__ would run the setter rather than store
-         a target, so it never gets copied across */
-      if(k === '__proto__' || !Object.prototype.hasOwnProperty.call(s.targets, k)) continue;
-      const v = num(s.targets[k], 0, 100, 0);
-      if(v > 0) t[k] = v;
-    }
-    s.targets = Object.keys(t).length ? t : null;
-  } else s.targets = null;
-
   if(!Array.isArray(s.customClasses)) s.customClasses = [];
   s.customClasses = s.customClasses.filter(c => c && typeof c === 'object' && !Array.isArray(c) && typeof c.id === 'string');
+  s.customClasses.forEach(c => {
+    /* the color picker writes this into value=""; only a hex code is safe there */
+    if(typeof c.color !== 'string' || !/^#[0-9a-fA-F]{3,6}$/.test(c.color)) c.color = '#888';
+  });
+
+  const used = new Set();
+  const note = id => { if(idOk(id)) used.add(id); };
+  s.accounts.forEach(a => { note(a.id); a.holdings.forEach(h => note(h.id)); });
+  s.customClasses.forEach(c => note(c.id));
+  const alloc = () => {
+    let id;
+    do { id = uid(); } while(!idOk(id) || used.has(id));
+    used.add(id);
+    return id;
+  };
+  /* one unsafe string shared by two records keeps one replacement, so a
+     contribution and the account it belongs to do not drift apart */
+  const rewrite = (id, map) => {
+    if(idOk(id)) return id;
+    if(typeof id === 'string' && id && map.has(id)) return map.get(id);
+    const next = alloc();
+    if(typeof id === 'string' && id) map.set(id, next);
+    return next;
+  };
+  const acctMap = new Map();
+  const clsMap = new Map();
+  s.accounts.forEach(a => {
+    a.id = rewrite(a.id, acctMap);
+    a.holdings.forEach(h => { if(!idOk(h.id)) h.id = alloc(); });
+  });
+  s.customClasses.forEach(c => { c.id = rewrite(c.id, clsMap); });
+  s.accounts.forEach(a => a.holdings.forEach(h => {
+    if(typeof h.cls === 'string' && clsMap.has(h.cls)) h.cls = clsMap.get(h.cls);
+    else if(!idOk(h.cls)) h.cls = 'US';
+  }));
+
+  if(s.targets && typeof s.targets === 'object' && !Array.isArray(s.targets)){
+    const t = {};
+    Object.keys(s.targets).forEach(k => {
+      /* a replaced category id has to take its target with it; a key named
+         __proto__ is never copied under that name, or the assignment would
+         hit the setter instead of storing a target */
+      const nk = clsMap.has(k) ? clsMap.get(k) : k;
+      if(!idOk(nk)) return;
+      const v = num(s.targets[k], 0, 100, 0);
+      if(v > 0) t[nk] = v;
+    });
+    s.targets = Object.keys(t).length ? t : null;
+  } else s.targets = null;
 
   if(!s.plan || typeof s.plan !== 'object' || Array.isArray(s.plan)) s.plan = {};
   s.plan.income  = num(s.plan.income, 0, 1e12, 0);
   s.plan.savePct = num(s.plan.savePct, 0, 100, 20);
   s.plan.monthly = num(s.plan.monthly, 0, 1e12, 0);
   s.plan.target  = num(s.plan.target, 0, 1e15, 1000000);
+  /* These three are written straight into value="" (and the month count into
+     the sentence). A missing one stays missing; a present one has to be a
+     number or the attribute breaks open. */
+  const fixNum = (key, lo, hi, dflt) => {
+    if(!Object.prototype.hasOwnProperty.call(s.plan, key) || s.plan[key] == null) return;
+    s.plan[key] = num(s.plan[key], lo, hi, dflt);
+  };
+  fixNum('advPct', 0, 100, 1);
+  fixNum('waitK', 0, 1e15, 10000);
+  fixNum('waitM', 0, 10000, 12);
 
+  const remapNums = (obj, map) => {
+    const out = {};
+    if(!obj || typeof obj !== 'object' || Array.isArray(obj)) return out;
+    Object.keys(obj).forEach(k => {
+      const nk = map.has(k) ? map.get(k) : k;
+      if(!idOk(nk)) return;
+      out[nk] = num(obj[k], 0, 1e12, 0);
+    });
+    return out;
+  };
   if(!s.ytd || typeof s.ytd !== 'object' || Array.isArray(s.ytd)) s.ytd = {};
+  else s.ytd = remapNums(s.ytd, acctMap);
+  if(s.contrib !== undefined) s.contrib = remapNums(s.contrib, acctMap);
   return s;
 }
 function load(){
@@ -1012,7 +1077,7 @@ function renderOverview(){
     const e={}; let tot=0;
     a.holdings.forEach(h=>{ const x=exposure(h); for(const c in x){ e[c]=(e[c]||0)+x[c]; tot+=x[c]; } });
     if(tot<=0) return '';
-    const segs2 = Object.keys(CLASSES).filter(c=>e[c]>0).map(c=>`<div style="width:${(e[c]/tot*100)}%;background:${CLASSES[c].color}" title="${CLASSES[c].name}: ${fmt$(e[c])}"></div>`).join('');
+    const segs2 = Object.keys(CLASSES).filter(c=>e[c]>0).map(c=>`<div style="width:${(e[c]/tot*100)}%;background:${CLASSES[c].color}" title="${esc(CLASSES[c].name)}: ${fmt$(e[c])}"></div>`).join('');
     return `<div class="arow"><div class="alab"><span>${esc(a.name)} <span style="color:var(--faint)">· ${(tot/total*100).toFixed(0)}% of portfolio</span></span><b class="num">${fmt$(tot)}</b></div><div class="stackbar">${segs2}</div></div>`;
   }).join('') || '<div class="empty">Add balances to see accounts.</div>';
   /* --- growth chart --- */
@@ -1126,7 +1191,7 @@ function renderAum(){
   el.innerHTML = `
     <div class="slider-row" style="margin-bottom:12px">
       <span class="end">0.25%</span>
-      <input type="range" min="0.25" max="2" step="0.05" aria-label="Advisor fee, percent per year" value="${p}" oninput="S.plan.advPct=+this.value;save();renderAum()">
+      <input type="range" min="0.25" max="2" step="0.05" aria-label="Advisor fee, percent per year" value="${esc(p)}" oninput="S.plan.advPct=+this.value;save();renderAum()">
       <span class="end">2%</span>
       <span class="split-read num">${p.toFixed(2)}%</span>
     </div>
@@ -1141,11 +1206,11 @@ function renderWait(){
   el.innerHTML = `
     <div class="contrib-grid" style="margin-bottom:12px">
       <div class="c-inp"><label>Cash on the sidelines</label>
-        <div class="money-wrap"><span>$</span><input class="money num" inputmode="numeric" aria-label="Cash on the sidelines, in dollars" value="${A||''}" onchange="S.plan.waitK=+this.value||0;save();renderWait()"></div></div>
-      <div class="c-inp"><label>Months of waiting: <b class="num">${mo}</b></label>
-        <input type="range" min="1" max="36" step="1" aria-label="Months of waiting" value="${mo}" style="margin-top:12px" oninput="S.plan.waitM=+this.value;save();renderWait()"></div>
+        <div class="money-wrap"><span>$</span><input class="money num" inputmode="numeric" aria-label="Cash on the sidelines, in dollars" value="${esc(A||'')}" onchange="S.plan.waitK=+this.value||0;save();renderWait()"></div></div>
+      <div class="c-inp"><label>Months of waiting: <b class="num">${esc(mo)}</b></label>
+        <input type="range" min="1" max="36" step="1" aria-label="Months of waiting" value="${esc(mo)}" style="margin-top:12px" oninput="S.plan.waitM=+this.value;save();renderWait()"></div>
     </div>
-    <div style="font-size:14px;line-height:1.7">Investing ${fmt$(A)} today versus sitting on it for ${mo} month${mo===1?'':'s'}: in the moderate 7% case, the 30-year difference is about <b class="num" style="font-family:var(--disp);color:var(--red)">${fmt$(cost)}</b>.</div>
+    <div style="font-size:14px;line-height:1.7">Investing ${fmt$(A)} today versus sitting on it for ${esc(mo)} month${mo===1?'':'s'}: in the moderate 7% case, the 30-year difference is about <b class="num" style="font-family:var(--disp);color:var(--red)">${fmt$(cost)}</b>.</div>
     <div style="font-size:12px;color:var(--faint);margin-top:10px">This is the arithmetic behind "time in the market beats timing the market." It assumes the moderate case holds during the wait, which nobody can know in advance. Sometimes waiting wins. Historically it usually has not.</div>`;
 }
 function renderPlanner(){
@@ -1396,7 +1461,7 @@ function renderCustomCats(){
   el.style.display='block';
   const list = (S.customClasses||[]).map(c=>`
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:7px">
-      <input type="color" aria-label="Color for the ${esc(c.name)} category" value="${c.color}" onchange="upCategory('${c.id}','color',this.value)" style="width:30px;height:28px;border:1px solid var(--border);border-radius:6px;background:none;cursor:pointer;padding:1px" title="Pick a color">
+      <input type="color" aria-label="Color for the ${esc(c.name)} category" value="${esc(c.color)}" onchange="upCategory('${c.id}','color',this.value)" style="width:30px;height:28px;border:1px solid var(--border);border-radius:6px;background:none;cursor:pointer;padding:1px" title="Pick a color">
       <input class="inp" aria-label="Category name" value="${esc(c.name)}" onchange="upCategory('${c.id}','name',this.value)" style="border:1px solid var(--border);background:#fff;flex:1" placeholder="Gold, REITs, momentum…">
       <button class="x" title="Remove category" onclick="delCategory('${c.id}')">×</button>
     </div>`).join('');
@@ -1476,7 +1541,7 @@ function renderContribs(){
     return `
     <div class="c-inp">
       <label>${esc(a.name)}</label>
-      <div class="money-wrap"><span>$</span><input class="money num" inputmode="numeric" aria-label="Contribution to ${esc(a.name)} this month, in dollars" placeholder="0" value="${S.contrib[a.id]||''}" onchange="S.contrib['${a.id}']=+this.value||0;save();renderContribs()"></div>
+      <div class="money-wrap"><span>$</span><input class="money num" inputmode="numeric" aria-label="Contribution to ${esc(a.name)} this month, in dollars" placeholder="0" value="${esc(S.contrib[a.id]||'')}" onchange="S.contrib['${a.id}']=+this.value||0;save();renderContribs()"></div>
       ${hint}
     </div>`;}).join('') || '<div class="empty">Add an account first.</div>';
 }
