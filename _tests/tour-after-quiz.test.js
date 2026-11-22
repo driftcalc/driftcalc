@@ -15,8 +15,9 @@ async function page(w,h,seed){const p=await (await br.newContext({viewport:{widt
   await p.check('.tq input[name=tq5][value="401(k)"]'); await p.check('.tq input[name=tq5][value="Roth IRA"]'); await p.click('.tq-foot .btn.primary');
   await p.waitForTimeout(600);
   ok(await p.isVisible('#firstRun .tt-entry'),'after quiz: no tour button in the No balances box');
-  await p.evaluate(()=>scrollTo(0,0)); await p.waitForTimeout(300);
-  const fr=await (await p.$('#firstRun')).boundingBox(); await p.screenshot({path:'after-quiz-firstrun.png',clip:{x:0,y:fr.y-8,width:390,height:fr.height+16}});
+  /* screenshot the box itself: a clip from boundingBox() missed it when the page
+     was still scrolling, and threw "Clipped area is either empty or outside" */
+  await p.locator('#firstRun').screenshot({path:'after-quiz-firstrun.png'});
   await p.click('#firstRun .tt-entry');
   const n=await p.$$eval('.tt-card .tq-steps i',x=>x.length); ok(n===5,'after quiz stops '+n+' (summary row should be skipped)');
   ok((await p.textContent('#ttTitle'))==='Your target','first stop '+await p.textContent('#ttTitle'));
